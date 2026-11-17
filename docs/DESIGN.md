@@ -219,7 +219,7 @@ Why −0.47: the swap must happen under **pure** white. The screen point nearest
 | Hold | — | 0.1 s | — |
 | Fade | overlay opacity 1 → 0 | 0.45 s | `power2.out` |
 
-Used for: landing → first section break, question 15 → checking, results → retake.
+Used for: safety briefing TAKE OFF → first section break (§5b), Resume from the landing page, question 15 → checking, results → retake. (Start, landing → briefing, does not use it.)
 Reduced motion: no overlay, instant swap.
 
 ### 4.5 Count-up (`motion/countUp.js` → `countUp(el, to, {decimals, suffix, duration})`)
@@ -296,16 +296,51 @@ Below-the-fold sections: fade-up y 16 when 15% into the viewport (IntersectionOb
 
 ### 5.4 Motion — on Start
 
-The steps overlap so Start feels quick (≈ 1.7 s in total; the screen swaps at ≈ 1.15 s):
+Start leads to the safety briefing (§5b) with a quick transition, ≤ 0.6 s in total (the horizon glow now comes later, on TAKE OFF):
 
 | Time | Step |
 |---|---|
 | 0 | Buttons and meta fade to 0 (0.2 s) **and** headline glitch-out (§4.2, 0.57 s with stagger) start together. |
-| 0.285 s (glitch-out halfway) | Horizon glow (§4.4) starts rising; the rest of the glitch-out plays under it. |
-| ≈ 1.135 s | Swap under full white: the Vocabulary section break replaces the landing. The globe stops here (it is covered). |
-| ≈ 1.685 s | Glow has faded; transition complete. |
+| 0.285 s (glitch-out halfway) | Swap: the briefing replaces the landing (the rest of the glitch-out is cut). The globe stops here. |
+| 0.285 → ≈ 0.585 s | The briefing's header fades up (0.3 s, y 10 → 0, "soft", 40 ms apart) with its action bar. Its panels follow (§5b motion). |
 
-The glow's own steps (0.85 s rise + 0.1 s hold + 0.45 s fade = 1.4 s) set the floor: starting it at the glitch-out's halfway point gives ≈ 1.7 s.
+Resume (from the resume banner) still goes landing → section break / question through the horizon glow (§4.4).
+
+---
+
+## 5b. Screen: Safety briefing (`screens/briefing.js`)
+
+An airline safety-briefing card, shown once per check between the landing page's Start and the Vocabulary section break. Retake and Resume skip it. Text: `CONTENT.md` §5b.
+
+### 5b.1 Layout
+
+- Column max-width 1040px, padding 24px 20px (phone) / 40px 40px 56px (desktop), blocks 32px / 40px apart. Theme toggle top right.
+- **Header:** mono label `briefing.label` · Anton title `briefing.title` (`clamp(40px, 7vw, 84px)`) · muted `--fs-body-lg` line `briefing.intro`.
+- **Six panels** (`components/briefingArt.js`), grid gap 16px: 3×2 desktop (≥ 1024px), 2×3 tablet (640–1023px), 1 column phone. Each panel: `--surface`, radius card, padding 20px 24px 24px; a line illustration (inline SVG 220×72, 1.5px stroke, `--cobalt` + the theme's `--ink`, `aria-hidden`), a mono number "01"–"06" (cobalt, 12px), the title (Archivo 700 18px) and one muted line (15px).
+  1. Route map: dotted path with three cobalt stops labelled WORTSCHATZ · GRAMMATIK · LESEN (`SECTIONS[].de`), a paper plane at the start and a flag at the end.
+  2. Demo: a mini option list (3 options) and a mini "I'M SURE" button (`question.sure`). Its markup is the final frame (option 2 outlined, button filled, cursor hidden).
+  3. A coin marked "½" with a curved arrow.
+  4. A "?" in a cobalt circle and the underlined "I don't know this yet" (`question.unknown`).
+  5. An open book and a phone, crossed out by one cobalt diagonal line.
+  6. A back arrow and a small cobalt circular "saved / refresh" arrow.
+- **Seatbelt pledge** (`components/seatbelt.js`):
+  - A small **FASTEN SEATBELT** sign above the card: `--board` plate, radius 10px, padding 8px 14px, seat-and-belt icon + `briefing.seatbeltSign` in mono 12px. Unfastened: grey and 30% opacity. Fastened: lit `--board-alert` amber, full opacity, soft amber glow (`box-shadow 0 0 18px rgba(255,179,0,.45)`, text glow). Stays dark in both themes.
+  - The card is one `<label>` around a visually hidden real checkbox (its label is the pledge text), so a click anywhere on the card, or Space on the focused checkbox, toggles it. `--surface`, radius card, padding 20px 24px, a cobalt border when fastened, the focus ring on the card when the checkbox has keyboard focus. Contents: the belt (SVG 150×44: the strap and tongue on the left, the buckle housing with a cobalt release button on the right, 40px apart) and `briefing.pledge` (`--fs-body-lg`, 500). Phone: belt above the text; tablet/desktop: side by side.
+- **Actions:** text button `briefing.back` (to the landing page) and primary `briefing.takeOff` ("TAKE OFF →"). TAKE OFF is disabled until fastened; while disabled it shows `briefing.takeOffHint` under it (muted, 13px) and has `aria-describedby` pointing to it. Phone and tablet: the bar is **sticky at the bottom** (paper background, top hairline, safe-area padding), so TAKE OFF is in reach from the first panel; the button fills the bar on phones and keeps its own width on tablets. Desktop: in the flow under the pledge, Back left, TAKE OFF right.
+
+### 5b.2 Motion (`motion/briefingMotion.js`, `motion/seatbeltMotion.js`)
+
+| Time (from enter) | What | Animation |
+|---|---|---|
+| 0 | Header (label, title, line), action bar | Fade-up y 10, 0.3 s, "soft", 40 ms apart |
+| 0.1 | Panels | Fade-up y 16 while unfolding (`rotateX` 8° → 0, perspective 700px, origin top), 0.6 s, "soft", 70 ms apart |
+| 0.52 | Seatbelt sign + pledge | Fade-up y 10, 0.3 s |
+| 0.84 | Panel 3 coin | Flips once: `scaleX` 1 → 0.05 → 1 (0.4 s) with a 6px toss |
+| 1.05 (all panels in) | Panel 2 demo | A cursor dot appears, moves to option 2 and taps (scale 0.7, 80 ms each way), the option's outline draws (DrawSVG, 0.45 s); moves to "I'M SURE", taps, the fill sweeps left → right (`scaleX`, 0.35 s) and the label turns white; holds; the cursor fades. One loop is 3.5 s; 3 loops, ending on the final frame. |
+
+- **Fasten:** the tongue slides 52px into the buckle (0.25 s, `power3.in`), the belt gives a click shake (x 0 → 2 → −2 → 0, 0.15 s) and the sign lights up (0.2 s). **Unfasten:** the sign dims and the tongue slides back out (0.25 s, `power3.out`).
+- **TAKE OFF:** the button lifts 3px (0.15 s, `power2.out`), then the horizon glow (§4.4) carries the learner to the Vocabulary section break.
+- **Reduced motion:** no loops, no coin flip; the demo shows its final frame; fastening is instant; TAKE OFF goes straight to the glow-free swap.
 
 ---
 
@@ -644,7 +679,7 @@ If something nice-to-have is cut, its element still appears in its final, static
 
 **Landing (390×844):** copy first, globe below it with a soft fade at the bottom; buttons are full-width or side by side; nothing scrolls sideways.
 
-**Start:** headline glitches out, the cobalt glow rises and covers the page, and the Vocabulary section break appears as it fades; "WORTSCHATZ" slides behind "01 / 03 · VOCABULARY".
+**Start:** the headline glitches out and the safety briefing fades up (≤ 0.6 s): six panels unfold in, the coin flips, the panel-2 demo taps an option and "I'M SURE". Fastening the seatbelt slides the tongue into the buckle and lights the amber sign; TAKE OFF lifts, the cobalt glow rises and covers the page, and the Vocabulary section break appears as it fades; "WORTSCHATZ" slides behind "01 / 03 · VOCABULARY". On a phone the TAKE OFF bar is pinned to the bottom.
 
 **Questions:** the journey bar shows 15 dots with the plane on the current one; tapping an option draws a cobalt outline; the two confidence buttons switch on; "I'm sure" sweeps blue, "I guessed" wobbles; the plane hops to the next dot. On phones the confidence bar stays pinned at the bottom.
 

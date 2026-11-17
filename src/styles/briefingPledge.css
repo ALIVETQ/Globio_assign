@@ -1,0 +1,136 @@
+/* Safety briefing, lower half (DESIGN.md §5b): the FASTEN SEATBELT sign, the
+   pledge card with its buckle, and the TAKE OFF bar. */
+
+.seatbelt {
+  display: grid;
+  justify-items: start;
+  gap: var(--s-3);
+}
+
+/* Cabin sign: dark plate, dim (30%) until fastened, then lit amber with a glow.
+   --lit goes 0 → 1; motion/seatbeltMotion.js animates it. */
+.seatbelt-sign {
+  --lit: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: var(--board);
+  color: color-mix(in srgb, var(--board-alert) calc(var(--lit) * 100%), #a0a0a0);
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  opacity: calc(0.3 + 0.7 * var(--lit));
+  box-shadow: 0 0 calc(18px * var(--lit)) rgba(255, 179, 0, calc(0.45 * var(--lit)));
+  text-shadow: 0 0 calc(8px * var(--lit)) rgba(255, 179, 0, calc(0.6 * var(--lit)));
+}
+.is-fastened .seatbelt-sign {
+  --lit: 1;
+}
+.seatbelt-sign__icon {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* The pledge card is one <label> around a visually hidden checkbox. */
+.pledge {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--s-4);
+  width: 100%;
+  padding: 20px 24px;
+  border: 1.5px solid transparent;
+  border-radius: var(--r-card);
+  background: var(--surface);
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+.is-fastened .pledge {
+  border-color: var(--cobalt);
+}
+.pledge:has(.pledge__input:focus-visible) {
+  outline: 2px solid var(--cobalt);
+  outline-offset: 3px;
+}
+.pledge__text {
+  font-size: var(--fs-body-lg);
+  line-height: var(--lh-body-lg);
+  font-weight: 500;
+}
+.belt {
+  flex: none;
+  color: var(--ink);
+}
+.belt rect {
+  fill: var(--raised);
+  stroke: currentColor;
+  stroke-width: 1.5;
+}
+.belt .belt__strap {
+  fill: currentColor;
+  stroke: none;
+  opacity: 0.75;
+}
+.belt .belt__release {
+  fill: var(--cobalt);
+  stroke: none;
+}
+
+/* ── TAKE OFF bar. Phone: sticky at the bottom from the first panel on. ── */
+.briefing__actions {
+  position: sticky;
+  bottom: 0;
+  z-index: var(--z-sticky);
+  display: flex;
+  align-items: center;
+  gap: var(--s-4);
+  margin: 0 -20px;
+  padding: 12px 20px calc(12px + env(safe-area-inset-bottom));
+  border-top: var(--hairline-border);
+  background: var(--paper);
+}
+.briefing__go {
+  display: grid;
+  flex: 1;
+  gap: 4px;
+  justify-items: stretch;
+  text-align: center;
+}
+.briefing__hint {
+  font-size: 13px;
+}
+.briefing__hint[hidden] {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .pledge {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--s-6);
+  }
+  /* Tablet: still sticky, but the button keeps its own width, on the right. */
+  .briefing__go {
+    flex: none;
+    margin-left: auto;
+    justify-items: end;
+    text-align: right;
+  }
+}
+@media (min-width: 1024px) {
+  /* Desktop: in the flow under the pledge, Back on the left, TAKE OFF on the right. */
+  .briefing__actions {
+    position: static;
+    justify-content: space-between;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+  }
+}

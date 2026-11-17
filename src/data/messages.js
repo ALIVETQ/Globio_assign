@@ -1,8 +1,10 @@
 // All UI text that is not a question, section or topic (CONTENT.md §4–§7).
-// Results-page text (CONTENT.md §8) lives in messagesResults.js to keep files short;
-// both are merged into one MESSAGES object here, so screens import only this file.
+// Results-page text (CONTENT.md §8) lives in messagesResults.js and the safety
+// briefing (CONTENT.md §5b) in messagesBriefing.js, to keep files short; all are
+// merged into one MESSAGES object here, so screens import only this file.
 // Text inside {braces} is filled by logic/fill.js; never type those values by hand.
 import { RESULTS_MESSAGES } from "./messagesResults.js";
+import { BRIEFING_MESSAGES } from "./messagesBriefing.js";
 
 export const MESSAGES = {
   brand: {
@@ -104,6 +106,9 @@ export const MESSAGES = {
     // Optional (DESIGN.md §5.3)
     floatingWords: ["Hallo", "Danke", "Bahnhof", "Apotheke", "halb acht"],
   },
+
+  // ───────────── §5b Safety briefing (messagesBriefing.js) ─────────────
+  ...BRIEFING_MESSAGES,
 
   // ───────────── §6 Section break and question screen ─────────────
   sectionBreak: {

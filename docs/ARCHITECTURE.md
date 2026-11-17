@@ -93,6 +93,7 @@ Globio_assign/                 ← repo root (GitHub: Globio_assign)
 │   │   ├── sections.js        ← the 3 sections: id, order, labels (from CONTENT.md)
 │   │   ├── messages.js        ← all other UI text (CONTENT.md §4–§7); merges messagesResults.js into MESSAGES
 │   │   ├── messagesResults.js ← results-page, coverage, review, method, actions, summary text (CONTENT.md §8)
+│   │   ├── messagesBriefing.js ← safety briefing text (CONTENT.md §5b)
 │   │   ├── config.js          ← every number that decides "ready" (from LOGIC.md)
 │   │   └── landdots.json      ← generated globe dots
 │   │
@@ -108,6 +109,7 @@ Globio_assign/                 ← repo root (GitHub: Globio_assign)
 │   │
 │   ├── screens/               ← ONE FILE PER SCREEN (see §5 for the contract)
 │   │   ├── landing.js
+│   │   ├── briefing.js        ← safety briefing: six panels, seatbelt pledge, TAKE OFF
 │   │   ├── sectionBreak.js
 │   │   ├── question.js
 │   │   ├── checking.js
@@ -116,6 +118,8 @@ Globio_assign/                 ← repo root (GitHub: Globio_assign)
 │   ├── components/            ← reusable pieces used by screens
 │   │   ├── landingHero.js     ← landing top bar, resume banner, hero copy, meta line, globe slot
 │   │   ├── landingSections.js ← landing: why, how it works, sample result, coverage note, footer
+│   │   ├── briefingArt.js     ← the six briefing panel illustrations (inline SVG)
+│   │   ├── seatbelt.js        ← FASTEN SEATBELT sign + pledge card (label around a hidden checkbox) + buckle
 │   │   ├── optionList.js      ← the answer options
 │   │   ├── confidenceBar.js   ← "I'm sure" / "I guessed" / "I don't know this yet"
 │   │   ├── themeToggle.js     ← sun/moon button markup
@@ -144,6 +148,8 @@ Globio_assign/                 ← repo root (GitHub: Globio_assign)
 │   │   ├── glow.js            ← horizon glow screen transition
 │   │   ├── fadeUp.js          ← fade-up helper (DESIGN.md §4.3)
 │   │   ├── landingMotion.js   ← landing entrance, below-the-fold reveals, Start exit
+│   │   ├── briefingMotion.js  ← briefing entrance (panels unfold), coin flip, panel-2 demo loop, TAKE OFF lift
+│   │   ├── seatbeltMotion.js  ← fasten / unfasten: tongue slide, click shake, sign lights up
 │   │   ├── sectionBreakMotion.js ← giant-word slide, label fade-up, title glitch
 │   │   ├── questionMotion.js  ← question enter/exit, option stroke, confidence feedback
 │   │   ├── journeyMotion.js   ← journey plane along the path (MotionPath) + dot pop
@@ -168,6 +174,8 @@ Globio_assign/                 ← repo root (GitHub: Globio_assign)
 │       ├── screens.css        ← small screens: checking readout
 │       ├── landing.css        ← landing hero: top bar, hero copy, globe slot
 │       ├── landingSections.css ← landing sections below the hero
+│       ├── briefing.css       ← safety briefing: header, panel grid, line illustrations
+│       ├── briefingPledge.css ← seatbelt sign, pledge card + buckle, sticky TAKE OFF bar
 │       ├── journey.css        ← journey bar (section break + question screens)
 │       ├── sectionBreak.css   ← section break screen
 │       ├── question.css       ← question screen: label row, prompt, confidence bar
@@ -187,6 +195,7 @@ Globio_assign/                 ← repo root (GitHub: Globio_assign)
     ├── scoring.test.js
     ├── shuffle.test.js
     ├── keys.test.js           ← keyboard shortcut mapping
+    ├── state.test.js          ← briefing flow: Start → briefing, seatbelt gates TAKE OFF, Retake skips it
     ├── resultText.test.js     ← results text for all 8 presets (reason template, filled placeholders, summary)
     └── data.test.js           ← content sanity checks, config validation, fill()
 ```
@@ -200,12 +209,14 @@ Globio_assign/                 ← repo root (GitHub: Globio_assign)
 ### 4.1 Screens
 
 ```
-landing ──Start──▶ sectionBreak(vocabulary) ──▶ question ×5
-                   sectionBreak(grammar)    ──▶ question ×5
-                   sectionBreak(reading)    ──▶ question ×5
-                   ──▶ checking ──▶ results ──Retake──▶ sectionBreak(vocabulary)
-                                              └─Home──▶ landing
+landing ──Start──▶ briefing ──fasten seatbelt, TAKE OFF──▶ sectionBreak(vocabulary) ──▶ question ×5
+   │                  └─Back──▶ landing                    sectionBreak(grammar)    ──▶ question ×5
+   └─Resume──▶ the saved section break / question          sectionBreak(reading)    ──▶ question ×5
+                                                           ──▶ checking ──▶ results ──Retake──▶ sectionBreak(vocabulary)
+                                                                                      └─Home──▶ landing
 ```
+
+The safety briefing (`DESIGN.md` §5b) is shown once per check: Start → briefing (quick glitch-out + fade-up), TAKE OFF → horizon glow → Vocabulary section break. Retake and Resume skip it.
 
 There is no URL router. The current screen lives in state. The browser Back button is not used for navigation inside the quiz (a "Back" control inside the question screen handles going to the previous question).
 
@@ -213,18 +224,20 @@ There is no URL router. The current screen lives in state. The browser Back butt
 
 ```js
 const state = {
-  screen: "landing",      // "landing" | "sectionBreak" | "question" | "checking" | "results"
+  screen: "landing",      // "landing" | "briefing" | "sectionBreak" | "question" | "checking" | "results"
   attempt: 1,             // increments on retake
   order: [],              // this attempt's questions, after shuffle.js (array of question objects with shuffled options)
   index: 0,               // position in `order` (0–14)
   answers: {},            // { [questionId]: { choice: <original option index> | null, confidence: "sure" | "guessed" | "unknown" } }
   pendingChoice: null,    // option the learner has tapped but not yet confirmed
   result: null,           // output of scoreCheck(), set when entering "checking"
+  accepted: false,        // the briefing's seatbelt pledge; TAKE OFF needs it. Saved with the session.
 };
 ```
 
 **Rules**
-- Only functions in `state.js` change state: `start()`, `selectOption(i)`, `confirm(confidence)`, `skip()`, `back()`, `next()`, `finish()`, `retake()`, `goHome()`.
+- Only functions in `state.js` change state: `start()`, `setAccepted(on)`, `takeOff()`, `selectOption(i)`, `confirm(confidence)`, `skip()`, `back()`, `next()`, `finish()`, `retake()`, `goHome()`, `resume()`, `startOver()`.
+- `start()` goes to `briefing` with `accepted = false`; `setAccepted(on)` (the seatbelt checkbox) works only there; `takeOff()` needs `accepted` and goes to the Vocabulary section break. `retake()` starts a fresh attempt straight at the section break (`accepted` stays true).
 - Answers are stored by **question id** and **original option index**, never by shuffled position. Shuffling must never affect scoring.
 - After every change, state is saved to `sessionStorage` (key `examReady.v1`). On load, if a saved quiz is in progress, offer "Continue where you left off?" on the landing screen. Results are recomputed from answers, never stored.
 
@@ -291,7 +304,7 @@ Transitions that span two screens (the horizon glow) are run by `motion/glow.js`
 ### Debug mode (`?debug=1`)
 
 Built in Phase 0 and used in every phase after. It shows a small floating panel with:
-- **Jump to screen:** landing, any section break, any question by number, checking, results.
+- **Jump to screen:** landing, briefing, any section break, any question by number, checking, results.
 - **Results preset:** any of the 8 presets in `LOGIC.md` §12 (`perfect`, `ready`, `almostOverall`, `almostWeakest`, `notYetOverall`, `notYetWeakest`, `luckyGuesser`, `allUnknown`).
 - **Replay** the current screen's entrance animation.
 - **Slow-mo** toggle (1× / 0.25×).

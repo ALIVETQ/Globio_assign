@@ -285,14 +285,16 @@ Goal: a learner who retakes the check shouldn't be able to remember "the answer 
 
 | Action | Rule |
 |---|---|
-| `start()` | `attempt` = 1 (or +1 on retake), `order = buildAttempt(...)`, `index = 0`, `answers = {}`, `pendingChoice = null`, go to `sectionBreak` for the first section. |
+| `start()` | `attempt` = 1, `order = buildAttempt(...)`, `index = 0`, `answers = {}`, `pendingChoice = null`, `accepted = false`, go to `briefing` (the safety briefing, `DESIGN.md` §5b). |
+| `setAccepted(on)` | Only on `briefing`: `accepted = on` (the seatbelt pledge checkbox). |
+| `takeOff()` | Only on `briefing` and only when `accepted`: go to `sectionBreak` for the first section. |
 | `selectOption(displayIndex)` | `pendingChoice = order[index].optionOrder[displayIndex]` (or the index itself for unshuffled formats). Selecting another option replaces it. Tapping the selected option again keeps it selected (no deselect). |
 | `confirm("sure" \| "guessed")` | Allowed only when `pendingChoice !== null`. Saves `{ choice: pendingChoice, confidence }` for the current question, then `next()`. |
 | `skip()` | Saves `{ choice: null, confidence: "unknown" }`, then `next()`. Allowed at any time, even if an option is selected (the selection is discarded). |
 | `next()` | `pendingChoice = null`. If this was the last question: compute `result = scoreCheck(...)` and go to `checking`. Else if the next question is in a new section: go to that section's `sectionBreak`, then its first question. Else `index + 1`. |
 | `back()` | Not available on question 1. `index − 1` (skipping section breaks; back from the first grammar question goes straight to the last vocabulary question). `pendingChoice` is pre-filled with the saved `choice` for that question (null if it was "unknown"), so the earlier choice shows as selected. The learner must confirm or skip again to move on; that overwrites the old answer. |
 | `finish()` | Called when the checking screen ends: go to `results`. |
-| `retake()` | `start()` with `attempt + 1` and a fresh shuffle. |
+| `retake()` | A fresh attempt like `start()` (`attempt + 1`, fresh shuffle), but straight to the first `sectionBreak`: no second briefing; `accepted` stays true. |
 | `goHome()` | Go to `landing`. If the quiz was finished, clear the saved session. |
 
 ### 10.2 Saving and restoring (`sessionStorage`, key `examReady.v1`)
@@ -305,12 +307,14 @@ Saved after every action:
   questionIds: ["v1", ..., "r5"],   // to detect changed content
   attempt, index, answers,
   optionOrders: { v1: [2,0,3,1], ... },
-  screen,                            // "sectionBreak" | "question" | "checking" | "results"
+  screen,                            // "briefing" | "sectionBreak" | "question" | "checking" | "results"
+  accepted,                          // the briefing's seatbelt pledge (true once fastened)
 }
 ```
 
 On page load:
 - Nothing saved, or `v` is different, or `questionIds` don't match the current `QUESTIONS` → ignore and clear it.
+- Saved `screen` is `"briefing"` → nothing to resume: the landing page, no banner (the learner presses Start again).
 - Saved `screen` is `"sectionBreak"` or `"question"` → show the landing page with the **resume banner** (`landing.resumeText`). "Continue" restores and returns to the saved question; "Start over" clears and stays on landing.
 - Saved `screen` is `"checking"` or `"results"` → recompute the result from the saved answers and show the results page directly.
 - The result is never stored; it is always recomputed.

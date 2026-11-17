@@ -17,13 +17,14 @@ const DEV = import.meta.env.DEV;
 const UNKNOWN = { choice: null, confidence: "unknown" };
 
 export const state = {
-  screen: "landing", // "landing" | "sectionBreak" | "question" | "checking" | "results"
+  screen: "landing", // "landing" | "briefing" | "sectionBreak" | "question" | "checking" | "results"
   attempt: 1, // increments on retake
   order: [], // this attempt's questions with `optionOrder` (logic/shuffle.js)
   index: 0, // position in `order` (0–14)
   answers: {}, // { [questionId]: { choice: originalIndex | null, confidence } }
   pendingChoice: null, // original index tapped but not yet confirmed
   result: null, // scoreCheck() output, set when entering "checking"
+  accepted: false, // the safety-briefing seatbelt pledge (saved with the session)
 };
 
 const listeners = new Set();
@@ -52,7 +53,8 @@ function computeResult() {
 
 // ───────────── Actions (LOGIC.md §10.1) ─────────────
 
-export function start({ attempt = 1 } = {}) {
+// A fresh attempt: new shuffle, no answers, first question.
+function newAttempt(attempt, screen) {
   Object.assign(state, {
     attempt,
     order: buildAttempt(QUESTIONS),
@@ -60,8 +62,29 @@ export function start({ attempt = 1 } = {}) {
     answers: {},
     pendingChoice: null,
     result: null,
-    screen: "sectionBreak",
+    screen,
   });
+}
+
+// Landing "Start": the safety briefing comes first; the learner fastens the
+// seatbelt (the pledge) and takes off from there.
+export function start() {
+  newAttempt(1, "briefing");
+  state.accepted = false;
+  commit();
+}
+
+// The seatbelt checkbox on the briefing. Fastening is the learner's promise to
+// answer alone and honestly; TAKE OFF stays disabled until it is fastened.
+export function setAccepted(on) {
+  if (state.screen !== "briefing") return;
+  state.accepted = Boolean(on);
+  commit();
+}
+
+export function takeOff() {
+  if (state.screen !== "briefing" || !state.accepted) return;
+  state.screen = "sectionBreak";
   commit();
 }
 
@@ -118,8 +141,12 @@ export function finish() {
   commit();
 }
 
+// Straight to the Vocabulary section break with a fresh shuffle: the learner
+// already fastened the seatbelt for this session, so no second briefing.
 export function retake() {
-  start({ attempt: state.attempt + 1 }); // fresh shuffle
+  newAttempt(state.attempt + 1, "sectionBreak");
+  state.accepted = true;
+  commit();
 }
 
 export function goHome() {
@@ -146,6 +173,7 @@ function restore(saved) {
     answers: saved.answers,
     result: null,
     screen: saved.screen,
+    accepted: saved.accepted,
   });
   state.pendingChoice = state.screen === "question" ? savedChoice(current()) : null;
 }

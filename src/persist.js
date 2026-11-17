@@ -8,7 +8,8 @@ import { isValidOrder } from "./logic/shuffle.js";
 
 const KEY = "examReady.v1";
 const VERSION = 1;
-const SCREENS = ["sectionBreak", "question", "checking", "results"];
+// "briefing" is saved too, but never resumed: a refresh there goes back to landing.
+const SCREENS = ["briefing", "sectionBreak", "question", "checking", "results"];
 const CONFIDENCES = ["sure", "guessed", "unknown"];
 
 export function save(state) {
@@ -20,6 +21,7 @@ export function save(state) {
     answers: state.answers,
     optionOrders: Object.fromEntries(state.order.map((q) => [q.id, q.optionOrder])),
     screen: state.screen,
+    accepted: state.accepted, // the briefing's seatbelt pledge
   };
   try {
     sessionStorage.setItem(KEY, JSON.stringify(data));
@@ -84,6 +86,7 @@ export function readSaved(questions) {
     screen: data.screen,
     optionOrders: data.optionOrders,
     answers: cleanAnswers(data.answers, questions),
+    accepted: data.accepted === true,
   };
 }
 

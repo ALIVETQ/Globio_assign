@@ -491,6 +491,36 @@ landing: {
 
 ---
 
+## 5b. Safety briefing (`src/data/messagesBriefing.js`)
+
+Shown once per check, between the landing page's Start and the Vocabulary section break (Retake and Resume skip it). The panel illustrations that show UI reuse existing text: the section names (`SECTIONS[].de`), `question.sure` and `question.unknown`.
+
+```js
+briefing: {
+  label: "SAFETY BRIEFING · FLIGHT GL-A1 · DEL → BER",
+  title: "BEFORE TAKE-OFF",
+  intro: "Please read before take-off. It takes 30 seconds.",
+
+  // In this order; the number (01–06) comes from the position.
+  panels: [
+    { id: "route", title: "Your route", text: "15 questions in 3 parts. About 6 minutes, no timer." },
+    { id: "answer", title: "How to answer", text: "Pick an answer, then say how sure you are." },
+    { id: "guess", title: "Guesses count half", text: "A right guess earns half a point. Luck doesn’t help on exam day." },
+    { id: "unknown", title: "Don’t know? Say so", text: "An honest result is more useful than a lucky one." },
+    { id: "noHelp", title: "No help on board", text: "No dictionary, no translator, no asking a friend." },
+    { id: "back", title: "You can go back", text: "Change any answer with Back. Your progress is saved if you refresh." },
+  ],
+
+  seatbeltSign: "FASTEN SEATBELT",
+  pledge: "I’ll answer on my own, without a dictionary or translator, and I’ll be honest when I’m guessing.", // also the checkbox label
+  takeOff: "TAKE OFF",          // primary button, "→" added like every primary button
+  takeOffHint: "Fasten your seatbelt to take off", // shown + aria-describedby while TAKE OFF is disabled
+  back: "Back",                 // text button, back to the landing page
+},
+```
+
+---
+
 ## 6. Section break and question screen
 
 ```js

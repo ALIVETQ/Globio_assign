@@ -8,6 +8,8 @@ import "./styles/base.css";
 import "./styles/screens.css";
 import "./styles/landing.css";
 import "./styles/landingSections.css";
+import "./styles/briefing.css";
+import "./styles/briefingPledge.css";
 import "./styles/journey.css";
 import "./styles/sectionBreak.css";
 // options.css before question.css: question.css's desktop block shows the keycaps.
@@ -33,12 +35,13 @@ import { validateConfig } from "./logic/validateConfig.js";
 import { glowTransition } from "./motion/glow.js";
 import { initTheme } from "./theme.js";
 import * as landing from "./screens/landing.js";
+import * as briefing from "./screens/briefing.js";
 import * as sectionBreak from "./screens/sectionBreak.js";
 import * as question from "./screens/question.js";
 import * as checking from "./screens/checking.js";
 import * as results from "./screens/results.js";
 
-const SCREENS = { landing, sectionBreak, question, checking, results };
+const SCREENS = { landing, briefing, sectionBreak, question, checking, results };
 
 // A founder editing config.js gets a loud error at once instead of wrong verdicts.
 if (import.meta.env.DEV) {
@@ -61,6 +64,8 @@ let pending = false;
 const guard = (fn) => (...args) => (transitioning ? undefined : fn(...args));
 const actions = {
   start: guard(() => S.start()),
+  setAccepted: guard(S.setAccepted),
+  takeOff: guard(S.takeOff),
   selectOption: guard(S.selectOption),
   confirm: guard(S.confirm),
   skip: guard(S.skip),
@@ -88,9 +93,11 @@ function focusHeading(el) {
   h.focus({ preventScroll: true });
 }
 
-// Screen changes that pass through the horizon glow (DESIGN.md §4.4, §9.11):
-// Start, the last answer, and Retake (results → a fresh Vocabulary section break).
-const GLOW = new Set(["landing>sectionBreak", "question>checking", "results>sectionBreak"]);
+// Screen changes that pass through the horizon glow (DESIGN.md §4.4, §5b, §9.11):
+// TAKE OFF from the safety briefing, Resume from the landing page, the last
+// answer, and Retake (results → a fresh Vocabulary section break). Start itself
+// (landing → briefing) is a quick glitch-out + fade-up, no glow.
+const GLOW = new Set(["briefing>sectionBreak", "landing>sectionBreak", "question>checking", "results>sectionBreak"]);
 
 async function show(next, nextName) {
   if (current) await current.exit(currentEl, S.state); // old screen animates out

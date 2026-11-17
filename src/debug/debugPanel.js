@@ -26,7 +26,7 @@ const CSS = `
 .dbg pre{white-space:pre-wrap;word-break:break-all;margin:6px 0 0;color:#cfd8ff;font-size:11px}`;
 
 function jumpOptions() {
-  const opts = [`<option value="landing">landing</option>`];
+  const opts = [`<option value="landing">landing</option>`, `<option value="briefing">briefing</option>`];
   for (const s of SECTIONS) {
     const first = QUESTIONS.findIndex((q) => q.section === s.id);
     opts.push(`<option value="sectionBreak:${first}">section break · ${s.id}</option>`);
