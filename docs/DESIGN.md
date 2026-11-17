@@ -152,7 +152,7 @@ One canvas, created once, used on the landing page. (It used to appear on the re
 5. **Rim:** line width `max(1, 1.4k)`; full circle `rgba(47,99,255,.35)`; white highlight arc `rgba(255,255,255,.9)` at radius `R − .8` from −2.4 to −0.3 rad.
 6. **Arc India → Germany:** 64 points of a spherical linear interpolation, lifted by `1 + (0.18 + 0.42·ω/π)·sin(π·t)` (ω = angle between the places; base lift raised from 0.08 so the arc reads as a flight path). Cobalt, alpha .85, width `max(1.2, 1.4k)`, round caps. Drawn only up to `arcProgress` (0–1) of its length. Segments hidden when behind the globe (z ≤ 0 and inside the disc).
 7. **Pins:** cobalt dot, radius `max(3.5, 5k)`, 1.5px white ring. Label above (6px gap): JetBrains Mono 500, uppercase, `max(10px, 12.5k)`, letter-spacing .05em, ink, on a soft white halo (stroke 3px, `rgba(255,255,255,.9)`, round joins, drawn under the text) so it reads over the dots.
-8. **Plane** (landing only, see §3.6).
+8. **Plane** (see §3.6): an airliner seen from above (wings and tail), cobalt, length `max(14, 22k)` px, nose pointing along the route, on a 1.5px page-coloured halo so it reads over the dots. Behind it a contrail of the last 14 positions as small fading dots.
 
 ### 3.5 Placement
 
@@ -168,11 +168,11 @@ One canvas, created once, used on the landing page. (It used to appear on the re
 |---|---|
 | Intro fade | alpha = `1 − (1 − clamp(t/1.1))³` |
 | Pins | India fades in over 0.6 s from t = 0.8 s; Germany from t = 0.96 s |
-| Arc (landing) | Draws from 0 to 1 over 1.4 s, `power2.inOut`, starting t = 1.1 s |
-| Plane (landing) | After the arc is drawn: a cobalt dot (radius `max(2.5, 3.2k)`) flies India → Germany along the arc in 3.2 s, `power1.inOut`, with a trail of the last 14 positions fading from alpha .6 to 0 and shrinking to 40% size. Pauses 1.2 s at Germany (Germany pin pulses once: a ring growing from 1× to 2.4× pin radius and fading out over 0.8 s), then restarts from India. |
+| Take-off (first flight) | At t = 1.1 s the plane takes off from India and flies to Germany (3.2 s, `power1.inOut`); the arc is drawn **behind the plane** as it flies (the route never draws itself). After the first flight the whole arc stays drawn. |
+| Plane (landing) | Each flight: grows from 55% to full size over the first 10% of the route (take-off) and shrinks back over the last 10% (landing), then is gone while it rests 1.2 s at Germany (the Germany pin pulses once: a ring growing from 1× to 2.4× pin radius and fading out over 0.8 s). Then the next flight takes off from India along the drawn route. |
 | Sway | Continuous from t = 0 (§3.2) |
 | Pausing | Stop the loop when the canvas is off-screen or the tab is hidden. |
-| Reduced motion | Draw one still frame: sway at 0, pins shown, arc fully drawn, plane at the tip, no trail. |
+| Reduced motion | Draw one still frame: sway at 0, pins shown, arc fully drawn, the plane on it at 62% of the way (mid-flight), no contrail. |
 
 ---
 
@@ -675,7 +675,7 @@ If something nice-to-have is cut, its element still appears in its final, static
 
 ## 12. Acceptance check
 
-**Landing (1440×900):** the dotted globe fades in on the right and sways gently; India and Germany pins pop in; the arc draws and a small plane with a fading trail flies India → Germany on a loop. "AM I / EXAM / READY?" glitches in line by line under the cobalt overline; paragraph, buttons and the meta line fade up, and the meta numbers count up.
+**Landing (1440×900):** the dotted globe fades in on the right and sways gently; India and Germany pins pop in; a small airliner takes off from India and flies to Germany, drawing the route behind it, then keeps flying the route on a loop. "AM I / EXAM / READY?" glitches in line by line under the cobalt overline; paragraph, buttons and the meta line fade up, and the meta numbers count up.
 
 **Landing (390×844):** copy first, globe below it with a soft fade at the bottom; buttons are full-width or side by side; nothing scrolls sideways.
 

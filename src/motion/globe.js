@@ -14,12 +14,13 @@ import { buildDots, drawFrame, VIEW_LON } from "./globeDraw.js";
 import { MESSAGES } from "../data/messages.js";
 
 const clamp01 = (v) => Math.min(1, Math.max(0, v));
-const arcEase = gsap.parseEase("power2.inOut");
 const planeEase = gsap.parseEase("power1.inOut");
 
 // §3.6 timings, in seconds of globe time
-const ARC_START = 1.1, ARC_DUR = 1.4;
+const TAKE_OFF = 1.1; // the first flight leaves India here
 const FLY = 3.2, REST = 1.2, PULSE = 0.8;
+const EDGE = 0.1; // share of a flight spent taking off / landing (plane grows / shrinks)
+const STILL_AT = 0.62; // reduced motion: where the plane is shown, mid-flight
 const TRAIL = 14; // positions, one per 60 fps frame
 const PHONE_MARGIN = 16; // px each side of the phone globe
 
@@ -81,30 +82,36 @@ function frameAt(t) {
     pins: still ? { from: 1, to: 1 } : { from: clamp01((t - 0.8) / 0.6), to: clamp01((t - 0.96) / 0.6) },
     arc: 0,
     plane: null,
+    planeSize: 1, // 0.55 on the ground → 1 at cruising height
     trail: [],
     pulse: null,
   };
 
-  f.arc = still ? 1 : arcEase(clamp01((t - ARC_START) / ARC_DUR));
   if (still) {
-    f.plane = 1; // plane at the tip, no trail
+    f.arc = 1; // the whole route, the plane on it mid-flight, no trail
+    f.plane = STILL_AT;
     return f;
   }
-  const flyStart = ARC_START + ARC_DUR;
-  if (t >= flyStart) {
-    const c = (t - flyStart) % (FLY + REST);
-    if (c < FLY) {
-      f.plane = planeEase(c / FLY);
-      for (let i = 1; i <= TRAIL; i++) {
-        const ct = c - i / 60;
-        if (ct < 0) break;
-        f.trail.push(planeEase(ct / FLY));
-      }
-    } else {
-      f.plane = 1; // resting at Germany
-      const p = (c - FLY) / PULSE;
-      if (p < 1) f.pulse = p;
+  if (t < TAKE_OFF) return f;
+  const cycle = FLY + REST;
+  const flight = Math.floor((t - TAKE_OFF) / cycle); // 0 = the first flight
+  const c = (t - TAKE_OFF) % cycle;
+  if (c < FLY) {
+    const u = c / FLY;
+    f.plane = planeEase(u);
+    // The first flight draws the route behind the plane; after that it stays drawn.
+    f.arc = flight === 0 ? f.plane : 1;
+    // Take-off and landing: the plane grows from the India pin and shrinks into Germany.
+    f.planeSize = 0.55 + 0.45 * Math.min(1, u / EDGE, (1 - u) / EDGE);
+    for (let i = 1; i <= TRAIL; i++) {
+      const ct = c - i / 60;
+      if (ct < 0) break;
+      f.trail.push(planeEase(ct / FLY));
     }
+  } else {
+    f.arc = 1; // landed: the plane is gone, Germany's pin pulses
+    const p = (c - FLY) / PULSE;
+    if (p < 1) f.pulse = p;
   }
   return f;
 }

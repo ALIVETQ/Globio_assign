@@ -144,6 +144,7 @@ Globio_assign/                 ← repo root (GitHub: Globio_assign)
 │   │   ├── prefs.js           ← reduced motion, low-power detection, debug slow-mo
 │   │   ├── globe.js           ← canvas globe singleton (landing page): lifecycle, loop, pausing
 │   │   ├── globeDraw.js       ← globe geometry + one-frame drawing (DESIGN.md §3.1–3.4)
+│   │   ├── globePlane.js      ← the globe's airliner + contrail (DESIGN.md §3.4 item 8)
 │   │   ├── glitch.js          ← glitch reveal / glitch-out
 │   │   ├── glow.js            ← horizon glow screen transition
 │   │   ├── fadeUp.js          ← fade-up helper (DESIGN.md §4.3)

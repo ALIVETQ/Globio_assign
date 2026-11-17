@@ -2,6 +2,7 @@
 // globe.js decides WHAT the frame shows (sway, fades, arc progress, plane) and
 // calls drawFrame(). Every number below is from DESIGN.md §3.
 import landDots from "../data/landdots.json";
+import { drawPlane } from "./globePlane.js";
 
 const DEG = Math.PI / 180;
 export const VIEW_LAT = 30; // °N: India and Germany both on the visible face
@@ -95,7 +96,7 @@ function radial(ctx, x0, y0, r0, x1, y1, r1, stops) {
   return g;
 }
 
-// f = { w, h, cx, cy, R, viewLon, alpha, pins: {from, to}, arc, plane, trail, pulse, labels, colors, dots }
+// f = { w, h, cx, cy, R, viewLon, alpha, pins: {from, to}, arc, plane, planeSize, trail, pulse, labels, colors, dots }
 export function drawFrame(ctx, f) {
   const { cx, cy, R, colors } = f;
   const k = R / 400;
@@ -213,21 +214,7 @@ export function drawFrame(ctx, f) {
     ctx.fillText(label, sx, sy - pinR - 6);
   }
 
-  // 8. Plane and its trail (oldest first, so the plane is drawn on top)
-  if (f.plane !== null) {
-    const planeR = Math.max(2.5, 3.2 * k);
-    ctx.fillStyle = colors.cobalt;
-    const n = f.trail.length;
-    for (let i = n - 1; i >= -1; i--) {
-      const s = i === -1 ? f.plane : f.trail[i];
-      const p = rot(...arcPoint(s));
-      if (hidden(p)) continue;
-      const age = (i + 1) / n; // 0 for the plane itself
-      ctx.globalAlpha = f.alpha * (i === -1 ? 1 : 0.6 * (1 - age));
-      ctx.beginPath();
-      ctx.arc(...px(p), planeR * (i === -1 ? 1 : 1 - 0.6 * age), 0, Math.PI * 2);
-      ctx.fill();
-    }
-  }
+  // 8. Plane and its contrail (globePlane.js)
+  if (f.plane !== null) drawPlane(ctx, f, { rot, px, hidden, arcPoint, k, halo: pal.halo });
   ctx.restore();
 }
