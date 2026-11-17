@@ -7,8 +7,12 @@
   min-height: 100svh;
 }
 
-/* Label row + column move together on enter/exit (§7.6); the journey bar and
-   confidence bar stay put. */
+/* Structure: journey bar · label row · .q-layout [passage?] [.q-main: .q-body + confidence].
+   Only .q-body (prompt, hint, options) moves on enter/exit (§7.6); the label
+   row, any passage, the journey bar and the confidence bar stay put.
+   Reading layout (two columns / passage on top) is in reading.css. */
+.q-layout,
+.q-main,
 .q-body {
   display: flex;
   flex-direction: column;
@@ -116,6 +120,8 @@
   /* The column grows so the bar rests at the bottom of the screen even when
      the question is short; when it's long, the bar sticks over the page bottom
      and slides back below the last option at the end of the scroll. */
+  .q-layout,
+  .q-main,
   .q-body,
   .q-column {
     flex: 1;

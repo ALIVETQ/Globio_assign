@@ -5,6 +5,7 @@
 // nothing here ever stores or scores a display position.
 import { MESSAGES } from "../data/messages.js";
 import { esc } from "../dom.js";
+import { adsOptionsHTML } from "./passageAds.js";
 
 const Q = MESSAGES.question;
 
@@ -16,7 +17,12 @@ export function keycapFor(question, displayIndex) {
   return String(displayIndex + 1);
 }
 
+// Layouts by format (§7.2): a vertical list; Richtig/Falsch side by side;
+// for the ads question the two ad cards are the options.
 export function optionListHTML(question) {
+  if (question.format === "ads") {
+    return `<div class="options options--ads" role="radiogroup" aria-label="${esc(Q.optionsAria)}">${adsOptionsHTML(question)}</div>`;
+  }
   const items = question.optionOrder
     .map(
       (orig, i) => `

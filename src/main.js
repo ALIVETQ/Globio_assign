@@ -13,6 +13,8 @@ import "./styles/sectionBreak.css";
 // options.css before question.css: question.css's desktop block shows the keycaps.
 import "./styles/options.css";
 import "./styles/question.css";
+import "./styles/reading.css";
+import "./styles/passages.css";
 
 // Imported first so ?slow= and reduced motion apply before any screen animates.
 import "./motion/prefs.js";

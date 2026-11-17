@@ -1,0 +1,183 @@
+/* Reading passages (DESIGN.md §7.5.1, §7.5.3, §7.5.4) — made to look like the
+   real objects. Ads (§7.5.2) are option cards; see reading.css. */
+
+/* ── Email (r1, r2) ── */
+.email {
+  max-width: 520px;
+  padding: 20px 24px;
+  border-radius: var(--r-card);
+  background: var(--paper);
+  box-shadow: var(--shadow-card);
+}
+.email__head {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+}
+.email__avatar {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--wash);
+  color: var(--cobalt);
+  font-weight: 600;
+  font-size: 15px;
+}
+.email__who {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.25;
+}
+.email__from {
+  font-weight: 600;
+  font-size: 15px;
+}
+.email__to {
+  font-size: 13px;
+  color: var(--muted);
+}
+.email__time {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.email__subject {
+  margin-top: var(--s-4);
+  padding-bottom: var(--s-3);
+  border-bottom: var(--hairline-border);
+  font-weight: 600;
+  font-size: 16px;
+}
+.email__body {
+  margin-top: var(--s-3);
+  font-size: 17px;
+  line-height: 1.55;
+  white-space: pre-line;
+}
+
+/* ── Door sign (r4): a plaque hanging from a short line ── */
+.sign-wrap {
+  max-width: 380px;
+  text-align: center; /* centres the hanger above the plaque */
+}
+.sign__hanger {
+  display: block;
+  width: 1px;
+  height: 24px;
+  margin: 0 auto;
+  background: var(--hairline);
+}
+.sign {
+  position: relative;
+  padding: 22px 26px;
+  border-radius: 10px;
+  background: var(--plaque);
+  color: var(--plaque-text);
+  text-align: left;
+}
+.sign__screw {
+  position: absolute;
+  top: 10px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.25);
+}
+.sign__screw.is-left { left: 10px; }
+.sign__screw.is-right { right: 10px; }
+.sign__title {
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 1.25;
+}
+.sign__subtitle {
+  margin-top: 2px;
+  font-size: 14px;
+  opacity: 0.75;
+}
+.sign__divider {
+  margin: 14px 0;
+  border: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+.sign__heading {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+.sign__hours {
+  margin: 8px 0 0;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.7;
+  white-space: pre-line;
+}
+.sign__row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--s-4);
+}
+.sign__row dd {
+  margin: 0;
+  text-align: right; /* times right-aligned */
+  white-space: nowrap;
+}
+
+/* ── Train board (r5): split-flap cells ── */
+.board {
+  --cell: clamp(16px, 3.6vw, 24px);
+  max-width: 520px;
+  padding: 18px;
+  border-radius: 10px;
+  background: var(--board);
+}
+.board__rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.board__row {
+  display: flex;
+  flex-wrap: wrap; /* long rows wrap between words; never sideways scroll */
+  gap: 4px 0;
+  color: var(--board-text);
+}
+.board__row.is-alert {
+  color: var(--board-alert);
+}
+.board__word {
+  display: inline-flex;
+  gap: 2px;
+  margin-right: 2px;
+}
+.flap {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: var(--cell);
+  height: calc(var(--cell) * 1.45);
+  border-radius: 3px;
+  background: var(--board-flap);
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: calc(var(--cell) * 1.05);
+  line-height: 1;
+}
+/* The hinge: a thin dark line across the middle of every flap */
+.flap::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.6);
+}

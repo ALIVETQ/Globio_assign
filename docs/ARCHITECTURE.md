@@ -117,10 +117,11 @@ Globio_assign/                 ← repo root (GitHub: Globio_assign)
 │   │   ├── optionList.js      ← the answer options
 │   │   ├── confidenceBar.js   ← "I'm sure" / "I guessed" / "I don't know this yet"
 │   │   ├── journeyBar.js      ← India → Germany progress bar with plane
+│   │   ├── passage.js         ← passage wrapper: format label, phone 45% scroll box, type dispatch
 │   │   ├── passageEmail.js    ← email / note passage
 │   │   ├── passageSign.js     ← door sign / notice passage
 │   │   ├── passageBoard.js    ← split-flap train board passage
-│   │   ├── passageAds.js      ← two-ad matching passage
+│   │   ├── passageAds.js      ← two-ad matching passage (the ad cards are the a/b options)
 │   │   ├── scoreMeter.js      ← overall score + ready line
 │   │   ├── skillBars.js
 │   │   ├── verdictStamp.js
@@ -156,6 +157,8 @@ Globio_assign/                 ← repo root (GitHub: Globio_assign)
 │       ├── journey.css        ← journey bar (section break + question screens)
 │       ├── sectionBreak.css   ← section break screen
 │       ├── question.css       ← question screen: label row, prompt, confidence bar
+│       ├── reading.css        ← reading layout (passage left / on top), Richtig/Falsch, ad options
+│       ├── passages.css       ← email, door sign, split-flap board
 │       └── options.css        ← answer options + drawn selection stroke
 │
 └── tests/

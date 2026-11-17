@@ -1,0 +1,142 @@
+/* Reading questions (DESIGN.md §7.2, §7.5): layout with a passage, Richtig/Falsch
+   side by side, ad cards as options. The passage objects themselves are in passages.css. */
+
+/* ── Passage block: format label, then the object ── */
+.passage {
+  width: 100%;
+  max-width: calc(720px + 2 * var(--q-pad));
+  margin: 16px auto 0;
+  padding: 0 var(--q-pad);
+}
+.passage__format {
+  margin-bottom: var(--s-3);
+}
+.passage__scroll {
+  /* a little room so the email's shadow isn't clipped when this box scrolls */
+  padding: 2px 4px 12px;
+  margin: -2px -4px 0;
+}
+
+/* Phones: the passage takes at most 45% of the screen and scrolls inside its
+   own box, with a soft fade at the bottom while there is more below (§7.5). */
+@media (max-width: 639px) {
+  .passage__scroll {
+    max-height: 45svh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .passage__scroll.has-more {
+    -webkit-mask-image: linear-gradient(#000 82%, transparent);
+    mask-image: linear-gradient(#000 82%, transparent);
+  }
+  .is-reading .q-layout > .passage {
+    flex: none; /* the passage keeps its size; the question below takes the rest */
+  }
+  /* Tighter on phones so the answers sit above the pinned confidence bar. */
+  .is-reading .q-column,
+  .is-ads .q-column {
+    margin-top: 20px;
+  }
+}
+
+/* ── Richtig / Falsch: two options side by side, centred (§7.2) ── */
+.options--trueFalse {
+  flex-direction: row;
+}
+.options--trueFalse .option {
+  flex: 1 1 0;
+  min-width: 0;
+  justify-content: center;
+  text-align: center;
+}
+
+/* ── Ads (r3): the two ad cards are the options (§7.5.2) ── */
+/* The format label takes the options' usual 28px gap below the prompt/hint. */
+.q-column > .passage__format {
+  margin-top: 28px;
+}
+.q-column > .passage__format + .options {
+  margin-top: 0;
+}
+.options--ads {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.option--ad {
+  --option-border: 2px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--s-2);
+  padding: 18px;
+  border: 2px dashed var(--hairline);
+  border-radius: 12px;
+  background: var(--surface);
+}
+.option--ad .option__stroke {
+  inset: -2px;
+  width: calc(100% + 4px);
+  height: calc(100% + 4px);
+}
+/* The ad's mono badge doubles as its keycap, so it shows at every size. */
+.option--ad .ad__badge {
+  display: inline-grid;
+  background: var(--paper);
+}
+.ad__text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.ad__title {
+  font-weight: 700;
+  font-size: 17px;
+}
+.ad__line {
+  font-weight: 400;
+  font-size: 15px;
+  color: var(--ink);
+}
+@media (max-width: 519px) {
+  .options--ads {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Desktop (≥1024px): passage left, question right, gap 48px, max 1120px ── */
+@media (min-width: 1024px) {
+  .is-reading .q-label-row {
+    max-width: calc(1120px + 2 * var(--q-pad));
+  }
+  .is-reading .q-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+    gap: 48px;
+    width: 100%;
+    max-width: calc(1120px + 2 * var(--q-pad));
+    margin: 32px auto 0;
+    padding: 0 var(--q-pad);
+  }
+  .is-reading .passage {
+    position: sticky; /* stays in view if the question side is taller */
+    top: 96px;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+  /* Inside the right column the question parts use the column's width. */
+  .is-reading .q-main .q-column,
+  .is-reading .q-main .confidence {
+    max-width: none;
+    margin: 0;
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .is-reading .q-main .confidence__main {
+    justify-content: flex-start;
+  }
+  .is-reading .q-main .confidence {
+    align-items: flex-start;
+  }
+}

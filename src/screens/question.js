@@ -9,6 +9,7 @@ import { commandForKey } from "../logic/keys.js";
 import { journeyBarHTML, mountJourney } from "../components/journeyBar.js";
 import { optionListHTML, updateOptionList } from "../components/optionList.js";
 import { confidenceBarHTML, updateConfidenceBar } from "../components/confidenceBar.js";
+import { hasSidePassage, passageHTML, formatLabelHTML, mountPassageScroll } from "../components/passage.js";
 import { playEnter, playExit, sizeStroke, setStroke, pulseEnable } from "../motion/questionMotion.js";
 
 const Q = MESSAGES.question;
@@ -16,6 +17,9 @@ const live = new WeakMap();
 // Direction for the next question's entrance: set by the outgoing question
 // (Back = −1, enter from the left), used once by the incoming one.
 let enterDir = 1;
+// The passage last shown and how far it was scrolled (phones), so r2 opens the
+// shared email where r1 left it.
+let lastPassage = { id: null, scrollTop: 0 };
 
 // "___" in a prompt is drawn as a 3em cobalt underline (§7.1). The underscores
 // stay in the text for screen readers, visually hidden.
@@ -35,21 +39,31 @@ export function render(state, actions) {
       ? `<button type="button" class="btn btn--link q-back" data-action="back"><span aria-hidden="true">← </span>${esc(Q.back)}</button>`
       : "<span></span>";
 
+  // Reading questions with a passage get two columns on desktop (passage left)
+  // and the passage on top on phones (§7.5). The passage sits outside .q-body,
+  // so it stays still while the question side animates (r1 → r2 share an email).
+  const side = hasSidePassage(q);
   const el = fromHTML(`
-    <section class="screen question-screen">
+    <section class="screen question-screen${side ? " is-reading" : ""}${q.format === "ads" ? " is-ads" : ""}">
       ${journeyBarHTML()}
-      <div class="q-body">
-        <div class="q-label-row">
-          ${back}
-          <p class="label">${esc(labelText(state, q))}</p>
-        </div>
-        <div class="q-column">
-          <h1 class="prompt" lang="de">${promptHTML(q.prompt)}</h1>
-          ${q.hint ? `<p class="q-hint small muted">${esc(q.hint)}</p>` : ""}
-          ${optionListHTML(q)}
+      <div class="q-label-row">
+        ${back}
+        <p class="label">${esc(labelText(state, q))}</p>
+      </div>
+      <div class="q-layout">
+        ${side ? passageHTML(q) : ""}
+        <div class="q-main">
+          <div class="q-body">
+            <div class="q-column">
+              <h1 class="prompt" lang="de">${promptHTML(q.prompt)}</h1>
+              ${q.hint ? `<p class="q-hint small muted">${esc(q.hint)}</p>` : ""}
+              ${q.format === "ads" ? formatLabelHTML(q) : ""}
+              ${optionListHTML(q)}
+            </div>
+          </div>
+          ${confidenceBarHTML()}
         </div>
       </div>
-      ${confidenceBarHTML()}
     </section>
   `);
 
@@ -95,6 +109,7 @@ export function render(state, actions) {
     }),
     offKey: () => document.removeEventListener("keydown", onKey),
     offResize: () => ro.disconnect(),
+    offPassage: mountPassageScroll(el, q.passage && q.passage === lastPassage.id ? lastPassage.scrollTop : 0),
     journey: mountJourney(el, state.order, state.index, state.attempt),
   });
   live.set(el, h);
@@ -141,6 +156,10 @@ export function destroy(el) {
   h.offClick();
   h.offKey();
   h.offResize();
+  // Remember the passage scroll before the screen goes (for r1 → r2).
+  const box = el.querySelector(".passage__scroll");
+  lastPassage = { id: el.querySelector(".passage")?.dataset.passage ?? null, scrollTop: box?.scrollTop ?? 0 };
+  h.offPassage();
   h.journey.destroy();
   live.delete(el);
 }
