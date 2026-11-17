@@ -146,8 +146,8 @@ One canvas, created once, used on the landing page and the results page.
 3. **Inner limb shading** (clipped to the circle): radial `.8R → R`, transparent 0, `rgba(47,99,255,.10)` .75, `rgba(47,99,255,.38)` 1.
 4. **Land dots** (clipped): radius `max(.9px, 1.7·k) × (.5 + .5·√z)` where `k = R/400`. Five depth buckets, `bucket = min(4, floor(z·5.5))`; each bucket one `#111` path at alpha `.20 + bucket·.18`.
 5. **Rim:** line width `max(1, 1.4k)`; full circle `rgba(47,99,255,.35)`; white highlight arc `rgba(255,255,255,.9)` at radius `R − .8` from −2.4 to −0.3 rad.
-6. **Arc India → Germany:** 64 points of a spherical linear interpolation, lifted by `1 + (0.08 + 0.42·ω/π)·sin(π·t)` (ω = angle between the places). Cobalt, alpha .85, width `max(1.2, 1.4k)`, round caps. Drawn only up to `arcProgress` (0–1) of its length. Segments hidden when behind the globe (z ≤ 0 and inside the disc).
-7. **Pins:** cobalt dot, radius `max(3.5, 5k)`, 1.5px white ring. Label above: JetBrains Mono 500, uppercase, `max(10px, 12.5k)`, letter-spacing .05em, ink.
+6. **Arc India → Germany:** 64 points of a spherical linear interpolation, lifted by `1 + (0.18 + 0.42·ω/π)·sin(π·t)` (ω = angle between the places; base lift raised from 0.08 so the arc reads as a flight path). Cobalt, alpha .85, width `max(1.2, 1.4k)`, round caps. Drawn only up to `arcProgress` (0–1) of its length. Segments hidden when behind the globe (z ≤ 0 and inside the disc).
+7. **Pins:** cobalt dot, radius `max(3.5, 5k)`, 1.5px white ring. Label above (6px gap): JetBrains Mono 500, uppercase, `max(10px, 12.5k)`, letter-spacing .05em, ink, on a soft white halo (stroke 3px, `rgba(255,255,255,.9)`, round joins, drawn under the text) so it reads over the dots.
 8. **Plane** (landing only, see §3.6).
 
 ### 3.5 Placement
@@ -155,7 +155,8 @@ One canvas, created once, used on the landing page and the results page.
 | Size | Placement |
 |---|---|
 | desktop (landing) | Fills the right side of the hero. `R = min(0.42 · heroHeight, 0.30 · vw)`. Centre at `x = vw − 0.27·vw`, `y = 0.56 · heroHeight`. Bleeds off the bottom a little. |
-| tablet / phone (landing) | Below the hero copy in a box `min(92vw, 520px)` tall, `overflow: hidden`, bottom 25% faded with `mask-image: linear-gradient(#000 75%, transparent)`. `R = 0.62 · vw` (max 340px), centre at 55% width, 58% box height. |
+| tablet (landing, 640–1023px) | Below the hero copy in a box `min(92vw, 520px)` tall, `overflow: hidden`, bottom 25% faded with `mask-image: linear-gradient(#000 75%, transparent)`. `R = 0.62 · vw` (max 340px), centre at 55% width, 58% box height. |
+| phone (landing, < 640px) | Same box and bottom fade as tablet. The whole globe fits the width with a 16px margin each side: `R = boxWidth / 2 − 16` (max 340px), centre at 50% width, 58% box height. India, Germany and the arc are always fully visible. |
 | results (all sizes) | In the verdict block (see §9.2). Box 360×300 desktop / full width × 260 phone. `R` fits the box with 12px margin. No haze beyond the box. |
 
 ### 3.6 Motion
@@ -209,8 +210,10 @@ Sequence (GSAP timeline animating a numeric `edge` and re-writing the gradient o
 
 | Step | From → to | Duration | Ease |
 |---|---|---|---|
-| Rise | `edge` 1.25 → −0.03 | 0.85 s | `power3.inOut` |
+| Rise | `edge` 1.25 → −0.47 | 0.85 s | `power3.inOut` |
 | Swap | call `swapFn()` (screen change happens under full white) | — | — |
+
+Why −0.47: the swap must happen under **pure** white. The screen point nearest the ellipse is the top edge, `−cy / Ry` gradient units from its centre; that has to reach the last stop (1.65), so `edge ≤ −(1.65 − 1) · 0.72 = −0.468`. (The earlier −0.03 left a pale-blue band along the top edge.) `glow.js` computes this from the stops.
 | Hold | — | 0.1 s | — |
 | Fade | overlay opacity 1 → 0 | 0.45 s | `power2.out` |
 
@@ -291,10 +294,16 @@ Below-the-fold sections: fade-up y 16 when 15% into the viewport (IntersectionOb
 
 ### 5.4 Motion — on Start
 
-1. Buttons and meta fade to 0 (0.2 s).
-2. Headline glitch-out (§4.2).
-3. Horizon glow (§4.4); the swap shows the Vocabulary section break.
-4. Globe pauses after the glow covers it.
+The steps overlap so Start feels quick (≈ 1.7 s in total; the screen swaps at ≈ 1.15 s):
+
+| Time | Step |
+|---|---|
+| 0 | Buttons and meta fade to 0 (0.2 s) **and** headline glitch-out (§4.2, 0.57 s with stagger) start together. |
+| 0.285 s (glitch-out halfway) | Horizon glow (§4.4) starts rising; the rest of the glitch-out plays under it. |
+| ≈ 1.135 s | Swap under full white: the Vocabulary section break replaces the landing. The globe stops here (it is covered). |
+| ≈ 1.685 s | Glow has faded; transition complete. |
+
+The glow's own steps (0.85 s rise + 0.1 s hold + 0.45 s fade = 1.4 s) set the floor: starting it at the glitch-out's halfway point gives ≈ 1.7 s.
 
 ---
 

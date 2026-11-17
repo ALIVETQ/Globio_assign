@@ -20,6 +20,15 @@ const STOPS = [
   [1.65, "#ffffff"],
 ];
 
+const RY_SHARE = 0.72; // Ry = 0.72·vh
+const WHITE_AT = STOPS[STOPS.length - 1][0]; // 1.65: from here outwards it's pure white
+
+// Where the rise must end for the WHOLE screen to be white at the swap.
+// The screen point nearest the ellipse is the top edge, at distance −cy from its
+// centre, i.e. (−cy / Ry) in gradient units. Needing that ≥ 1.65 with
+// cy = edge·vh − Ry gives edge ≤ −(1.65 − 1)·0.72 = −0.468. A hair beyond, for rounding.
+const END_EDGE = -(WHITE_AT - 1) * RY_SHARE - 0.002;
+
 export function glowTransition(swapFn) {
   if (reducedMotion) {
     swapFn(); // no overlay, instant swap
@@ -29,7 +38,7 @@ export function glowTransition(swapFn) {
   const vw = window.innerWidth;
   const vh = window.innerHeight;
   const Rx = Math.max(0.75 * vw, 0.9 * vh);
-  const Ry = 0.72 * vh;
+  const Ry = RY_SHARE * vh;
   const stops = STOPS.map(([m, c]) => `${c} ${(m * Rx).toFixed(1)}px`).join(", ");
 
   const overlay = document.createElement("div");
@@ -52,7 +61,7 @@ export function glowTransition(swapFn) {
           resolve();
         },
       })
-      .to(state, { edge: -0.03, duration: 0.85, ease: "power3.inOut", onUpdate: paint })
+      .to(state, { edge: END_EDGE, duration: 0.85, ease: "power3.inOut", onUpdate: paint })
       .call(swapFn)
       .to({}, { duration: 0.1 }) // hold under white
       .to(overlay, { opacity: 0, duration: 0.45, ease: "power2.out" });

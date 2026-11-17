@@ -21,6 +21,7 @@ const planeEase = gsap.parseEase("power1.inOut");
 const ARC_START = 1.1, ARC_DUR = 1.4;
 const FLY = 3.2, REST = 1.2, PULSE = 0.8;
 const TRAIL = 14; // positions, one per 60 fps frame
+const PHONE_MARGIN = 16; // px each side of the phone globe
 
 let canvas = null, ctx = null, dots = null, colors = null;
 let container = null, mode = "landing", arcProgress = 0;
@@ -52,8 +53,12 @@ function layout() {
     box = { w, h, cx: w / 2, cy: h / 2, R: Math.max(0, Math.min(w, h) / 2 - 12) };
   } else if (window.innerWidth >= 1024) {
     box = { w, h, cx: w - 0.27 * w, cy: 0.56 * h, R: Math.min(0.42 * h, 0.3 * w) };
-  } else {
+  } else if (window.innerWidth >= 640) {
     box = { w, h, cx: 0.55 * w, cy: 0.58 * h, R: Math.min(0.62 * w, 340) };
+  } else {
+    // Phone: the whole globe fits the width with a 16px margin each side, so
+    // India, Germany and the arc are never cut off by the screen edge.
+    box = { w, h, cx: 0.5 * w, cy: 0.58 * h, R: Math.min(w / 2 - PHONE_MARGIN, 340) };
   }
 }
 

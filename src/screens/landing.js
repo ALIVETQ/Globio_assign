@@ -27,6 +27,7 @@ function stopMotion(el) {
   h.entrance?.stop();
   h.entrance?.tl?.kill();
   h.stopReveal?.();
+  h.exitTl?.kill();
 }
 
 export function render(state, actions) {
@@ -72,7 +73,11 @@ export function exit(el) {
   // Finish the entrance first so the glitch-out starts from the full headline.
   h?.entrance?.stop();
   h?.entrance?.tl?.progress(1);
-  return playExit(el);
+  // Resolves halfway through the glitch-out so the glow can start (§5.4);
+  // the timeline is kept so destroy() can stop whatever is left of it.
+  const { tl, ready } = playExit(el);
+  if (h) h.exitTl = tl;
+  return ready;
 }
 
 // Called under the glow (§5.4 step 4: the globe stops once it is covered).

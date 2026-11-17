@@ -81,12 +81,16 @@ export function revealBelowFold(root) {
   };
 }
 
-// §5.4 steps 1–2: buttons and meta fade out (0.2 s), then the headline glitches
-// out. The glow (step 3) is run by main.js around the screen swap.
+// §5.4 steps 1–2, overlapped so Start feels quick: the buttons and meta fade out
+// (0.2 s) WHILE the headline glitches out. `ready` resolves when the glitch-out
+// is halfway through; main.js starts the glow then, and the rest of the
+// glitch-out plays on under the rising glow. Returns { tl, ready }.
 export function playExit(root) {
-  if (reducedMotion) return Promise.resolve();
+  if (reducedMotion) return { tl: null, ready: Promise.resolve() };
   const tl = gsap.timeline();
-  tl.to($$(root, ".hero__ctas, .meta, .resume-bar"), { opacity: 0, duration: 0.2 });
-  tl.add(glitchOut($(root, ".hero__headline")));
-  return tl.then();
+  tl.to($$(root, ".hero__ctas, .meta, .resume-bar"), { opacity: 0, duration: 0.2 }, 0);
+  const out = glitchOut($(root, ".hero__headline"));
+  tl.add(out, 0);
+  const ready = new Promise((resolve) => tl.call(resolve, null, out.duration() / 2));
+  return { tl, ready };
 }

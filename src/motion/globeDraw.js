@@ -30,6 +30,8 @@ export const TO = toVec(...PLACES.to);
 
 // 64 slerp points India → Germany, lifted off the surface so the arc reads as a
 // flight path. Longer routes lift higher (ω = angle between the places).
+// Base lift 0.18 (was 0.08): seen almost head-on, a lower arc looked flat.
+const BASE_LIFT = 0.18;
 export const ARC = (() => {
   const dot = FROM[0] * TO[0] + FROM[1] * TO[1] + FROM[2] * TO[2];
   const w = Math.acos(Math.min(1, Math.max(-1, dot)));
@@ -38,7 +40,7 @@ export const ARC = (() => {
     const t = i / (ARC_POINTS - 1);
     const a = Math.sin((1 - t) * w) / Math.sin(w);
     const b = Math.sin(t * w) / Math.sin(w);
-    const lift = 1 + (0.08 + (0.42 * w) / Math.PI) * Math.sin(Math.PI * t);
+    const lift = 1 + (BASE_LIFT + (0.42 * w) / Math.PI) * Math.sin(Math.PI * t);
     pts.push([0, 1, 2].map((k) => (a * FROM[k] + b * TO[k]) * lift));
   }
   return pts;
@@ -186,6 +188,11 @@ export function drawFrame(ctx, f) {
       ctx.stroke();
       ctx.globalAlpha = f.alpha * a;
     }
+    // Soft white halo first, so the label reads over the land dots.
+    ctx.lineWidth = 3;
+    ctx.lineJoin = "round";
+    ctx.strokeStyle = "rgba(255,255,255,.9)";
+    ctx.strokeText(label, sx, sy - pinR - 6);
     ctx.fillStyle = colors.ink;
     ctx.fillText(label, sx, sy - pinR - 6);
   }
