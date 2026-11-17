@@ -38,7 +38,15 @@ function readColors() {
     paper: v("--paper", "#ffffff"),
     cobalt: v("--cobalt", "#2f63ff"),
     monoFont: v("--font-mono", "monospace"),
+    dark: document.documentElement.dataset.theme === "dark",
   };
+}
+
+// The theme can change while the globe is on screen: re-read the colours and
+// redraw at once (the loop, if running, picks them up on its next frame too).
+function onTheme() {
+  colors = readColors();
+  draw();
 }
 
 // §3.5 placement. The slot's CSS decides its size; this decides where in it the
@@ -173,6 +181,7 @@ export function mount(el, { mode: m = "landing" } = {}) {
   });
   intersectObs.observe(canvas);
   document.addEventListener("visibilitychange", onVisibility);
+  window.addEventListener("examready:theme", onTheme);
   unsubPrefs = onPrefsChange(update);
   // Canvas text needs the mono font; redraw once it has loaded (matters for still frames).
   document.fonts?.ready.then(() => container === el && draw());
@@ -186,6 +195,7 @@ export function unmount() {
   intersectObs?.disconnect();
   unsubPrefs?.();
   document.removeEventListener("visibilitychange", onVisibility);
+  window.removeEventListener("examready:theme", onTheme);
   resizeObs = intersectObs = unsubPrefs = null;
   canvas?.remove();
   container = null;

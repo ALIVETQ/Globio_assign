@@ -203,6 +203,44 @@ h1:focus {
   pointer-events: none;
 }
 
+/* ── Sun/moon theme toggle (components/themeToggle.js) ──
+   Moon in light mode (press for dark), sun in dark mode (press for light). */
+.theme-toggle {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: var(--hairline-border);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  transition: border-color 0.25s, color 0.25s;
+}
+.theme-toggle:hover {
+  border-color: var(--cobalt);
+  color: var(--cobalt);
+}
+.theme-toggle svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.theme-toggle__sun circle {
+  fill: currentColor;
+}
+.theme-toggle__sun,
+:root[data-theme="dark"] .theme-toggle__moon {
+  display: none;
+}
+:root[data-theme="dark"] .theme-toggle__sun {
+  display: block;
+}
+
 /* ── Globe canvas (motion/globe.js): fills whatever slot it is mounted in ── */
 .globe-canvas {
   position: absolute;
@@ -221,6 +259,9 @@ h1:focus {
 }
 .row--between {
   justify-content: space-between;
+}
+.row--end {
+  justify-content: flex-end;
 }
 .plain-list {
   list-style: none;

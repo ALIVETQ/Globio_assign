@@ -65,6 +65,27 @@ export function arcPoint(s) {
   return [0, 1, 2].map((k) => ARC[i][k] + (ARC[i + 1][k] - ARC[i][k]) * u);
 }
 
+// Canvas colours that aren't tokens. Light = DESIGN.md §3.4 exactly; dark =
+// DESIGN.md §2.6 (a deep navy sphere, so the light land dots read like ink on paper).
+const PALETTE = {
+  light: {
+    haze: [[0, "rgba(47,99,255,.45)"], [0.12, "rgba(90,128,255,.26)"], [0.4, "rgba(169,188,255,.14)"], [1, "rgba(238,242,255,0)"]],
+    body: [[0, "#ffffff"], [0.55, "#f6f8ff"], [0.85, "#e8eeff"], [1, "#d5dfff"]],
+    limb: [[0, "rgba(47,99,255,0)"], [0.75, "rgba(47,99,255,.10)"], [1, "rgba(47,99,255,.38)"]],
+    rim: "rgba(47,99,255,.35)",
+    highlight: "rgba(255,255,255,.9)",
+    halo: "rgba(255,255,255,.9)",
+  },
+  dark: {
+    haze: [[0, "rgba(91,128,255,.35)"], [0.12, "rgba(70,105,230,.2)"], [0.4, "rgba(50,80,190,.1)"], [1, "rgba(14,16,22,0)"]],
+    body: [[0, "#232b48"], [0.55, "#1a2139"], [0.85, "#141a31"], [1, "#11183a"]],
+    limb: [[0, "rgba(107,140,255,0)"], [0.75, "rgba(107,140,255,.12)"], [1, "rgba(107,140,255,.42)"]],
+    rim: "rgba(107,140,255,.45)",
+    highlight: "rgba(255,255,255,.18)",
+    halo: "rgba(14,16,22,.9)",
+  },
+};
+
 // Behind the globe = facing away AND covered by the disc (§3.4 item 6).
 const hidden = ([x, y, z]) => z <= 0 && x * x + y * y < 1;
 
@@ -78,6 +99,7 @@ function radial(ctx, x0, y0, r0, x1, y1, r1, stops) {
 export function drawFrame(ctx, f) {
   const { cx, cy, R, colors } = f;
   const k = R / 400;
+  const pal = colors.dark ? PALETTE.dark : PALETTE.light;
   const rot = rotator(f.viewLon);
   const px = (p) => [cx + R * p[0], cy - R * p[1]];
 
@@ -87,25 +109,19 @@ export function drawFrame(ctx, f) {
 
   // 1. Haze
   const hx = cx - 0.05 * R, hy = cy + 0.08 * R;
-  ctx.fillStyle = radial(ctx, hx, hy, 0.9 * R, hx, hy, 1.5 * R, [
-    [0, "rgba(47,99,255,.45)"], [0.12, "rgba(90,128,255,.26)"], [0.4, "rgba(169,188,255,.14)"], [1, "rgba(238,242,255,0)"],
-  ]);
+  ctx.fillStyle = radial(ctx, hx, hy, 0.9 * R, hx, hy, 1.5 * R, pal.haze);
   ctx.fillRect(0, 0, f.w, f.h);
 
   // 2. Sphere body
   ctx.beginPath();
   ctx.arc(cx, cy, R, 0, Math.PI * 2);
-  ctx.fillStyle = radial(ctx, cx + 0.3 * R, cy - 0.42 * R, 0.05 * R, cx + 0.1 * R, cy - 0.15 * R, 1.25 * R, [
-    [0, "#ffffff"], [0.55, "#f6f8ff"], [0.85, "#e8eeff"], [1, "#d5dfff"],
-  ]);
+  ctx.fillStyle = radial(ctx, cx + 0.3 * R, cy - 0.42 * R, 0.05 * R, cx + 0.1 * R, cy - 0.15 * R, 1.25 * R, pal.body);
   ctx.fill();
 
   // 3–4. Limb shading and land dots, clipped to the disc
   ctx.save();
   ctx.clip();
-  ctx.fillStyle = radial(ctx, cx, cy, 0.8 * R, cx, cy, R, [
-    [0, "rgba(47,99,255,0)"], [0.75, "rgba(47,99,255,.10)"], [1, "rgba(47,99,255,.38)"],
-  ]);
+  ctx.fillStyle = radial(ctx, cx, cy, 0.8 * R, cx, cy, R, pal.limb);
   ctx.fillRect(cx - R, cy - R, 2 * R, 2 * R);
   const buckets = [0, 1, 2, 3, 4].map(() => new Path2D());
   const base = Math.max(0.9, 1.7 * k);
@@ -129,11 +145,11 @@ export function drawFrame(ctx, f) {
 
   // 5. Rim + highlight
   ctx.lineWidth = Math.max(1, 1.4 * k);
-  ctx.strokeStyle = "rgba(47,99,255,.35)";
+  ctx.strokeStyle = pal.rim;
   ctx.beginPath();
   ctx.arc(cx, cy, R, 0, Math.PI * 2);
   ctx.stroke();
-  ctx.strokeStyle = "rgba(255,255,255,.9)";
+  ctx.strokeStyle = pal.highlight;
   ctx.beginPath();
   ctx.arc(cx, cy, R - 0.8, -2.4, -0.3);
   ctx.stroke();
@@ -188,10 +204,10 @@ export function drawFrame(ctx, f) {
       ctx.stroke();
       ctx.globalAlpha = f.alpha * a;
     }
-    // Soft white halo first, so the label reads over the land dots.
+    // Soft halo (page-coloured) first, so the label reads over the land dots.
     ctx.lineWidth = 3;
     ctx.lineJoin = "round";
-    ctx.strokeStyle = "rgba(255,255,255,.9)";
+    ctx.strokeStyle = pal.halo;
     ctx.strokeText(label, sx, sy - pinR - 6);
     ctx.fillStyle = colors.ink;
     ctx.fillText(label, sx, sy - pinR - 6);

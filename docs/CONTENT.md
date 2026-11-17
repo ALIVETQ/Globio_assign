@@ -398,6 +398,12 @@ globe: {
   labelTo: "GERMANY",
 },
 
+// Sun/moon theme button (aria-label + tooltip): what pressing it will do.
+theme: {
+  toDark: "Switch to dark mode",
+  toLight: "Switch to light mode",
+},
+
 journey: {
   from: "INDIA",
   to: "GERMANY",

@@ -20,6 +20,12 @@ export const MESSAGES = {
     labelTo: "GERMANY",
   },
 
+  // Sun/moon button (CONTENT.md §4). Says what pressing it will do.
+  theme: {
+    toDark: "Switch to dark mode",
+    toLight: "Switch to light mode",
+  },
+
   journey: {
     from: "INDIA",
     to: "GERMANY",

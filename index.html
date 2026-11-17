@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>Am I exam-ready? · A1 German readiness check</title>
+    <meta name="color-scheme" content="light dark" />
+    <!-- Set the theme before anything paints, so dark-mode users never see a white flash.
+         Same rule as src/theme.js: a saved choice wins, otherwise follow the device. -->
+    <script>
+      try {
+        var t = localStorage.getItem("examReady.theme");
+        if (t !== "dark" && t !== "light") t = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        document.documentElement.dataset.theme = t;
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <main id="app" aria-live="polite"></main>

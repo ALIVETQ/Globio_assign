@@ -3,6 +3,7 @@
 // The typed lines and count-ups come in Phase 5.
 import { MESSAGES } from "../data/messages.js";
 import { esc, fromHTML } from "../dom.js";
+import { themeToggleHTML } from "../components/themeToggle.js";
 
 const T = MESSAGES.checking;
 const READOUT_MS = 1500; // ARCHITECTURE.md Phase 5: "the 1.5 s checking readout"
@@ -15,6 +16,7 @@ export function render(state, actions) {
     .join("");
   const el = fromHTML(`
     <section class="screen placeholder">
+      <div class="row row--end">${themeToggleHTML()}</div>
       <h1 class="h2">${esc(T.title)}</h1>
       <ul class="plain-list">${lines}</ul>
     </section>

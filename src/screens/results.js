@@ -3,6 +3,7 @@
 // Home buttons. The real results page comes in Phase 5.
 import { MESSAGES } from "../data/messages.js";
 import { esc, fromHTML, onAction } from "../dom.js";
+import { themeToggleHTML } from "../components/themeToggle.js";
 
 const cleanups = new WeakMap();
 
@@ -12,7 +13,10 @@ export function render(state, actions) {
 
   const el = fromHTML(`
     <section class="screen placeholder">
-      <p class="label">${esc(MESSAGES.results.label)}</p>
+      <div class="row row--between">
+        <p class="label">${esc(MESSAGES.results.label)}</p>
+        ${themeToggleHTML()}
+      </div>
       <h1 class="display">${esc(stamp)}</h1>
       <pre class="json">${esc(JSON.stringify(r, null, 2))}</pre>
       <div class="row">

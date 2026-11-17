@@ -6,7 +6,7 @@
   max-width: 520px;
   padding: 20px 24px;
   border-radius: var(--r-card);
-  background: var(--paper);
+  background: var(--raised); /* white in light mode; a lifted dark grey in dark mode */
   box-shadow: var(--shadow-card);
 }
 .email__head {
@@ -138,6 +138,10 @@
   padding: 18px;
   border-radius: 10px;
   background: var(--board);
+}
+/* In dark mode the near-black board would melt into the page: give it an edge. */
+:root[data-theme="dark"] .board {
+  box-shadow: 0 0 0 1px var(--hairline);
 }
 .board__rows {
   display: flex;

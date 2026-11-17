@@ -24,6 +24,7 @@ import { CONFIG } from "./data/config.js";
 import { SECTIONS } from "./data/sections.js";
 import { validateConfig } from "./logic/validateConfig.js";
 import { glowTransition } from "./motion/glow.js";
+import { initTheme } from "./theme.js";
 import * as landing from "./screens/landing.js";
 import * as sectionBreak from "./screens/sectionBreak.js";
 import * as question from "./screens/question.js";
@@ -141,6 +142,7 @@ function replay() {
   if (current && !transitioning) current.enter(currentEl, S.state);
 }
 
+initTheme(); // before the first screen renders, so toggles get the right label
 S.subscribe(sync);
 S.boot();
 sync();

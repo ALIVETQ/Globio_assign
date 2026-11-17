@@ -4,6 +4,7 @@
 import { MESSAGES } from "../data/messages.js";
 import { esc } from "../dom.js";
 import { fill } from "../logic/fill.js";
+import { themeToggleHTML } from "./themeToggle.js";
 
 const T = MESSAGES.landing;
 const B = MESSAGES.brand;
@@ -22,7 +23,10 @@ function topBar() {
         ${wordmark()}
         <span class="label pill-tag">${esc(B.tag)}</span>
       </div>
-      <a class="btn btn--link" href="#how-it-works" data-action="how">${esc(T.navHowItWorks)}<span aria-hidden="true"> ↓</span></a>
+      <div class="topbar__actions">
+        <a class="btn btn--link" href="#how-it-works" data-action="how">${esc(T.navHowItWorks)}<span aria-hidden="true"> ↓</span></a>
+        ${themeToggleHTML()}
+      </div>
     </header>`;
 }
 

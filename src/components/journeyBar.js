@@ -9,6 +9,7 @@ import { MESSAGES } from "../data/messages.js";
 import { esc } from "../dom.js";
 import { fill } from "../logic/fill.js";
 import { rawPathOf, placePlane, setDone, flyPlane } from "../motion/journeyMotion.js";
+import { themeToggleHTML } from "./themeToggle.js";
 
 const T = MESSAGES.journey;
 const H = 44;
@@ -25,10 +26,13 @@ let last = null; // { attempt, index }
 
 export function journeyBarHTML() {
   return `
-    <div class="journey" role="progressbar" aria-valuemin="1">
-      <span class="journey__end label" aria-hidden="true"><span class="journey__long">${esc(T.from)}</span><span class="journey__short">${esc(T.fromShort)}</span></span>
-      <svg class="journey__track" height="${H}" aria-hidden="true"></svg>
-      <span class="journey__end label" aria-hidden="true"><span class="journey__long">${esc(T.to)}</span><span class="journey__short">${esc(T.toShort)}</span></span>
+    <div class="journey">
+      <div class="journey__progress" role="progressbar" aria-valuemin="1">
+        <span class="journey__end label" aria-hidden="true"><span class="journey__long">${esc(T.from)}</span><span class="journey__short">${esc(T.fromShort)}</span></span>
+        <svg class="journey__track" height="${H}" aria-hidden="true"></svg>
+        <span class="journey__end label" aria-hidden="true"><span class="journey__long">${esc(T.to)}</span><span class="journey__short">${esc(T.toShort)}</span></span>
+      </div>
+      ${themeToggleHTML()}
     </div>`;
 }
 
@@ -97,7 +101,7 @@ function draw(svg, order, index) {
 
 // Wire up a rendered bar. Returns { destroy() }.
 export function mountJourney(root, order, index, attempt) {
-  const bar = root.querySelector(".journey");
+  const bar = root.querySelector(".journey__progress");
   const svg = bar.querySelector("svg");
   bar.setAttribute("aria-valuemax", String(order.length));
   bar.setAttribute("aria-valuenow", String(index + 1));

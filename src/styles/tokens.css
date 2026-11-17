@@ -76,6 +76,8 @@
 
   /* Shadow: only on the email card and floating results cards */
   --shadow-card: 0 1px 2px rgba(17, 17, 17, 0.06), 0 8px 24px rgba(17, 17, 17, 0.08);
+  /* Background of cards that float on the page (the email). */
+  --raised: #ffffff;
 
   --hairline-border: 1px solid var(--hairline);
 
@@ -85,4 +87,34 @@
   --z-sticky: 10;
   --z-glow: 50;
   --z-debug: 100;
+
+  color-scheme: light;
+}
+
+/* ── Dark theme (DESIGN.md §2.6) ──
+   Set by src/theme.js as <html data-theme="dark">. Only colours change; the
+   cobalt is lifted so it reads on the dark page, and anything drawn ON cobalt
+   uses --paper (dark text on light cobalt keeps 6:1 contrast). The exam
+   objects (train board, door plaque) are dark in both themes. */
+:root[data-theme="dark"] {
+  --ink: #eef0f5;
+  --paper: #0e1016;
+  --cobalt: #6b8cff;
+  --cobalt-hover: #8aa4ff;
+  --wash: #18213d;
+  --periwinkle: #3f5197;
+  --muted: #a3a8b6;
+  --muted-2: #8b909c;
+  --hairline: #2a2e38;
+  --giant: #1a1d25;
+  --surface: #171a22;
+  --ready: #22c55e;
+  --ready-wash: #0f2a1a;
+  --almost: #f59e0b;
+  --almost-wash: #2d2210;
+  --notyet: #f05252;
+  --notyet-wash: #2e1414;
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.5), 0 8px 24px rgba(0, 0, 0, 0.45);
+  --raised: #181b24;
+  color-scheme: dark;
 }

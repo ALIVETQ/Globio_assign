@@ -20,6 +20,22 @@ const STOPS = [
   [1.65, "#ffffff"],
 ];
 
+// Dark mode (DESIGN.md §2.6): same positions, but the horizon fades into the
+// dark page colour instead of white, so the swap happens under "full dark"
+// rather than flashing the screen white.
+const DARK_STOPS = [
+  [0, "rgba(14,16,22,0)"],
+  [0.985, "rgba(14,16,22,0)"],
+  [1.0, "rgba(60,90,200,.35)"],
+  [1.06, "#2a3b80"],
+  [1.14, "#3d63e0"],
+  [1.236, "#5b84ff"],
+  [1.32, "#3d63e0"],
+  [1.42, "#2a3b80"],
+  [1.53, "#161c33"],
+  [1.65, "#0e1016"],
+];
+
 const RY_SHARE = 0.72; // Ry = 0.72·vh
 const WHITE_AT = STOPS[STOPS.length - 1][0]; // 1.65: from here outwards it's pure white
 
@@ -39,7 +55,8 @@ export function glowTransition(swapFn) {
   const vh = window.innerHeight;
   const Rx = Math.max(0.75 * vw, 0.9 * vh);
   const Ry = RY_SHARE * vh;
-  const stops = STOPS.map(([m, c]) => `${c} ${(m * Rx).toFixed(1)}px`).join(", ");
+  const palette = document.documentElement.dataset.theme === "dark" ? DARK_STOPS : STOPS;
+  const stops = palette.map(([m, c]) => `${c} ${(m * Rx).toFixed(1)}px`).join(", ");
 
   const overlay = document.createElement("div");
   overlay.className = "glow";

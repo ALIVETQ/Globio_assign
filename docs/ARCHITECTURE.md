@@ -82,6 +82,7 @@ Globio_assign/                 ← repo root (GitHub: Globio_assign)
 ├── src/
 │   ├── main.js                ← boots the app, switches screens, guards input during transitions
 │   ├── state.js               ← state object and all actions (incl. resume/startOver, debug jumps)
+│   ├── theme.js               ← light/dark theme: device default, saved choice, toggle wiring
 │   ├── persist.js             ← sessionStorage save/restore + validation, used only by state.js
 │   ├── dom.js                 ← esc(), fromHTML(), onAction() event delegation for screens
 │   │
@@ -116,6 +117,7 @@ Globio_assign/                 ← repo root (GitHub: Globio_assign)
 │   │   ├── landingSections.js ← landing: why, how it works, sample result, coverage note, footer
 │   │   ├── optionList.js      ← the answer options
 │   │   ├── confidenceBar.js   ← "I'm sure" / "I guessed" / "I don't know this yet"
+│   │   ├── themeToggle.js     ← sun/moon button markup
 │   │   ├── journeyBar.js      ← India → Germany progress bar with plane
 │   │   ├── passage.js         ← passage wrapper: format label, phone 45% scroll box, type dispatch
 │   │   ├── passageEmail.js    ← email / note passage

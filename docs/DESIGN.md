@@ -52,6 +52,10 @@ Mood words: *confident, calm, honest, a bit cinematic.* Not: playful, gamified, 
 
 Verdict colours appear **only** on the results page and in the sample result card on the landing page. Everything else is ink, white, greys and cobalt.
 
+### 2.6 Dark theme (added on request)
+
+A sun/moon button (`components/themeToggle.js`) switches light/dark: in the landing top bar, at the right end of the journey bar (section break + question screens), and at the top of checking/results. The page follows the device setting until the learner presses it; the choice is saved in `localStorage` (`examReady.theme`). `index.html` sets `<html data-theme>` before paint (no flash). Dark token values live in `tokens.css` under `:root[data-theme="dark"]` (ink `#eef0f5`, paper `#0e1016`, cobalt `#6b8cff` with dark text on cobalt, surface `#171a22`, hairline `#2a2e38`, raised `#181b24`, verdict colours lifted). The globe (`globeDraw.js` PALETTE.dark) and the horizon glow (`glow.js` DARK_STOPS, fading to the dark page colour) have dark variants. The train board and door plaque stay dark in both themes.
+
 ### 2.2 Type
 
 | Family | Weights | Fallback | Used for |
