@@ -81,9 +81,9 @@ function focusHeading(el) {
   h.focus({ preventScroll: true });
 }
 
-// Screen changes that pass through the horizon glow (DESIGN.md §4.4). The
-// others (Q15 → checking, results → retake) are added in Phases 4 and 5.
-const GLOW = new Set(["landing>sectionBreak"]);
+// Screen changes that pass through the horizon glow (DESIGN.md §4.4).
+// Results → retake is added in Phase 5.
+const GLOW = new Set(["landing>sectionBreak", "question>checking"]);
 
 async function show(next, nextName) {
   if (current) await current.exit(currentEl, S.state); // old screen animates out

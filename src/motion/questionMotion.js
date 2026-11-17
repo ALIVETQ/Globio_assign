@@ -18,7 +18,8 @@ const GHOST = "-2px 0 rgba(47,99,255,.5)";
 // dir 1 = forward (in from the right), −1 = Back (in from the left).
 // Returns { tl, ready }: `ready` resolves when the column has landed (0.32 s);
 // the options' fade-up may still be finishing, but the learner can already act.
-export function playEnter(root, dir = 1) {
+// `skipOptions`: the options have their own entrance (the ad cards, §7.6).
+export function playEnter(root, dir = 1, { skipOptions = false } = {}) {
   if (reducedMotion) return { tl: null, ready: Promise.resolve() };
   const body = root.querySelector(".q-body");
   const col = root.querySelector(".q-column");
@@ -28,7 +29,7 @@ export function playEnter(root, dir = 1) {
   tl.set(col, { x: 3, textShadow: GHOST }, 0)
     .set(col, { x: -3 }, FRAME)
     .set(col, { x: 0, textShadow: "none", clearProps: "transform,textShadow" }, 2 * FRAME);
-  root.querySelectorAll(".option").forEach((o, i) => tl.add(fadeUp(o, { y: 8 }), i * 0.05));
+  if (!skipOptions) root.querySelectorAll(".option").forEach((o, i) => tl.add(fadeUp(o, { y: 8 }), i * 0.05));
   const ready = new Promise((resolve) => tl.call(resolve, null, ENTER_S));
   return { tl, ready };
 }

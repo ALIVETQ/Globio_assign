@@ -144,6 +144,7 @@ Globio_assign/                 ← repo root (GitHub: Globio_assign)
 │   │   ├── sectionBreakMotion.js ← giant-word slide, label fade-up, title glitch
 │   │   ├── questionMotion.js  ← question enter/exit, option stroke, confidence feedback
 │   │   ├── journeyMotion.js   ← journey plane along the path (MotionPath) + dot pop
+│   │   ├── passageMotion.js   ← passage entrances: email pill → Flip, ads, door sign; board via splitFlap.js
 │   │   ├── countUp.js
 │   │   └── splitFlap.js
 │   │

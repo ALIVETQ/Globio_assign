@@ -60,6 +60,34 @@
   line-height: 1.55;
   white-space: pre-line;
 }
+/* Notification pill (§7.6): the email's first state before it expands.
+   Avatar + sender + first line, 64px tall; subject and body are hidden. */
+.email__preview {
+  display: none;
+}
+.email.is-pill {
+  height: 64px;
+  padding: 12px 16px;
+  border-radius: 32px;
+  overflow: hidden;
+}
+.email.is-pill .email__to,
+.email.is-pill .email__subject,
+.email.is-pill .email__body {
+  display: none;
+}
+.email.is-pill .email__preview {
+  display: block;
+  font-size: 13px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* While it grows, the content is revealed from the top down. */
+.email.is-expanding {
+  overflow: hidden;
+}
 
 /* ── Door sign (r4): a plaque hanging from a short line ── */
 .sign-wrap {
@@ -182,6 +210,34 @@
   left: 0;
   right: 0;
   top: 50%;
+  z-index: 2;
   height: 1px;
   background: rgba(0, 0, 0, 0.6);
+}
+/* While flipping (motion/splitFlap.js): the top half of the old character
+   folds down around the hinge, revealing the next one. Removed when done. */
+.flap {
+  perspective: 160px;
+}
+.flap__fold {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  height: 50%;
+  overflow: hidden;
+  border-radius: 3px 3px 0 0;
+  background: var(--board-flap);
+  transform-origin: 50% 100%;
+  backface-visibility: hidden;
+}
+.flap__fold-char {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: calc(var(--cell) * 1.45);
 }

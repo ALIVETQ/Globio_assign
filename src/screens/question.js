@@ -11,6 +11,8 @@ import { optionListHTML, updateOptionList } from "../components/optionList.js";
 import { confidenceBarHTML, updateConfidenceBar } from "../components/confidenceBar.js";
 import { hasSidePassage, passageHTML, formatLabelHTML, mountPassageScroll } from "../components/passage.js";
 import { playEnter, playExit, sizeStroke, setStroke, pulseEnable } from "../motion/questionMotion.js";
+import { playPassage } from "../motion/passageMotion.js";
+import { PASSAGES } from "../data/questions.js";
 
 const Q = MESSAGES.question;
 const live = new WeakMap();
@@ -67,7 +69,15 @@ export function render(state, actions) {
     </section>
   `);
 
-  const h = { index: state.index, command: null, ready: false };
+  const h = {
+    index: state.index,
+    command: null,
+    ready: false,
+    // The passage animates in (§7.6) unless it is the one already on screen:
+    // r1 → r2 (and Back r2 → r1) keep the same email still.
+    passageType: q.passage ? PASSAGES[q.passage]?.type : null,
+    samePassage: Boolean(q.passage) && q.passage === lastPassage.id,
+  };
   // Remember what the learner did, so the exit can play the matching feedback.
   const run = (cmd) => {
     if (!cmd) return false;
@@ -132,9 +142,12 @@ export function update(el, state) {
 export function enter(el) {
   const h = live.get(el);
   h.enterTl?.progress(1).kill(); // debug "Replay" calls enter() again
-  const { tl, ready } = playEnter(el, enterDir);
+  h.passageTl?.progress(1).kill();
+  // The ad cards are the options and have their own entrance.
+  const { tl, ready } = playEnter(el, enterDir, { skipOptions: h.passageType === "ads" });
   enterDir = 1;
   h.enterTl = tl;
+  if (h.passageType && !h.samePassage) h.passageTl = playPassage(el, h.passageType);
   return ready;
 }
 
@@ -153,6 +166,7 @@ export function destroy(el) {
   if (!h) return;
   h.enterTl?.kill();
   h.exitTl?.kill();
+  h.passageTl?.kill();
   h.offClick();
   h.offKey();
   h.offResize();

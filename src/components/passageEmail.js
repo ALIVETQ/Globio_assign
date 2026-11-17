@@ -10,6 +10,7 @@ export function passageEmailHTML(p) {
         <span class="email__who">
           <span class="email__from">${esc(p.from)}</span>
           <span class="email__to">${esc(p.to)}</span>
+          <span class="email__preview" aria-hidden="true">${esc(p.preview)}</span>
         </span>
         <span class="email__time">${esc(p.time)}</span>
       </header>
