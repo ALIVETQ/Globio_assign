@@ -23,15 +23,7 @@ const CSS = `
 .dbg select{width:100%}
 .dbg .dbg__row{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
 .dbg button[aria-pressed="true"]{background:#2f63ff;border-color:#2f63ff}
-.dbg pre{white-space:pre-wrap;word-break:break-all;margin:6px 0 0;color:#cfd8ff;font-size:11px}
-/* Outline of where the landing globe will be drawn (DESIGN.md §3.5), until it exists */
-.globe-slot{outline:1px dashed #a9bcff;outline-offset:-1px;--dbg-r:min(62vw,340px);--dbg-cx:55%;--dbg-cy:58%}
-.globe-slot::after{content:"GLOBE";position:absolute;display:grid;place-items:center;
-  border:1px dashed #2f63ff;border-radius:50%;font:11px ui-monospace,monospace;color:#2f63ff;
-  width:calc(2*var(--dbg-r));height:calc(2*var(--dbg-r));
-  left:calc(var(--dbg-cx) - var(--dbg-r));top:calc(var(--dbg-cy) - var(--dbg-r))}
-@media(min-width:1024px){.globe-slot{--dbg-r:min(calc(.42*max(100svh,640px)),30vw);--dbg-cx:73%;--dbg-cy:56%}}
-`;
+.dbg pre{white-space:pre-wrap;word-break:break-all;margin:6px 0 0;color:#cfd8ff;font-size:11px}`;
 
 function jumpOptions() {
   const opts = [`<option value="landing">landing</option>`];

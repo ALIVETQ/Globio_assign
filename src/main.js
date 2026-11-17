@@ -16,6 +16,7 @@ import { MESSAGES } from "./data/messages.js";
 import { CONFIG } from "./data/config.js";
 import { SECTIONS } from "./data/sections.js";
 import { validateConfig } from "./logic/validateConfig.js";
+import { glowTransition } from "./motion/glow.js";
 import * as landing from "./screens/landing.js";
 import * as sectionBreak from "./screens/sectionBreak.js";
 import * as question from "./screens/question.js";
@@ -34,6 +35,7 @@ document.title = MESSAGES.page.title;
 const app = document.getElementById("app");
 
 let current = null;
+let currentName = null;
 let currentEl = null;
 let currentKey = null;
 let transitioning = false;
@@ -71,18 +73,28 @@ function focusHeading(el) {
   h.focus({ preventScroll: true });
 }
 
-async function show(next) {
-  if (current) {
-    await current.exit(currentEl, S.state); // old screen animates out
-    current.destroy(currentEl);
-  }
-  const el = next.render(S.state, actions);
-  app.replaceChildren(el);
-  current = next;
-  currentEl = el;
-  window.scrollTo(0, 0);
-  await next.enter(el, S.state); // new screen animates in
-  focusHeading(el);
+// Screen changes that pass through the horizon glow (DESIGN.md §4.4). The
+// others (Q15 → checking, results → retake) are added in Phases 4 and 5.
+const GLOW = new Set(["landing>sectionBreak"]);
+
+async function show(next, nextName) {
+  if (current) await current.exit(currentEl, S.state); // old screen animates out
+
+  // The swap: old screen torn down, new one rendered. With the glow it happens
+  // under full white, so the learner never sees a blank or half-built page.
+  const swap = () => {
+    if (current) current.destroy(currentEl);
+    currentEl = next.render(S.state, actions);
+    app.replaceChildren(currentEl);
+    current = next;
+    currentName = nextName;
+    window.scrollTo(0, 0);
+  };
+  if (GLOW.has(`${currentName}>${nextName}`)) await glowTransition(swap);
+  else swap();
+
+  await next.enter(currentEl, S.state); // new screen animates in
+  focusHeading(currentEl);
 }
 
 async function sync() {
@@ -107,7 +119,7 @@ async function sync() {
   transitioning = true;
   currentKey = key;
   try {
-    await show(next);
+    await show(next, S.state.screen);
   } finally {
     transitioning = false;
   }

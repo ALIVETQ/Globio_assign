@@ -14,4 +14,7 @@ import { CustomEase } from "gsap/CustomEase"; // eases defined in DESIGN.md
 
 gsap.registerPlugin(SplitText, DrawSVGPlugin, MotionPathPlugin, Flip, ScrambleTextPlugin, CustomEase);
 
+// Named eases from DESIGN.md, registered once so every file can use them by name.
+CustomEase.create("soft", "M0,0 C0.2,0.7 0.2,1 1,1"); // §4.3 fade-up: cubic-bezier(.2,.7,.2,1)
+
 export { gsap, SplitText, DrawSVGPlugin, MotionPathPlugin, Flip, ScrambleTextPlugin, CustomEase };

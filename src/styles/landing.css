@@ -72,6 +72,7 @@
 }
 .hero__line {
   display: block;
+  width: fit-content; /* clip-path % in the glitch then measures the word, not the column */
   white-space: nowrap; /* one line per array item; the glitch reveal animates per line */
 }
 .hero__lede {

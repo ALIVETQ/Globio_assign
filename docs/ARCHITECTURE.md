@@ -131,9 +131,12 @@ Globio_assign/                 ← repo root (GitHub: Globio_assign)
 │   ├── motion/                ← ALL ANIMATION CODE
 │   │   ├── gsap.js            ← registers GSAP plugins once; exports gsap
 │   │   ├── prefs.js           ← reduced motion, low-power detection, debug slow-mo
-│   │   ├── globe.js           ← canvas globe singleton (landing + results)
+│   │   ├── globe.js           ← canvas globe singleton (landing + results): lifecycle, loop, pausing
+│   │   ├── globeDraw.js       ← globe geometry + one-frame drawing (DESIGN.md §3.1–3.4)
 │   │   ├── glitch.js          ← glitch reveal / glitch-out
 │   │   ├── glow.js            ← horizon glow screen transition
+│   │   ├── fadeUp.js          ← fade-up helper (DESIGN.md §4.3)
+│   │   ├── landingMotion.js   ← landing entrance, below-the-fold reveals, Start exit
 │   │   ├── countUp.js
 │   │   └── splitFlap.js
 │   │
