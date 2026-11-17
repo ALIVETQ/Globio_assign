@@ -3,6 +3,7 @@
 
 /* ── Confidence dots (§9.5): 2×2 on phones, four columns from tablet up ── */
 .dots {
+  position: relative; /* holds the temporary one-row start of the Flip */
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--s-6) var(--s-4);
@@ -26,6 +27,15 @@
   flex-wrap: wrap;
   gap: 6px;
   margin-top: var(--s-3);
+}
+/* Reveal only (motion/revealDots.js): the 15 dots in one row, in the gap
+   above the columns, measured as the Flip's starting point. */
+.dots__stage {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 3px);
+  display: flex;
+  gap: 6px;
 }
 .dot {
   width: 14px;
@@ -82,6 +92,17 @@
 .practice__tip {
   margin-top: var(--s-3);
 }
+/* Reveal only (motion/revealCards.js): the tip is painted by a gradient clipped
+   to the text — ink | cobalt | transparent, 3× wide. At 100% only the
+   transparent part shows; sliding to 0% sweeps the words in, cobalt then ink. */
+.practice__tip.is-sweeping {
+  background-image: linear-gradient(90deg, var(--ink) 0%, var(--ink) 40%, var(--cobalt) 50%, transparent 60%, transparent 100%);
+  background-size: 300% 100%;
+  background-position: 100% 0%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
 .chip {
   display: inline-block;
   padding: 5px 10px;
@@ -110,9 +131,28 @@
   gap: var(--s-3);
 }
 .tile {
+  position: relative;
+  overflow: hidden; /* keeps the shimmer band inside the tile */
   padding: var(--s-5);
   border-radius: var(--r-card);
   background: var(--surface);
+}
+/* A 30%-wide white-to-transparent diagonal band at 50% opacity, resting just
+   off the left edge; motion/shimmer.js sweeps it across. */
+.tile__shimmer {
+  position: absolute;
+  top: -20%;
+  bottom: -20%;
+  left: -45%;
+  width: 30%;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0), #fff 50%, rgba(255, 255, 255, 0));
+  opacity: 0.5;
+  transform: skewX(-20deg);
+  pointer-events: none;
+}
+/* White at 50% would glare on the dark tiles; a faint sheen reads the same. */
+:root[data-theme="dark"] .tile__shimmer {
+  opacity: 0.08;
 }
 .tile.is-covered {
   background: var(--paper);

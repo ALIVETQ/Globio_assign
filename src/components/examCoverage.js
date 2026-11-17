@@ -26,6 +26,7 @@ export function examCoverageHTML() {
         </div>
         <h3 class="tile__title">${esc(C[key].title)}</h3>
         <p class="tile__body">${esc(C[key].body)}</p>
+        ${covered ? "" : '<span class="tile__shimmer" aria-hidden="true"></span>'}
       </li>`,
   ).join("");
 

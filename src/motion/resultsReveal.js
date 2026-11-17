@@ -1,64 +1,39 @@
-// Results blocks below the fold (DESIGN.md §9.11, second table). Each block
-// animates once, when 15% of it scrolls into view. Phase 5b part 1: skill bars.
+// Results blocks below the fold (DESIGN.md §9.11, second table). Each block is
+// hidden on enter and animates once, when 15% of it scrolls into view.
 //
-// Skill bars: rows fade up (y 12) 120 ms apart; each fill grows from 0 (0.9 s,
-// power3.out) while its score counts up; the 60% dashed line draws top → bottom
-// (0.4 s). A bar below the line then pulses red twice (0.6 s each).
+// The block animations live in revealSkills.js, revealDots.js and
+// revealCards.js; the lucky-guess warning is small enough to live here: it
+// slides in from x −16 (0.4 s) while its dice icon turns 180° (0.6 s, back.out(2)).
 import { gsap } from "./gsap.js";
 import { reducedMotion } from "./prefs.js";
-import { countUp, showZero } from "./countUp.js";
+import { hideSkills, playSkills } from "./revealSkills.js";
+import { hideDots, playDots } from "./revealDots.js";
+import { hidePractice, playPractice, hideCoverage, playCoverage } from "./revealCards.js";
 
-const ROW_STEP = 0.12, GROW = 0.9, LINE = 0.4, PULSE = 0.6;
-const RED = "rgba(220,38,38,.25)"; // §9.11 exact value
-const RED_OFF = "rgba(220,38,38,0)";
-
-// On wide screens a row is `display: contents` (one shared grid), so its parts
-// are animated, not the row itself.
-const rowParts = (row) => row.querySelectorAll(".skill__name, .skill__bar, .skill__score");
-
-function hideSkills(block) {
-  const skills = block.querySelector(".skills");
-  gsap.set(skills, { "--line-draw": 0 });
-  gsap.set(block.querySelector(".skills__line-label"), { opacity: 0 });
-  for (const row of block.querySelectorAll(".skill")) {
-    gsap.set(rowParts(row), { opacity: 0 });
-    gsap.set(row.querySelector(".skill__fill"), { scaleX: 0 });
-    gsap.set(row.querySelector(".skill__bar"), { clearProps: "boxShadow" }); // a pulse cut short by Replay
-    showZero(row.querySelector(".skill__value"), { suffix: "%" });
-  }
+function hideLucky(block) {
+  gsap.set(block, { opacity: 0 });
 }
 
-function playSkills(block, result) {
+function playLucky(block) {
   const tl = gsap.timeline();
-  tl.to(block.querySelector(".skills"), { "--line-draw": 1, duration: LINE, ease: "power2.out" }, 0);
-  tl.to(block.querySelector(".skills__line-label"), { opacity: 1, duration: LINE, clearProps: "opacity" }, 0);
-  block.querySelectorAll(".skill").forEach((row, i) => {
-    const t = i * ROW_STEP;
-    const score = result.skills[row.dataset.skill].score;
-    const bar = row.querySelector(".skill__bar");
-    tl.fromTo(rowParts(row), { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.7, ease: "soft", clearProps: "opacity,transform" }, t);
-    tl.to(row.querySelector(".skill__fill"), { scaleX: score / 100, duration: GROW, ease: "power3.out" }, t);
-    tl.add(countUp(row.querySelector(".skill__value"), score, { suffix: "%", duration: GROW }), t);
-    if (row.classList.contains("is-below")) {
-      // A red glow swells to 6px and fades, twice, once the bar has finished.
-      tl.fromTo(
-        bar,
-        { boxShadow: `0 0 0 0px ${RED}` },
-        {
-          keyframes: [
-            { boxShadow: `0 0 0 6px ${RED}`, duration: PULSE / 2 },
-            { boxShadow: `0 0 0 0px ${RED_OFF}`, duration: PULSE / 2 },
-          ],
-          repeat: 1,
-          ease: "sine.inOut",
-          immediateRender: false,
-          clearProps: "boxShadow",
-        },
-        t + GROW,
-      );
-    }
-  });
+  tl.fromTo(block, { x: -16, opacity: 0 }, { x: 0, opacity: 1, duration: 0.4, ease: "power2.out", clearProps: "transform,opacity" }, 0);
+  // The dice looks the same turned 180°, so it can simply stay there.
+  tl.fromTo(block.querySelector(".lucky__icon"), { rotation: 0 }, { rotation: 180, duration: 0.6, ease: "back.out(2)", transformOrigin: "50% 50%" }, 0);
   return tl;
+}
+
+// Every block that reveals on scroll: [element, hide, play]. play(el, result,
+// onCleanup) returns a timeline; onCleanup takes extra stop functions (the
+// coverage shimmer). Blocks that aren't on the page (no warning) are skipped.
+function blocksOf(root) {
+  const block = (sel) => root.querySelector(sel)?.closest(".results-block, .lucky");
+  return [
+    [block(".skills"), hideSkills, playSkills],
+    [root.querySelector(".lucky"), hideLucky, playLucky],
+    [block(".dots"), hideDots, playDots],
+    [block(".practice"), hidePractice, playPractice], // none when nothing to practise
+    [block(".tiles"), hideCoverage, playCoverage],
+  ].filter(([el]) => el);
 }
 
 // Hides the blocks now and plays each one as it scrolls in. Returns a cleanup
@@ -66,17 +41,17 @@ function playSkills(block, result) {
 export function revealResults(root, result) {
   if (reducedMotion) return () => {};
   const timelines = [];
-  // block element → its animation. Part 2 of Phase 5b adds the lower blocks here.
-  const skills = root.querySelector(".skills").closest(".results-block");
-  const blocks = new Map([[skills, () => playSkills(skills, result)]]);
-  hideSkills(skills);
+  const stops = [];
+  const onCleanup = (fn) => stops.push(fn);
+  const blocks = new Map(blocksOf(root).map(([el, hide, play]) => [el, play]));
+  blocksOf(root).forEach(([el, hide]) => hide(el));
 
   const io = new IntersectionObserver(
     (entries) => {
       for (const e of entries) {
         if (!e.isIntersecting) continue;
         io.unobserve(e.target);
-        const tl = blocks.get(e.target)();
+        const tl = blocks.get(e.target)(e.target, result, onCleanup);
         // Switched to reduced motion while waiting: show the final state at once.
         if (reducedMotion) tl.progress(1);
         timelines.push(tl);
@@ -88,5 +63,6 @@ export function revealResults(root, result) {
   return () => {
     io.disconnect();
     timelines.forEach((t) => t.kill());
+    stops.forEach((stop) => stop());
   };
 }

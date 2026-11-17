@@ -149,7 +149,11 @@ Globio_assign/                 ← repo root (GitHub: Globio_assign)
 │   │   ├── passageMotion.js   ← passage entrances: email pill → Flip, ads, door sign; board via splitFlap.js
 │   │   ├── checkingMotion.js  ← checking readout: scramble, dotted leader, count-up, then on (1.6 s)
 │   │   ├── resultsMotion.js   ← results entrance: verdict block, stamp slam + shake + ring, meter, globe arc
-│   │   ├── resultsReveal.js   ← results blocks below the fold, once each as they scroll in (skill bars …)
+│   │   ├── resultsReveal.js   ← below-the-fold blocks: scroll triggers + lucky-warning slide/dice spin
+│   │   ├── revealSkills.js    ← skill bars grow, 60% line draws, red pulse under the line
+│   │   ├── revealDots.js      ← confidence dots: one row → Flip into the four groups, counts count up
+│   │   ├── revealCards.js     ← practice cards slide in with the text sweep; coverage tiles fade up
+│   │   ├── shimmer.js         ← endless shimmer on the three untested coverage tiles
 │   │   ├── countUp.js
 │   │   └── splitFlap.js
 │   │

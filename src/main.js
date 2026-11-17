@@ -86,9 +86,9 @@ function focusHeading(el) {
   h.focus({ preventScroll: true });
 }
 
-// Screen changes that pass through the horizon glow (DESIGN.md §4.4).
-// Results → retake is added in Phase 5.
-const GLOW = new Set(["landing>sectionBreak", "question>checking"]);
+// Screen changes that pass through the horizon glow (DESIGN.md §4.4, §9.11):
+// Start, the last answer, and Retake (results → a fresh Vocabulary section break).
+const GLOW = new Set(["landing>sectionBreak", "question>checking", "results>sectionBreak"]);
 
 async function show(next, nextName) {
   if (current) await current.exit(currentEl, S.state); // old screen animates out
