@@ -10,6 +10,7 @@ const ARROW = `<span aria-hidden="true">→</span>`;
 export function confidenceBarHTML() {
   return `
     <div class="confidence">
+      <p class="label confidence__label">${esc(Q.confidenceLabel)}</p>
       <p id="confidence-help" class="sr-only">${esc(Q.disabledHelp)}</p>
       <div class="confidence__main">
         <div class="confidence__item">

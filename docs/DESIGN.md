@@ -379,7 +379,7 @@ Reduced motion: no slide (giant word static, centred, clipped), auto-advance aft
 ```
 ┌──────────────────────────────────────────────┐
 │ INDIA ●──●──●──◉──○──○──○ … ○── GERMANY      │  ← journey bar, full width
-│ ← Back            01 / VOCABULARY · Q4 OF 15 │  ← label row
+│ ← Back            01 / VOCABULARY · Q4 OF 15 │  ← label row (the label is now in the ticket strip, §7.7)
 │                                              │
 │   Wo kauft man Medikamente?                  │  ← prompt, max 720px, centred column
 │   Where do you buy medicine?                 │  ← English hint (optional)
@@ -395,7 +395,8 @@ Reduced motion: no slide (giant word static, centred, clipped), auto-advance aft
 ```
 
 - Content column max-width 720px, centred; padding 20px (phone), 40px (desktop); starts 32px below the label row.
-- **Label row:** left a text button `question.back` with a "←" (hidden on question 1 of the whole test); right a mono label, e.g. `01 / VOCABULARY · Q4 OF 15` (format in `CONTENT.md`).
+- **Label row:** left a text button `question.back` with a "←" (hidden on question 1 of the whole test); right the topic chip when the topic card isn't shown (§7.7). The mono label `01 / VOCABULARY · Q4 OF 15` now sits at the right of the ticket strip (§7.7).
+- At ≥1200px the screen becomes the in-flight cockpit (§7.7).
 - **Prompt:** `--fs-prompt`, ink, `lang="de"`. Gaps ("___") are drawn as a 3em-wide inline underline (2px, cobalt), not underscores.
 - **English hint:** `--fs-small`, muted, 8px below the prompt, only if the question has one.
 - **Options:** 28px below. A vertical list, gap 10px.
@@ -499,6 +500,28 @@ Above every passage, a mono label naming the format: `reading.formatEmail`, `rea
 - **Number question (v3):** "47" shown in Anton 64px as two odometer digits that roll through 0–9 and settle (0.8 s, staggered 120 ms).
 
 **Reduced motion:** questions swap instantly; option selection shows the final stroke immediately; passages appear in their final state; journey plane jumps.
+
+---
+
+### 7.7 In-flight cockpit (`components/cockpit.js`, `styles/cockpit.css`, `cockpitRails.css`)
+
+Everything here is **static**: it changes only when the question changes, never while the learner is thinking (§10).
+
+**All sizes**
+- **Ticket strip** under the journey bar, full width, mono 12px (11px on phones), uppercase, `--muted`, hairline below, padding 8px 20px (10px 40px ≥1200px). Left (`aria-hidden`): `question.ticket` — "FLIGHT GL-A1 · SEAT Q01 · GATE WORTSCHATZ". Right: the question label (`question.label`, "01 / VOCABULARY · Q1 OF 15"), moved here from the label row. Wraps to two lines on phones.
+- **Label row:** Back on the left (as before); on the right, when the topic card isn't shown (below 1200px, and on reading questions), the **topic chip**: the topic `label` as a small mono pill (11px, `--surface`, `--muted`, one line with ellipsis).
+- **Background word:** the current section's German name (`SECTIONS[].de`: WORTSCHATZ / GRAMMATIK / LESEN) in Anton `clamp(160px, 18vw, 320px)`, line-height 0.8, `--ink` at 4%, `position: fixed`, centred, anchored to the bottom of the viewport, behind everything (`z-index: −1`), `aria-hidden`, `pointer-events: none`. It changes only at section breaks.
+
+**Desktop ≥1200px** (below that, the layout of §7.1–7.5)
+- **Three columns** (non-reading questions): left rail 240px · centre max 860px · right rail 280px, gap 48px, side padding 40px, vertically centred in the space below the header. Back sits above the centre column.
+- **Question:** prompt `clamp(32px, 3.2vw, 52px)` (line-height 1.2), hint 18px. Behind the prompt, top-left, the question number "01"–"15" in Anton 160px, outline only (1px stroke, `--ink` at 12%, transparent fill), `aria-hidden`.
+- **Options:** `choice4` in a 2×2 grid (gap 14px), text 22px, min-height 84px; `sentence` (g3) one column, 20px; Richtig/Falsch side by side, min-height 96px, 24px. Keycaps 32px (mono 14px). The drawn outline (§7.6) is measured from each option, so it fits every shape.
+- **Confidence bar:** a mono label `question.confidenceLabel` ("HOW SURE ARE YOU?") above it; the two main buttons 60px tall, min-width 240px; 24px padding above and below (so it stays on screen at 1440×900, and for vocabulary and grammar at 1280×800).
+- **Left rail, "YOUR ROUTE"** (`aria-hidden`; the journey bar's progressbar already says where you are): mono label `question.routeTitle`; a vertical 1.5px hairline line with 3 section stops (14px circles: hollow `--muted-2` ahead, 2px cobalt ring for the current section, filled cobalt once passed), each with its `de` name in mono 12px; under each stop its 5 question dots (10px): done filled cobalt, current a 2px cobalt ring with a 3px `--wash` halo, upcoming hollow `--muted-2`. **Position only — never right or wrong.** At the bottom `question.routeFooter` ("15 QUESTIONS · NO TIMER").
+- **Right rail, topic card:** `--surface`, radius card, padding 24px: label `question.topicTitle` ("TOPIC"), the topic `label` (Archivo 600, 20px), a hairline, label `question.examTitle` ("IN THE REAL EXAM"), then the topic's `examLink` (15px, `--muted`; `CONTENT.md` §3).
+- **Reading questions** (with a passage): the two-column passage + question layout of §7.5, plus the ticket strip, background word and topic chip; **no rails** (the passage needs the width). The ads question (r3) has no side passage, so it gets the rails.
+
+**Motion:** nothing new. The rails take part in the existing question-enter fade (opacity 0 → 1, 0.32 s, with the column); the background word fades in the same way only on the first question of a section. The route rail's current dot moves when the journey-bar plane lands (§7.6), not before; under reduced motion, at once.
 
 ---
 

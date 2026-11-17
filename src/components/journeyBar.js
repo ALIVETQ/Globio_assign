@@ -100,7 +100,9 @@ function draw(svg, order, index) {
 }
 
 // Wire up a rendered bar. Returns { destroy() }.
-export function mountJourney(root, order, index, attempt) {
+// onFrom(i): told at once where the plane starts (i = index when it doesn't fly);
+// onLand(): called when the plane reaches the current dot (at once if it doesn't fly).
+export function mountJourney(root, order, index, attempt, { onFrom = () => {}, onLand = () => {} } = {}) {
   const bar = root.querySelector(".journey__progress");
   const svg = bar.querySelector("svg");
   bar.setAttribute("aria-valuemax", String(order.length));
@@ -112,13 +114,23 @@ export function mountJourney(root, order, index, attempt) {
   last = { attempt, index };
   let tl = null;
   let first = true;
+  let landed = false;
+  const land = () => {
+    if (!landed) onLand();
+    landed = true;
+  };
+  onFrom(from ?? index);
+  if (from === null) land();
 
   // Drawn once the bar has a width (ResizeObserver fires before the first
   // paint), and again whenever the width changes (the flight then just snaps).
   const ro = new ResizeObserver(() => {
     tl?.kill();
     const parts = draw(svg, order, index);
-    if (!parts || !first || from === null) return;
+    if (!parts || !first || from === null) {
+      if (parts) land(); // a redraw mid-flight snaps the plane to its dot
+      return;
+    }
     first = false;
     tl = flyPlane({
       ...parts,
@@ -126,6 +138,8 @@ export function mountJourney(root, order, index, attempt) {
       to: parts.progress[index],
       leftDot: svg.querySelector(`.journey__dot[data-i="${from}"]`),
     });
+    if (tl) tl.call(land);
+    else land(); // reduced motion: the plane just jumps
   });
   ro.observe(svg);
   return {

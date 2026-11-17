@@ -126,6 +126,15 @@ export const MESSAGES = {
     disabledHelp: "Choose an answer first", // tooltip / aria-describedby on the disabled buttons
     optionsAria: "Answer options",
     trueFalse: { true: "Richtig", false: "Falsch", keyTrue: "R", keyFalse: "F" },
+
+    // In-flight cockpit (DESIGN.md §7.7). {nn} = question number "01"–"15";
+    // {sectionDe} = SECTIONS[].de of the current section.
+    ticket: "FLIGHT GL-A1 · SEAT Q{nn} · GATE {sectionDe}",
+    confidenceLabel: "HOW SURE ARE YOU?", // above the confidence bar, desktop
+    routeTitle: "YOUR ROUTE",
+    routeFooter: "{total} QUESTIONS · NO TIMER",
+    topicTitle: "TOPIC",
+    examTitle: "IN THE REAL EXAM",
   },
 
   reading: {

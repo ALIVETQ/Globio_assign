@@ -1,6 +1,6 @@
-// Question screen (DESIGN.md §7.1–7.4, motion §7.6), shared by all three sections.
-// Layout and wiring live here; animation lives in motion/questionMotion.js.
-// Passages come in Phase 4.
+// Question screen (DESIGN.md §7.1–7.7, motion §7.6), shared by all three sections.
+// Layout and wiring live here; animation lives in motion/questionMotion.js; the
+// cockpit parts (ticket strip, rails, background word) in components/cockpit.js.
 import { MESSAGES } from "../data/messages.js";
 import { SECTIONS } from "../data/sections.js";
 import { esc, fromHTML, onAction } from "../dom.js";
@@ -13,6 +13,7 @@ import { hasSidePassage, passageHTML, formatLabelHTML, mountPassageScroll } from
 import { playEnter, playExit, sizeStroke, setStroke, pulseEnable } from "../motion/questionMotion.js";
 import { playPassage } from "../motion/passageMotion.js";
 import { PASSAGES } from "../data/questions.js";
+import * as cockpit from "../components/cockpit.js";
 
 const Q = MESSAGES.question;
 const live = new WeakMap();
@@ -22,6 +23,8 @@ let enterDir = 1;
 // The passage last shown and how far it was scrolled (phones), so r2 opens the
 // shared email where r1 left it.
 let lastPassage = { id: null, scrollTop: 0 };
+// The section last shown: the background word fades in only when it changes.
+let lastSection = null;
 
 // "___" in a prompt is drawn as a 3em cobalt underline (§7.1). The underscores
 // stay in the text for screen readers, visually hidden.
@@ -45,18 +48,24 @@ export function render(state, actions) {
   // and the passage on top on phones (§7.5). The passage sits outside .q-body,
   // so it stays still while the question side animates (r1 → r2 share an email).
   const side = hasSidePassage(q);
+  // The rails need the width the passage uses, so reading questions get none (§7.7).
+  const rails = !side;
   const el = fromHTML(`
-    <section class="screen question-screen${side ? " is-reading" : ""}${q.format === "ads" ? " is-ads" : ""}">
+    <section class="screen question-screen${side ? " is-reading" : " has-rails"}${q.format === "ads" ? " is-ads" : ""}">
       ${journeyBarHTML()}
+      ${cockpit.ticketStripHTML(q, state.index, labelText(state, q))}
       <div class="q-label-row">
         ${back}
-        <p class="label">${esc(labelText(state, q))}</p>
+        ${cockpit.topicChipHTML(q)}
       </div>
+      <div class="q-cockpit">
+      ${rails ? cockpit.routeRailHTML(state.order, state.index) : ""}
       <div class="q-layout">
         ${side ? passageHTML(q) : ""}
         <div class="q-main">
           <div class="q-body">
             <div class="q-column">
+              ${cockpit.questionNumberHTML(state.index)}
               <h1 class="prompt" lang="de">${promptHTML(q.prompt)}</h1>
               ${q.hint ? `<p class="q-hint small muted">${esc(q.hint)}</p>` : ""}
               ${q.format === "ads" ? formatLabelHTML(q) : ""}
@@ -66,6 +75,9 @@ export function render(state, actions) {
           ${confidenceBarHTML()}
         </div>
       </div>
+      ${rails ? cockpit.topicRailHTML(q) : ""}
+      </div>
+      ${cockpit.bgWordHTML(q)}
     </section>
   `);
 
@@ -77,7 +89,9 @@ export function render(state, actions) {
     // r1 → r2 (and Back r2 → r1) keep the same email still.
     passageType: q.passage ? PASSAGES[q.passage]?.type : null,
     samePassage: Boolean(q.passage) && q.passage === lastPassage.id,
+    newSection: q.section !== lastSection,
   };
+  lastSection = q.section;
   // Remember what the learner did, so the exit can play the matching feedback.
   const run = (cmd) => {
     if (!cmd) return false;
@@ -120,7 +134,11 @@ export function render(state, actions) {
     offKey: () => document.removeEventListener("keydown", onKey),
     offResize: () => ro.disconnect(),
     offPassage: mountPassageScroll(el, q.passage && q.passage === lastPassage.id ? lastPassage.scrollTop : 0),
-    journey: mountJourney(el, state.order, state.index, state.attempt),
+    // The route rail's current dot moves when the journey-bar plane lands (§7.7).
+    journey: mountJourney(el, state.order, state.index, state.attempt, {
+      onFrom: (from) => cockpit.setRouteCurrent(el, from, state.order),
+      onLand: () => cockpit.setRouteCurrent(el, state.index, state.order),
+    }),
   });
   live.set(el, h);
   update(el, state);
@@ -144,7 +162,10 @@ export function enter(el) {
   h.enterTl?.progress(1).kill(); // debug "Replay" calls enter() again
   h.passageTl?.progress(1).kill();
   // The ad cards are the options and have their own entrance.
-  const { tl, ready } = playEnter(el, enterDir, { skipOptions: h.passageType === "ads" });
+  // The rails fade in with the question; the background word only when a section starts.
+  const also = [...el.querySelectorAll(".rail")];
+  if (h.newSection) also.push(el.querySelector(".q-bgword"));
+  const { tl, ready } = playEnter(el, enterDir, { skipOptions: h.passageType === "ads", also });
   enterDir = 1;
   h.enterTl = tl;
   if (h.passageType && !h.samePassage) h.passageTl = playPassage(el, h.passageType);

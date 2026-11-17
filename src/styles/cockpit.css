@@ -1,0 +1,142 @@
+/* Question screen "in-flight cockpit" (DESIGN.md §7.7, components/cockpit.js).
+   All sizes: ticket strip, topic chip, background word. ≥1200px: bigger
+   question, 2×2 options, outline number, and — not on reading questions — the
+   route rail and the topic card either side of the question. */
+
+/* ── Ticket strip, under the journey bar ── */
+.q-ticket {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 2px 16px;
+  padding: 8px var(--q-pad);
+  border-bottom: var(--hairline-border);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.5;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ── Topic chip (right of Back): shown when the topic card isn't ── */
+.q-chip {
+  overflow: hidden;
+  max-width: 62%;
+  padding: 4px 10px;
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* The cockpit row: below 1200px simply the old column (the rails are hidden). */
+.q-cockpit {
+  display: flex;
+  flex-direction: column;
+}
+@media (max-width: 639px) {
+  .q-cockpit { flex: 1; }
+  /* Fits "FLIGHT GL-A1 · SEAT Q01 · GATE WORTSCHATZ" on one 320px line */
+  .q-ticket { font-size: 11px; letter-spacing: 0.02em; }
+}
+
+/* ── Background word: the section's German name, huge, 4%, behind everything ── */
+.q-bgword {
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  z-index: -1;
+  transform: translateX(-50%);
+  font-family: var(--font-display);
+  font-size: clamp(160px, 18vw, 320px);
+  line-height: 0.8;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: color-mix(in srgb, var(--ink) 4%, transparent);
+  pointer-events: none;
+  user-select: none;
+}
+
+.rail,
+.q-num,
+.confidence__label {
+  display: none;
+}
+
+/* ═════════════ Desktop cockpit, ≥1200px ═════════════ */
+@media (min-width: 1200px) {
+  .q-ticket { padding: 10px 40px; }
+
+  /* Bigger question, with its number in outline behind it (top-left) */
+  .q-column {
+    position: relative;
+    isolation: isolate;
+  }
+  .q-num {
+    display: block;
+    position: absolute;
+    top: -0.42em;
+    left: -0.05em;
+    z-index: -1;
+    font-family: var(--font-display);
+    font-size: 160px;
+    line-height: 1;
+    color: transparent;
+    -webkit-text-stroke: 1px color-mix(in srgb, var(--ink) 12%, transparent);
+    pointer-events: none;
+  }
+  .question-screen .prompt { font-size: clamp(32px, 3.2vw, 52px); line-height: 1.2; }
+  .question-screen .q-hint { font-size: 18px; }
+
+  /* Options: choice4 as a 2×2 grid; sentences one column; Richtig/Falsch taller.
+     The drawn outline is measured from each option, so it fits every shape. */
+  .options--choice4 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+  .options--choice4 .option { min-height: 84px; font-size: 22px; }
+  .options--sentence .option { font-size: 20px; }
+  .options--trueFalse .option { min-height: 96px; font-size: 24px; }
+  .question-screen .keycap { width: 32px; height: 32px; font-size: 14px; }
+
+  /* Confidence bar: a label above it, bigger buttons */
+  .confidence__label { display: block; }
+  .confidence__main .btn { height: 60px; min-width: 240px; }
+
+  /* Three columns, vertically centred in the space below the header */
+  .has-rails .q-cockpit,
+  .has-rails .q-label-row {
+    display: grid;
+    grid-template-columns: 240px minmax(0, 860px) 280px;
+    column-gap: 48px;
+    justify-content: center;
+    width: 100%;
+    max-width: none;
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+  .has-rails .q-cockpit {
+    flex: 1;
+    align-items: center;
+  }
+  .has-rails .q-label-row > :first-child { grid-column: 2; justify-self: start; } /* Back, over the question */
+  .has-rails .q-chip { display: none; } /* the topic card says it */
+  .has-rails .q-layout { min-width: 0; }
+  .has-rails .q-column,
+  .has-rails .confidence {
+    max-width: none;
+    padding-left: 0;
+    padding-right: 0;
+  }
+  /* Tighter top and bottom, so the bar stays on screen down to 1280×800. */
+  .has-rails .confidence { padding-top: 24px; padding-bottom: 24px; }
+  .rail { display: block; }
+}
+
+/* Rail contents: cockpitRails.css */

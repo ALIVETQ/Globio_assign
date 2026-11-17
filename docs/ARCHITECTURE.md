@@ -122,6 +122,7 @@ Globio_assign/                 ← repo root (GitHub: Globio_assign)
 │   │   ├── seatbelt.js        ← FASTEN SEATBELT sign + pledge card (label around a hidden checkbox) + buckle
 │   │   ├── optionList.js      ← the answer options
 │   │   ├── confidenceBar.js   ← "I'm sure" / "I guessed" / "I don't know this yet"
+│   │   ├── cockpit.js         ← question-screen cockpit: ticket strip, topic chip, background word, route rail, topic card
 │   │   ├── themeToggle.js     ← sun/moon button markup
 │   │   ├── journeyBar.js      ← India → Germany progress bar with plane
 │   │   ├── passage.js         ← passage wrapper: format label, phone 45% scroll box, type dispatch
@@ -183,6 +184,8 @@ Globio_assign/                 ← repo root (GitHub: Globio_assign)
 │       ├── reading.css        ← reading layout (passage left / on top), Richtig/Falsch, ad options
 │       ├── passages.css       ← email, door sign
 │       ├── board.css          ← split-flap train board (+ flip folds)
+│       ├── cockpit.css        ← question cockpit: ticket strip, chip, background word, ≥1200px three-column layout
+│       ├── cockpitRails.css   ← question cockpit rails: route stops/dots, topic card
 │       ├── results.css        ← results page column, verdict block, score meter
 │       ├── ticket.css         ← boarding pass card: two parts, notches, perforation, narrow/wide layouts
 │       ├── ticketParts.css    ← boarding pass contents: header, route, fields, status flaps, stub

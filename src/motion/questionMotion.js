@@ -19,12 +19,15 @@ const GHOST = "-2px 0 rgba(47,99,255,.5)";
 // Returns { tl, ready }: `ready` resolves when the column has landed (0.32 s);
 // the options' fade-up may still be finishing, but the learner can already act.
 // `skipOptions`: the options have their own entrance (the ad cards, §7.6).
-export function playEnter(root, dir = 1, { skipOptions = false } = {}) {
+// `also`: elements that just fade in with the column (the cockpit rails, §7.7).
+export function playEnter(root, dir = 1, { skipOptions = false, also = [] } = {}) {
   if (reducedMotion) return { tl: null, ready: Promise.resolve() };
   const body = root.querySelector(".q-body");
   const col = root.querySelector(".q-column");
   const tl = gsap.timeline();
   tl.fromTo(body, { x: SHIFT * dir, opacity: 0 }, { x: 0, opacity: 1, duration: ENTER_S, ease: "power3.out", clearProps: "transform,opacity" }, 0);
+  const fades = also.filter(Boolean);
+  if (fades.length) tl.fromTo(fades, { opacity: 0 }, { opacity: 1, duration: ENTER_S, ease: "power3.out", clearProps: "opacity" }, 0);
   // Two-frame glitch at the start: ±3px jitter with a cobalt ghost, then clean.
   tl.set(col, { x: 3, textShadow: GHOST }, 0)
     .set(col, { x: -3 }, FRAME)

@@ -27,6 +27,7 @@ describe("content data", () => {
       expect(ids.has(q.id)).toBe(false);
       ids.add(q.id);
       expect(TOPICS[q.topic]).toBeDefined();
+      expect(TOPICS[q.topic].examLink).toMatch(/\S/); // the cockpit's topic card line (DESIGN.md §7.7)
       expect(q.answer).toBeGreaterThanOrEqual(0);
       expect(q.answer).toBeLessThan(q.options.length);
       if (q.section === "reading") expect(PASSAGES[q.passage]).toBeDefined();

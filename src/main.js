@@ -18,6 +18,8 @@ import "./styles/question.css";
 import "./styles/reading.css";
 import "./styles/passages.css";
 import "./styles/board.css";
+import "./styles/cockpit.css";
+import "./styles/cockpitRails.css";
 import "./styles/results.css";
 import "./styles/ticket.css";
 import "./styles/ticketParts.css";
