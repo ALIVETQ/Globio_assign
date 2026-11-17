@@ -37,6 +37,7 @@ function readColors() {
     ink: v("--ink", "#111111"),
     paper: v("--paper", "#ffffff"),
     cobalt: v("--cobalt", "#2f63ff"),
+    ready: v("--ready", "#16a34a"),
     monoFont: v("--font-mono", "monospace"),
     dark: document.documentElement.dataset.theme === "dark",
   };
@@ -85,11 +86,16 @@ function frameAt(t) {
     plane: null,
     trail: [],
     pulse: null,
+    arrived: false,
   };
 
   if (mode === "results") {
     f.arc = arcProgress;
-    f.plane = arcProgress > 0 ? arcProgress : null; // a plane dot sits at the arc's tip
+    // Only a "ready" verdict draws the arc all the way (§3.6): the plane has
+    // landed, so the Germany pin turns --ready. The plane dot is no longer
+    // drawn then: it would sit on the pin and hide its colour.
+    f.arrived = arcProgress >= 1;
+    f.plane = arcProgress > 0 && !f.arrived ? arcProgress : null; // a plane dot sits at the arc's tip
     return f;
   }
 

@@ -123,4 +123,6 @@ export const RESULTS_MESSAGES = {
     "Practise next: {practiceList}",
     "{url}",
   ],
+  // {practiceList} when there are no recommendations (CONTENT.md §8.5, comment above `summary`).
+  summaryNone: "nothing major",
 };

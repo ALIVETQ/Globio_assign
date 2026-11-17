@@ -102,6 +102,7 @@ Globio_assign/                 ← repo root (GitHub: Globio_assign)
 │   │   ├── shuffle.js         ← builds this attempt's question order and option order
 │   │   ├── presets.js         ← the 8 debug answer sets defined in LOGIC.md §12
 │   │   ├── fill.js            ← fill(template, values) placeholder helper (LOGIC.md §11)
+│   │   ├── resultText.js      ← results-page placeholder values, reason-template choice, copy-my-result summary
 │   │   ├── keys.js            ← question-screen keyboard shortcuts: key + question → command
 │   │   └── validateConfig.js  ← dev-only startup checks on config.js (LOGIC.md §2)
 │   │
@@ -124,13 +125,14 @@ Globio_assign/                 ← repo root (GitHub: Globio_assign)
 │   │   ├── passageSign.js     ← door sign / notice passage
 │   │   ├── passageBoard.js    ← split-flap train board passage
 │   │   ├── passageAds.js      ← two-ad matching passage (the ad cards are the a/b options)
-│   │   ├── scoreMeter.js      ← overall score + ready line
+│   │   ├── scoreMeter.js      ← overall score + ready/almost ticks
 │   │   ├── skillBars.js
-│   │   ├── verdictStamp.js
-│   │   ├── confidenceDots.js
+│   │   ├── verdictStamp.js    ← stamp heading + SVG ink-texture filter
+│   │   ├── confidenceDots.js  ← four dot groups + one script-positioned tooltip
 │   │   ├── practiceCards.js
 │   │   ├── examCoverage.js    ← "What this check can't see" grid
-│   │   └── answerReview.js
+│   │   ├── answerReview.js    ← "Review your answers" and "How we calculate ready" (both collapsed)
+│   │   └── toast.js           ← bottom-centre status message ("Copied to clipboard")
 │   │
 │   ├── motion/                ← ALL ANIMATION CODE
 │   │   ├── gsap.js            ← registers GSAP plugins once; exports gsap
@@ -154,7 +156,7 @@ Globio_assign/                 ← repo root (GitHub: Globio_assign)
 │   └── styles/
 │       ├── tokens.css         ← colours, fonts, spacing, radii, z-index (from DESIGN.md)
 │       ├── base.css           ← reset, typography, buttons, layout helpers
-│       ├── screens.css        ← per-screen styles, grouped by screen
+│       ├── screens.css        ← small screens: checking readout
 │       ├── landing.css        ← landing hero: top bar, hero copy, globe slot
 │       ├── landingSections.css ← landing sections below the hero
 │       ├── journey.css        ← journey bar (section break + question screens)
@@ -163,6 +165,10 @@ Globio_assign/                 ← repo root (GitHub: Globio_assign)
 │       ├── reading.css        ← reading layout (passage left / on top), Richtig/Falsch, ad options
 │       ├── passages.css       ← email, door sign
 │       ├── board.css          ← split-flap train board (+ flip folds)
+│       ├── results.css        ← results page column, verdict block, score meter, results globe box
+│       ├── skills.css         ← skill bars + 60% line, lucky-guess warning
+│       ├── resultsBlocks.css  ← confidence dots + tooltip, practice cards, coverage tiles
+│       ├── resultsFold.css    ← review + method folds, actions row, toast
 │       └── options.css        ← answer options + drawn selection stroke
 │
 └── tests/
@@ -170,6 +176,7 @@ Globio_assign/                 ← repo root (GitHub: Globio_assign)
     ├── scoring.test.js
     ├── shuffle.test.js
     ├── keys.test.js           ← keyboard shortcut mapping
+    ├── resultText.test.js     ← results text for all 8 presets (reason template, filled placeholders, summary)
     └── data.test.js           ← content sanity checks, config validation, fill()
 ```
 
@@ -443,7 +450,7 @@ Phases follow the screens in the order the learner meets them. **Each phase has 
 **Goal:** the screen that delivers the verdict and the advice. The most important screen.
 
 (a) Work
-- `screens/checking.js`: the 1.5 s "checking" readout, then automatically on to results.
+- `screens/checking.js`: the "checking" readout (1.6 s, `DESIGN.md` §8), then automatically on to results.
 - `screens/results.js`, top to bottom, exactly as ordered in `DESIGN.md`:
   1. verdict stamp + reason sentence + next action
   2. overall score meter with the ready line

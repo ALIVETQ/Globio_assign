@@ -1,0 +1,152 @@
+/* Results page, top (DESIGN.md §9.1–9.2): page column and the verdict block
+   (stamp, reason, score meter, globe). The other blocks: skills.css,
+   resultsBlocks.css, resultsFold.css. */
+
+.results {
+  --block-gap: var(--s-9); /* 56px between blocks on phones (§9) */
+  display: flex;
+  flex-direction: column;
+  gap: var(--block-gap);
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 20px;
+}
+.results__top {
+  margin-bottom: calc(var(--s-3) - var(--block-gap)); /* the toggle sits just above the verdict */
+}
+.results-block > * + * {
+  margin-top: var(--s-5);
+}
+
+/* ── Verdict block (§9.2): tinted with the verdict's wash; --v is its colour ── */
+.verdict {
+  display: grid;
+  gap: var(--s-6);
+  padding: 28px;
+  border-radius: var(--r-card);
+}
+.verdict--ready { --v: var(--ready); background: var(--ready-wash); }
+.verdict--almost { --v: var(--almost); background: var(--almost-wash); }
+.verdict--notYet { --v: var(--notyet); background: var(--notyet-wash); }
+.verdict__main {
+  min-width: 0;
+}
+.verdict__label {
+  margin-bottom: var(--s-4);
+}
+.stamp__defs {
+  position: absolute; /* holds the ink filter only; takes no space */
+}
+.stamp {
+  display: inline-block;
+  max-width: 100%;
+  margin: var(--s-2) 0 var(--s-1);
+  padding: 6px 18px;
+  border: 4px solid var(--v);
+  border-radius: 10px;
+  color: var(--v);
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(44px, 7vw, 84px);
+  line-height: 1;
+  text-transform: uppercase;
+  transform: rotate(-4deg);
+  transform-origin: left center;
+  filter: url(#stamp-ink); /* ink texture, see components/verdictStamp.js */
+}
+.verdict__reason {
+  margin-top: var(--s-5);
+  font-size: var(--fs-body-lg);
+  line-height: var(--lh-body-lg);
+  font-weight: 500;
+}
+.verdict__next {
+  margin-top: var(--s-2);
+  color: var(--muted);
+}
+
+/* Score meter: big number, bar in the verdict colour, ticks at 75 and 55 */
+.meter {
+  margin-top: var(--s-6);
+}
+.meter__number {
+  font-family: var(--font-display);
+  font-size: 72px;
+  line-height: 1;
+}
+.meter__pct {
+  font-size: 50%;
+}
+.meter__bar {
+  position: relative;
+  margin-top: var(--s-3);
+  padding-bottom: 22px; /* room for the tick labels */
+}
+.meter__track {
+  height: 10px;
+  border-radius: var(--r-pill);
+  background: var(--hairline);
+  overflow: hidden;
+}
+.meter__fill {
+  height: 100%;
+  background: var(--v);
+  transform-origin: left; /* scaleX, never width (§10.7) */
+}
+.meter__tick {
+  position: absolute;
+  top: -4px; /* 18px tall, centred on the 10px bar */
+  width: 2px;
+  height: 18px;
+  margin-left: -1px;
+  background: var(--ink);
+}
+.meter__tick-label {
+  position: absolute;
+  top: calc(100% + 4px);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+.meter__tick--almost .meter__tick-label { right: 0; } /* hangs left of its tick */
+.meter__tick--ready .meter__tick-label { left: 0; } /* hangs right of its tick */
+.meter__note {
+  margin-top: var(--s-2);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.5;
+  letter-spacing: 0.06em;
+  color: var(--muted-2);
+}
+
+/* Globe (§3.5 results): full width × 260 on phones, 360×300 on desktop */
+.verdict__globe {
+  margin: 0;
+  text-align: center;
+}
+.results-globe {
+  position: relative;
+  width: 100%;
+  height: 260px;
+  margin: 0 auto;
+}
+.verdict__caption {
+  margin-top: var(--s-2);
+}
+
+@media (min-width: 1024px) {
+  .results {
+    --block-gap: var(--s-10); /* 72px on desktop */
+    padding: 56px 40px;
+  }
+  .verdict {
+    grid-template-columns: 3fr 2fr; /* left 60% / right 40% */
+    align-items: center;
+  }
+  .results-globe {
+    width: 360px;
+    max-width: 100%;
+    height: 300px;
+  }
+}

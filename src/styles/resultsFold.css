@@ -1,0 +1,95 @@
+/* Results page, bottom (DESIGN.md §9.8–9.10): the two collapsed sections,
+   the actions row and the "copied" toast. */
+
+/* ── Collapsed sections (§9.8, §9.9) ── */
+.fold {
+  padding-top: var(--s-5);
+  border-top: var(--hairline-border);
+}
+.fold + .fold {
+  margin-top: calc(var(--s-6) - var(--block-gap)); /* the two folds sit together */
+}
+/* Title (+ count) on the left, wrapping on phones; the chevron stays on the right. */
+.fold__summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--s-3);
+  list-style: none;
+  cursor: pointer;
+}
+.fold__title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--s-2) var(--s-3);
+}
+.fold__summary::-webkit-details-marker { display: none; }
+.fold__chevron {
+  transition: transform 0.25s;
+}
+.fold[open] .fold__chevron { transform: rotate(180deg); }
+.review__row {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  grid-template-areas: "num status" "main main";
+  gap: var(--s-2) var(--s-3);
+  padding: var(--s-4) 0;
+  border-bottom: var(--hairline-border);
+}
+.review__num { grid-area: num; padding-top: 4px; }
+.review__main { grid-area: main; min-width: 0; }
+.review__status { grid-area: status; display: flex; align-items: center; justify-content: flex-end; gap: var(--s-3); }
+.review__prompt {
+  font-weight: 600;
+  white-space: nowrap; /* one line on phones */
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.review__answers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2) var(--s-6);
+  margin: var(--s-2) 0 0;
+  font-size: 15px;
+}
+.review__answers dd { margin: 4px 0 0; }
+.review__explain { margin-top: var(--s-2); font-size: var(--fs-small); color: var(--muted); }
+.review__mark { font-size: 18px; font-weight: 700; }
+.is-correct .review__mark { color: var(--ready); }
+.is-wrong .review__mark { color: var(--notyet); }
+.method { display: grid; gap: var(--s-3); max-width: 68ch; }
+@media (min-width: 640px) {
+  .review__row { grid-template-columns: 40px minmax(0, 1fr) auto; grid-template-areas: "num main status"; }
+  .review__status { align-items: flex-start; }
+  .review__prompt { white-space: normal; }
+}
+
+/* ── Actions (§9.10) and the "copied" toast ── */
+.results-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-3) var(--s-5);
+}
+@media (max-width: 639px) {
+  .results-actions .btn--primary,
+  .results-actions .btn--secondary { flex: 1 1 100%; }
+  .results-actions .btn--link { margin: var(--s-2) auto 0; }
+}
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: var(--s-6);
+  z-index: 60;
+  max-width: calc(100vw - 32px);
+  padding: 10px 18px;
+  border-radius: var(--r-pill);
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  text-align: center;
+  transform: translateX(-50%);
+}
+.toast[hidden] { display: none; }

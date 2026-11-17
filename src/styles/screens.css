@@ -1,31 +1,47 @@
-/* Per-screen styles, grouped by screen. Phase 0: placeholder layout only;
-   each phase replaces its screen's block with the real layout from DESIGN.md. */
+/* Per-screen styles that are too small for a file of their own.
+   Bigger screens have their own files: landing.css, landingSections.css,
+   journey.css, sectionBreak.css, question.css, reading.css, results.css. */
 
-/* ── Shared placeholder column ── */
-.placeholder {
+/* ── Checking (DESIGN.md §8.1): white, a centred column max 520px ── */
+.checking {
   display: flex;
   flex-direction: column;
-  gap: var(--s-6);
-  max-width: 720px;
-  margin: 0 auto;
-  padding: var(--s-5); /* phone */
+  min-height: 100svh;
+  padding: var(--s-5);
+}
+.checking__column {
+  width: 100%;
+  max-width: 520px;
+  margin: auto; /* centred both ways in the remaining height */
+}
+.checking__title {
+  margin-bottom: var(--s-6);
+}
+.readout {
+  display: grid;
+  gap: var(--s-3);
+}
+/* label ........ 80% — a dotted leader fills the space between */
+.readout__line {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-2);
+  font-family: var(--font-mono);
+  font-size: 15px;
+  color: var(--ink);
+}
+.readout__leader {
+  flex: 1;
+  min-width: var(--s-4);
+  border-bottom: 2px dotted var(--muted-2);
+  transform: translateY(-4px);
+}
+.readout__value {
+  min-width: 4ch;
+  text-align: right;
 }
 @media (min-width: 1024px) {
-  .placeholder {
+  .checking {
     padding: var(--s-8);
   }
 }
-
-/* ── Checking + results (placeholders until Phase 5) ── */
-.json {
-  font-family: var(--font-mono);
-  font-size: var(--fs-small);
-  background: var(--surface);
-  border-radius: var(--r-small);
-  padding: var(--s-4);
-  overflow-x: auto;
-  max-height: 60vh;
-}
-
-/* Real screens have their own files: landing.css, landingSections.css,
-   journey.css, sectionBreak.css, question.css. */

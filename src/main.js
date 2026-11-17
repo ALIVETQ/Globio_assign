@@ -16,6 +16,10 @@ import "./styles/question.css";
 import "./styles/reading.css";
 import "./styles/passages.css";
 import "./styles/board.css";
+import "./styles/results.css";
+import "./styles/skills.css";
+import "./styles/resultsBlocks.css";
+import "./styles/resultsFold.css";
 
 // Imported first so ?slow= and reduced motion apply before any screen animates.
 import "./motion/prefs.js";
@@ -118,9 +122,12 @@ async function sync() {
     // Same view: update in place if the screen supports it, else re-render.
     if (next.update) next.update(currentEl, S.state);
     else {
+      // A re-render is a fresh screen, so it gets its entrance too (results:
+      // the globe is mounted in enter(); checking: the auto-advance timer).
       next.destroy(currentEl);
       currentEl = next.render(S.state, actions);
       app.replaceChildren(currentEl);
+      next.enter(currentEl, S.state);
     }
     return;
   }

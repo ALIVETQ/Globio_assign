@@ -1,0 +1,143 @@
+/* Results page, middle blocks (DESIGN.md §9.5–9.7): confidence dots,
+   practice cards, coverage tiles. */
+
+/* ── Confidence dots (§9.5): 2×2 on phones, four columns from tablet up ── */
+.dots {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s-6) var(--s-4);
+}
+@media (min-width: 640px) {
+  .dots { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+.dots__label {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--s-2);
+  line-height: 1.35;
+}
+.dots__count {
+  color: var(--ink);
+  font-weight: 500;
+}
+.dots__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: var(--s-3);
+}
+.dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+}
+.dot--sureRight { background: var(--cobalt); }
+.dot--guessedRight { background: var(--paper); box-shadow: inset 0 0 0 2px var(--cobalt); }
+.dot--sureWrong { background: var(--notyet); }
+.dot--notKnown { background: var(--hairline); }
+.dot-tip {
+  position: fixed;
+  z-index: 20;
+  max-width: calc(100vw - 16px);
+  margin: 0; /* not spaced like a block: it is placed by script */
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.dot-tip[hidden] {
+  display: none;
+}
+
+/* ── Practice cards (§9.6) ── */
+.practice {
+  display: grid;
+  gap: var(--s-3);
+}
+.practice__card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--s-4) var(--s-3); /* tight on phones, so the text column keeps its width */
+  padding: 22px 24px;
+  border-radius: var(--r-card);
+  background: var(--surface);
+}
+.practice__num {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 28px;
+  line-height: 1;
+  color: var(--cobalt);
+}
+.practice__topic {
+  font-weight: 700;
+  font-size: 19px;
+  line-height: 1.3;
+}
+.practice__tip {
+  margin-top: var(--s-3);
+}
+.chip {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: var(--r-pill);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.3;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: var(--paper);
+  color: var(--ink);
+}
+.practice .chip {
+  margin-top: var(--s-2);
+}
+.chip--sureWrong { background: var(--notyet-wash); color: var(--notyet); }
+.chip--guessedRight { background: var(--almost-wash); color: var(--almost); }
+.chip--conf {
+  background: var(--surface);
+  white-space: nowrap;
+}
+
+/* ── What this check can't see (§9.7): 2×2, one column under 520px ── */
+.tiles {
+  display: grid;
+  gap: var(--s-3);
+}
+.tile {
+  padding: var(--s-5);
+  border-radius: var(--r-card);
+  background: var(--surface);
+}
+.tile.is-covered {
+  background: var(--paper);
+  border: var(--hairline-border);
+}
+.tile__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.tile__icon { display: flex; color: var(--muted); }
+.tile.is-covered .tile__icon { color: var(--ready); }
+.tile__title {
+  margin-top: var(--s-3);
+  font-weight: 600;
+  font-size: 17px;
+}
+.tile__body {
+  margin-top: var(--s-1);
+  font-size: 15px;
+  color: var(--muted);
+}
+@media (min-width: 520px) {
+  .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width: 640px) {
+  .practice__card { column-gap: var(--s-5); }
+}
