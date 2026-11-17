@@ -15,6 +15,7 @@ import "./styles/options.css";
 import "./styles/question.css";
 import "./styles/reading.css";
 import "./styles/passages.css";
+import "./styles/board.css";
 
 // Imported first so ?slow= and reduced motion apply before any screen animates.
 import "./motion/prefs.js";

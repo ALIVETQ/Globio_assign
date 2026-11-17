@@ -161,7 +161,8 @@ Globio_assign/                 ← repo root (GitHub: Globio_assign)
 │       ├── sectionBreak.css   ← section break screen
 │       ├── question.css       ← question screen: label row, prompt, confidence bar
 │       ├── reading.css        ← reading layout (passage left / on top), Richtig/Falsch, ad options
-│       ├── passages.css       ← email, door sign, split-flap board
+│       ├── passages.css       ← email, door sign
+│       ├── board.css          ← split-flap train board (+ flip folds)
 │       └── options.css        ← answer options + drawn selection stroke
 │
 └── tests/
