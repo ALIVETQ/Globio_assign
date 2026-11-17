@@ -24,8 +24,8 @@ const STOPS = [
 // dark page colour instead of white, so the swap happens under "full dark"
 // rather than flashing the screen white.
 const DARK_STOPS = [
-  [0, "rgba(14,16,22,0)"],
-  [0.985, "rgba(14,16,22,0)"],
+  [0, "rgba(0,0,0,0)"],
+  [0.985, "rgba(0,0,0,0)"],
   [1.0, "rgba(60,90,200,.35)"],
   [1.06, "#2a3b80"],
   [1.14, "#3d63e0"],
@@ -33,7 +33,7 @@ const DARK_STOPS = [
   [1.32, "#3d63e0"],
   [1.42, "#2a3b80"],
   [1.53, "#161c33"],
-  [1.65, "#0e1016"],
+  [1.65, "#000000"],
 ];
 
 const RY_SHARE = 0.72; // Ry = 0.72·vh

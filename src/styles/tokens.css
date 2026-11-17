@@ -98,7 +98,7 @@
    objects (train board, door plaque) are dark in both themes. */
 :root[data-theme="dark"] {
   --ink: #eef0f5;
-  --paper: #0e1016;
+  --paper: #000000; /* pure black page in dark mode */
   --cobalt: #6b8cff;
   --cobalt-hover: #8aa4ff;
   --wash: #18213d;
