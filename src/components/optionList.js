@@ -23,6 +23,7 @@ export function optionListHTML(question) {
       <button type="button" class="option" role="radio" aria-checked="false" data-action="select" data-index="${i}" lang="de">
         <span class="keycap" aria-hidden="true">${esc(keycapFor(question, i))}</span>
         <span class="option__text">${esc(question.options[orig])}</span>
+        <svg class="option__stroke" aria-hidden="true"><rect x="1" y="1" rx="13" ry="13"/></svg>
       </button>`,
     )
     .join("");
@@ -30,10 +31,14 @@ export function optionListHTML(question) {
 }
 
 // Mark the option whose ORIGINAL index is `pendingChoice` as selected.
-export function updateOptionList(root, question, pendingChoice) {
+// `onChange(btn, selected)` is called for each option whose state changed
+// (the screen uses it to draw or reverse the cobalt stroke).
+export function updateOptionList(root, question, pendingChoice, onChange = () => {}) {
   root.querySelectorAll(".option").forEach((btn) => {
     const selected = question.optionOrder[Number(btn.dataset.index)] === pendingChoice;
+    const was = btn.classList.contains("is-selected");
     btn.setAttribute("aria-checked", String(selected));
     btn.classList.toggle("is-selected", selected);
+    if (was !== selected) onChange(btn, selected);
   });
 }

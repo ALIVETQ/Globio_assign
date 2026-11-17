@@ -1,6 +1,6 @@
-// Question screen (DESIGN.md §7.1–7.4), shared by all three sections.
-// Phase 2a: layout, options, confidence bar, Back, static journey bar and
-// keyboard shortcuts. Motion comes in 2b; passages in Phase 4.
+// Question screen (DESIGN.md §7.1–7.4, motion §7.6), shared by all three sections.
+// Layout and wiring live here; animation lives in motion/questionMotion.js.
+// Passages come in Phase 4.
 import { MESSAGES } from "../data/messages.js";
 import { SECTIONS } from "../data/sections.js";
 import { esc, fromHTML, onAction } from "../dom.js";
@@ -9,9 +9,13 @@ import { commandForKey } from "../logic/keys.js";
 import { journeyBarHTML, mountJourney } from "../components/journeyBar.js";
 import { optionListHTML, updateOptionList } from "../components/optionList.js";
 import { confidenceBarHTML, updateConfidenceBar } from "../components/confidenceBar.js";
+import { playEnter, playExit, sizeStroke, setStroke, pulseEnable } from "../motion/questionMotion.js";
 
 const Q = MESSAGES.question;
 const live = new WeakMap();
+// Direction for the next question's entrance: set by the outgoing question
+// (Back = −1, enter from the left), used once by the incoming one.
+let enterDir = 1;
 
 // "___" in a prompt is drawn as a 3em cobalt underline (§7.1). The underscores
 // stay in the text for screen readers, visually hidden.
@@ -34,21 +38,26 @@ export function render(state, actions) {
   const el = fromHTML(`
     <section class="screen question-screen">
       ${journeyBarHTML()}
-      <div class="q-label-row">
-        ${back}
-        <p class="label">${esc(labelText(state, q))}</p>
-      </div>
-      <div class="q-column">
-        <h1 class="prompt" lang="de">${promptHTML(q.prompt)}</h1>
-        ${q.hint ? `<p class="q-hint small muted">${esc(q.hint)}</p>` : ""}
-        ${optionListHTML(q)}
+      <div class="q-body">
+        <div class="q-label-row">
+          ${back}
+          <p class="label">${esc(labelText(state, q))}</p>
+        </div>
+        <div class="q-column">
+          <h1 class="prompt" lang="de">${promptHTML(q.prompt)}</h1>
+          ${q.hint ? `<p class="q-hint small muted">${esc(q.hint)}</p>` : ""}
+          ${optionListHTML(q)}
+        </div>
       </div>
       ${confidenceBarHTML()}
     </section>
   `);
 
+  const h = { index: state.index, command: null, ready: false };
+  // Remember what the learner did, so the exit can play the matching feedback.
   const run = (cmd) => {
     if (!cmd) return false;
+    if (cmd.type !== "select") h.command = cmd.type;
     if (cmd.type === "select") actions.selectOption(cmd.index);
     else if (cmd.type === "sure") actions.confirm("sure");
     else if (cmd.type === "guessed") actions.confirm("guessed");
@@ -65,7 +74,18 @@ export function render(state, actions) {
   };
   document.addEventListener("keydown", onKey);
 
-  live.set(el, {
+  // Keep each option's stroke the size of the option (text can wrap on resize).
+  // The first call happens once the screen is on the page, and also draws the
+  // stroke of an option that was already selected (after Back or a restore).
+  const ro = new ResizeObserver(() => {
+    el.querySelectorAll(".option").forEach((o) => {
+      sizeStroke(o);
+      setStroke(o, o.classList.contains("is-selected"), false);
+    });
+  });
+  ro.observe(el.querySelector(".options"));
+
+  Object.assign(h, {
     offClick: onAction(el, {
       select: (btn) => run({ type: "select", index: Number(btn.dataset.index) }),
       sure: () => run({ type: "sure" }),
@@ -74,32 +94,53 @@ export function render(state, actions) {
       back: () => run({ type: "back" }),
     }),
     offKey: () => document.removeEventListener("keydown", onKey),
-    journey: mountJourney(el, state.order, state.index),
+    offResize: () => ro.disconnect(),
+    journey: mountJourney(el, state.order, state.index, state.attempt),
   });
+  live.set(el, h);
   update(el, state);
+  h.ready = true; // from now on, changes are the learner's and get animated
   return el;
 }
 
 // Same question, new selection: update in place (main.js calls this).
 export function update(el, state) {
+  const h = live.get(el);
   const q = state.order[state.index];
-  updateOptionList(el, q, state.pendingChoice);
-  updateConfidenceBar(el, state.pendingChoice !== null);
+  updateOptionList(el, q, state.pendingChoice, (btn, selected) => setStroke(btn, selected, h.ready));
+  const switchedOn = updateConfidenceBar(el, state.pendingChoice !== null);
+  if (switchedOn && h.ready) {
+    pulseEnable(el.querySelectorAll("[data-needs-choice]"), el.querySelector('[data-action="sure"]'));
+  }
 }
 
-export function enter() {
-  return Promise.resolve();
+export function enter(el) {
+  const h = live.get(el);
+  h.enterTl?.progress(1).kill(); // debug "Replay" calls enter() again
+  const { tl, ready } = playEnter(el, enterDir);
+  enterDir = 1;
+  h.enterTl = tl;
+  return ready;
 }
 
-export function exit() {
-  return Promise.resolve();
+export function exit(el, state) {
+  const h = live.get(el);
+  const dir = state.index < h.index ? -1 : 1; // moving back → leave to the right
+  enterDir = dir;
+  h.enterTl?.progress(1).kill();
+  const { tl, done } = playExit(el, { command: h.command, dir });
+  h.exitTl = tl;
+  return done;
 }
 
 export function destroy(el) {
   const h = live.get(el);
   if (!h) return;
+  h.enterTl?.kill();
+  h.exitTl?.kill();
   h.offClick();
   h.offKey();
+  h.offResize();
   h.journey.destroy();
   live.delete(el);
 }

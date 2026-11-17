@@ -446,6 +446,8 @@ Above every passage, a mono label naming the format: `reading.formatEmail`, `rea
 | **Journey bar** | On every confirm: the cobalt line extends to the next dot and the plane moves along the path to it (MotionPath, 0.5 s, `power2.inOut`); the dot it leaves fills cobalt with a 1 → 1.4 → 1 scale pop (0.25 s). On Back, the plane moves backwards. |
 | **Back** | Mirror of enter/exit (enter from the left). |
 
+**Timing within the 0.6 s budget (§10 rule 3):** the button feedback for "I'm sure", "I guessed" and "I don't know" starts *together with* the question exit, not before it. Exit 0.22 s + enter 0.32 s = 0.54 s for every kind of confirm. The sure sweep (0.22 s) and the don't-know fade (0.15 s) finish inside the exit; the guessed wobble (0.35 s) is cut at 0.22 s when the screen swaps. Played strictly one after the other, "I guessed" would take 0.89 s.
+
 **Passage entrances** (each finishes within 1.2 s; then everything on screen is still):
 
 | Passage | Animation |

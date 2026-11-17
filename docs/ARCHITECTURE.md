@@ -138,6 +138,9 @@ Globio_assign/                 ← repo root (GitHub: Globio_assign)
 │   │   ├── glow.js            ← horizon glow screen transition
 │   │   ├── fadeUp.js          ← fade-up helper (DESIGN.md §4.3)
 │   │   ├── landingMotion.js   ← landing entrance, below-the-fold reveals, Start exit
+│   │   ├── sectionBreakMotion.js ← giant-word slide, label fade-up, title glitch
+│   │   ├── questionMotion.js  ← question enter/exit, option stroke, confidence feedback
+│   │   ├── journeyMotion.js   ← journey plane along the path (MotionPath) + dot pop
 │   │   ├── countUp.js
 │   │   └── splitFlap.js
 │   │

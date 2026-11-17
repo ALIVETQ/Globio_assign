@@ -7,6 +7,13 @@
   min-height: 100svh;
 }
 
+/* Label row + column move together on enter/exit (§7.6); the journey bar and
+   confidence bar stay put. */
+.q-body {
+  display: flex;
+  flex-direction: column;
+}
+
 /* ── Label row: ← Back (left) · 01 / VOCABULARY · Q4 OF 15 (right) ── */
 .q-label-row {
   display: flex;
@@ -51,6 +58,7 @@
   margin-top: 28px;
 }
 .option {
+  position: relative; /* for the stroke SVG */
   display: flex;
   align-items: center;
   gap: 14px;
@@ -67,14 +75,29 @@
   color: var(--ink);
   text-align: left;
   cursor: pointer;
-  transition: border-color 0.25s, background-color 0.25s;
+  transition: border-color 0.25s, background-color 0.2s; /* background → wash in 0.2 s (§7.6) */
 }
 .option:hover {
   border-color: var(--periwinkle);
 }
 .option.is-selected {
   background: var(--wash);
-  border-color: var(--cobalt); /* Phase 2b draws this border with DrawSVG */
+}
+/* The selected border is this 2px cobalt stroke, drawn by DrawSVG (motion/questionMotion.js).
+   It covers the option's border box; the rect is sized in px from JS. */
+.option__stroke {
+  position: absolute;
+  inset: -1.5px;
+  width: calc(100% + 3px);
+  height: calc(100% + 3px);
+  overflow: visible;
+  pointer-events: none;
+}
+.option__stroke rect {
+  fill: none;
+  stroke: var(--cobalt);
+  stroke-width: 2;
+  stroke-dasharray: 0 99999; /* hidden until JS sets the drawn length */
 }
 .options--sentence .option {
   min-height: 64px;
@@ -134,6 +157,24 @@
 .confidence__unknown {
   color: var(--muted);
 }
+/* "I'm sure" fill sweep (§7.6): the button turns white, a cobalt copy wipes in. */
+.btn.is-sweeping {
+  position: relative;
+  background: var(--paper);
+  border-color: var(--cobalt);
+  color: var(--cobalt);
+}
+.btn__sweep {
+  position: absolute;
+  inset: -1.5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-3);
+  border-radius: inherit;
+  background: var(--cobalt);
+  color: var(--paper);
+}
 .keyhint {
   display: none;
   font-family: var(--font-mono);
@@ -146,6 +187,7 @@
   /* The column grows so the bar rests at the bottom of the screen even when
      the question is short; when it's long, the bar sticks over the page bottom
      and slides back below the last option at the end of the scroll. */
+  .q-body,
   .q-column {
     flex: 1;
   }

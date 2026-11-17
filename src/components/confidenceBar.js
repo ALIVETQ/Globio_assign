@@ -30,8 +30,11 @@ export function confidenceBarHTML() {
 
 // Main buttons are disabled until a choice exists; the reason is given as a
 // tooltip and, for screen readers, through aria-describedby.
+// Returns true when the buttons have just switched on (for the enable pulse).
 export function updateConfidenceBar(root, hasChoice) {
-  root.querySelectorAll("[data-needs-choice]").forEach((btn) => {
+  const buttons = root.querySelectorAll("[data-needs-choice]");
+  const switchedOn = hasChoice && buttons[0]?.disabled;
+  buttons.forEach((btn) => {
     btn.disabled = !hasChoice;
     if (hasChoice) {
       btn.removeAttribute("aria-describedby");
@@ -41,4 +44,5 @@ export function updateConfidenceBar(root, hasChoice) {
       btn.setAttribute("title", Q.disabledHelp);
     }
   });
+  return switchedOn;
 }

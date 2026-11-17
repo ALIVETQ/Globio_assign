@@ -1,6 +1,6 @@
 // Section break (DESIGN.md §6): shown before each section, then moves on by
-// itself. Phase 2a: static — the giant word sits centred and clipped (the
-// reduced-motion look); the slide comes in 2b.
+// itself. The giant word slides across behind the copy (motion/sectionBreakMotion.js);
+// under reduced motion it sits static, centred and clipped.
 import { MESSAGES } from "../data/messages.js";
 import { SECTIONS } from "../data/sections.js";
 import { esc, fromHTML, onAction } from "../dom.js";
@@ -8,10 +8,10 @@ import { fill } from "../logic/fill.js";
 import { gsap } from "../motion/gsap.js";
 import { reducedMotion } from "../motion/prefs.js";
 import { journeyBarHTML, mountJourney } from "../components/journeyBar.js";
+import { playSectionBreak, SLIDE_S } from "../motion/sectionBreakMotion.js";
 
-// Auto-advance (§6.2): 1.8 s, the length of the giant-word slide; 1.2 s under
-// reduced motion. A GSAP delayedCall (not setTimeout) so ?slow= stretches it too.
-const ADVANCE_S = 1.8;
+// Auto-advance (§6.2): when the 1.8 s slide ends; 1.2 s under reduced motion.
+// A GSAP delayedCall (not setTimeout) so ?slow= stretches it with the slide.
 const ADVANCE_REDUCED_S = 1.2;
 
 const live = new WeakMap();
@@ -48,16 +48,19 @@ export function render(state, actions) {
     actions,
     offClick: onAction(el, { next }),
     offKey: () => document.removeEventListener("keydown", onKey),
-    journey: mountJourney(el, state.order, state.index),
+    journey: mountJourney(el, state.order, state.index, state.attempt),
   });
   return el;
 }
 
-// The timer starts after the screen is in place, so it can't fire mid-transition.
+// Resolves at once so "Skip" works during the slide. The timer starts here,
+// after the screen is in place, so it can't fire mid-transition.
 export function enter(el) {
   const h = live.get(el);
   h.timer?.kill(); // debug "Replay" calls enter() again
-  h.timer = gsap.delayedCall(reducedMotion ? ADVANCE_REDUCED_S : ADVANCE_S, () => h.actions.next());
+  h.tl?.progress(1).kill();
+  h.tl = playSectionBreak(el);
+  h.timer = gsap.delayedCall(reducedMotion ? ADVANCE_REDUCED_S : SLIDE_S, () => h.actions.next());
   return Promise.resolve();
 }
 
@@ -69,6 +72,7 @@ export function destroy(el) {
   const h = live.get(el);
   if (!h) return;
   h.timer?.kill();
+  h.tl?.kill();
   h.offClick();
   h.offKey();
   h.journey.destroy();
