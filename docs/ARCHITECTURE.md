@@ -61,10 +61,10 @@ The code must be easy to read and easy to change. That requirement shapes every 
 ## 3. Folder structure
 
 ```
-exam-ready/
+Globio_assign/                 ← repo root (GitHub: Globio_assign)
 ├── index.html                 ← single page; <main id="app"> is the only mount point
 ├── package.json
-├── vite.config.js
+├── vite.config.js             ← also holds the Vitest config
 ├── README.md
 │
 ├── docs/                      ← these four spec files live here
@@ -80,21 +80,28 @@ exam-ready/
 │   └── build-dots.mjs         ← run once: world map → src/data/landdots.json
 │
 ├── src/
-│   ├── main.js                ← boots the app, owns state, switches screens
-│   ├── state.js               ← state object, actions, sessionStorage save/restore
+│   ├── main.js                ← boots the app, switches screens, guards input during transitions
+│   ├── state.js               ← state object and all actions (incl. resume/startOver, debug jumps)
+│   ├── persist.js             ← sessionStorage save/restore + validation, used only by state.js
+│   ├── dom.js                 ← esc(), fromHTML(), onAction() event delegation for screens
 │   │
 │   ├── data/                  ← CONTENT. Everything a founder might ask to change.
-│   │   ├── questions.js       ← the 15 questions (from CONTENT.md)
+│   │   ├── questions.js       ← the 15 questions (from CONTENT.md); re-exports PASSAGES
+│   │   ├── passages.js        ← the 4 reading passages (CONTENT.md §2.3)
 │   │   ├── topics.js          ← topic labels + practice tips (from CONTENT.md)
 │   │   ├── sections.js        ← the 3 sections: id, order, labels (from CONTENT.md)
-│   │   ├── messages.js        ← all other UI text: landing, verdicts, self-checks (from CONTENT.md)
+│   │   ├── messages.js        ← all other UI text (CONTENT.md §4–§7); merges messagesResults.js into MESSAGES
+│   │   ├── messagesResults.js ← results-page, coverage, review, method, actions, summary text (CONTENT.md §8)
 │   │   ├── config.js          ← every number that decides "ready" (from LOGIC.md)
 │   │   └── landdots.json      ← generated globe dots
 │   │
 │   ├── logic/                 ← PURE FUNCTIONS. No DOM, no GSAP. Fully tested.
 │   │   ├── scoring.js         ← answers → result object (LOGIC.md)
+│   │   ├── recommend.js       ← practice-topic ranking (LOGIC.md §6), called by scoring.js
 │   │   ├── shuffle.js         ← builds this attempt's question order and option order
-│   │   └── presets.js         ← the 8 debug answer sets defined in LOGIC.md §12
+│   │   ├── presets.js         ← the 8 debug answer sets defined in LOGIC.md §12
+│   │   ├── fill.js            ← fill(template, values) placeholder helper (LOGIC.md §11)
+│   │   └── validateConfig.js  ← dev-only startup checks on config.js (LOGIC.md §2)
 │   │
 │   ├── screens/               ← ONE FILE PER SCREEN (see §5 for the contract)
 │   │   ├── landing.js
@@ -137,9 +144,13 @@ exam-ready/
 │       └── screens.css        ← per-screen styles, grouped by screen
 │
 └── tests/
+    ├── helpers.js             ← shared scoring context, per-section answer builder, seeded rng
     ├── scoring.test.js
-    └── shuffle.test.js
+    ├── shuffle.test.js
+    └── data.test.js           ← content sanity checks, config validation, fill()
 ```
+
+**Local only (git-ignored):** `.claude/` holds the dev-server launch config for Claude Code.
 
 ---
 
@@ -286,7 +297,7 @@ No images except the favicon and inline SVGs. Textures (for example the stamp's 
 
 ## 10. Deployment
 
-1. Public GitHub repo named `exam-ready`.
+1. Public GitHub repo named `Globio_assign`.
 2. Connect it to Vercel (framework preset: Vite; build `npm run build`; output `dist`).
 3. Every push to `main` deploys. **Push and check the live link at the end of every phase.**
 4. `README.md` (written in Phase 6) covers: what it is, the live link, how "ready" is decided (short), how to run locally, and the folder map.

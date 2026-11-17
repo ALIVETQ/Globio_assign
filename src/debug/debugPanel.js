@@ -2,9 +2,10 @@
 // import() in main.js, so none of this ships to learners. Labels here are
 // developer-facing and deliberately not in CONTENT.md.
 //
-// Slow-mo and reduced-motion toggles publish their value on <html> data
-// attributes and an "examready:prefs" event; motion/prefs.js (Phase 0b) reads them.
+// Slow-mo and reduced-motion toggles go straight to motion/prefs.js, so they
+// behave exactly like ?slow=0.25 and the prefers-reduced-motion media query.
 import { state, subscribe, debugJump, debugLoadPreset } from "../state.js";
+import { timeScale, reducedMotion, setTimeScale, setForcedReducedMotion } from "../motion/prefs.js";
 import { QUESTIONS } from "../data/questions.js";
 import { SECTIONS } from "../data/sections.js";
 import { PRESET_NAMES } from "../logic/presets.js";
@@ -36,9 +37,13 @@ function jumpOptions() {
   return opts.join("");
 }
 
-function setPref(name, value) {
-  document.documentElement.dataset[name] = String(value);
-  window.dispatchEvent(new CustomEvent("examready:prefs", { detail: { [name]: value } }));
+// Keep ?slow= in the address bar in step with the toggle, so a reload (or a
+// copied link) keeps the same speed.
+function syncSlowParam(value) {
+  const url = new URL(location.href);
+  if (value === 1) url.searchParams.delete("slow");
+  else url.searchParams.set("slow", String(value));
+  history.replaceState(history.state, "", url);
 }
 
 function readout() {
@@ -63,9 +68,9 @@ export function mountDebugPanel({ replay }) {
   style.textContent = CSS;
   document.head.append(style);
 
-  const params = new URLSearchParams(location.search);
-  let slow = Number(params.get("slow")) || 1;
-  let reduced = false;
+  // Start from what prefs.js already applied (?slow=, system reduced-motion).
+  let slow = timeScale;
+  let reduced = reducedMotion;
 
   const panel = document.createElement("aside");
   panel.className = "dbg";
@@ -78,8 +83,8 @@ export function mountDebugPanel({ replay }) {
       <label>Results preset<select data-dbg="preset">${PRESET_NAMES.map((n) => `<option>${esc(n)}</option>`).join("")}</select></label>
       <div class="dbg__row"><button data-dbg="load">Load preset</button><button data-dbg="replay">Replay</button></div>
       <div class="dbg__row">
-        <button data-dbg="slow" aria-pressed="${slow !== 1}">Slow-mo ${slow !== 1 ? `${slow}×` : "1×"}</button>
-        <button data-dbg="reduced" aria-pressed="false">Reduced motion</button>
+        <button data-dbg="slow" aria-pressed="${slow !== 1}">Slow-mo ${slow}×</button>
+        <button data-dbg="reduced" aria-pressed="${reduced}">Reduced motion</button>
       </div>
       <pre data-dbg="state"></pre>
     </div>`;
@@ -105,12 +110,13 @@ export function mountDebugPanel({ replay }) {
       slow = slow === 1 ? 0.25 : 1;
       $("slow").textContent = `Slow-mo ${slow}×`;
       $("slow").setAttribute("aria-pressed", String(slow !== 1));
-      setPref("timeScale", slow);
+      setTimeScale(slow);
+      syncSlowParam(slow);
     }
     if (k === "reduced") {
       reduced = !reduced;
       $("reduced").setAttribute("aria-pressed", String(reduced));
-      setPref("reducedMotion", reduced);
+      setForcedReducedMotion(reduced);
     }
   });
 

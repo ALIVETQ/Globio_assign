@@ -7,6 +7,8 @@ import "./styles/tokens.css";
 import "./styles/base.css";
 import "./styles/screens.css";
 
+// Imported first so ?slow= and reduced motion apply before any screen animates.
+import "./motion/prefs.js";
 import * as S from "./state.js";
 import { MESSAGES } from "./data/messages.js";
 import { CONFIG } from "./data/config.js";
