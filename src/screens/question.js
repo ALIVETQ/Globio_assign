@@ -65,7 +65,6 @@ export function render(state, actions) {
         <div class="q-main">
           <div class="q-body">
             <div class="q-column">
-              ${cockpit.questionNumberHTML(state.index)}
               <h1 class="prompt" lang="de">${promptHTML(q.prompt)}</h1>
               ${q.hint ? `<p class="q-hint small muted">${esc(q.hint)}</p>` : ""}
               ${q.format === "ads" ? formatLabelHTML(q) : ""}
