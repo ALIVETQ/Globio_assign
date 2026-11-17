@@ -1,0 +1,88 @@
+/* Every colour, font, size, spacing and layer value (DESIGN.md §2).
+   Change a value here and it changes everywhere. Do not hard-code these elsewhere. */
+:root {
+  /* ── §2.1 Colours ── */
+  --ink: #111111;
+  --paper: #ffffff;
+  --cobalt: #2f63ff;
+  --cobalt-hover: #1f4fe0;
+  --wash: #eef2ff;
+  --periwinkle: #a9bcff;
+  --muted: #5d6270;
+  --muted-2: #6b6f78;
+  --hairline: #d9dbe0;
+  --giant: #e9e9e9;
+  --surface: #f6f7f9;
+  /* Verdict colours: results page and the landing sample card ONLY */
+  --ready: #16a34a;
+  --ready-wash: #e8f7ee;
+  --almost: #d97706;
+  --almost-wash: #fdf3e6;
+  --notyet: #dc2626;
+  --notyet-wash: #fdecec;
+  /* Exam objects */
+  --board: #141414;
+  --board-flap: #222222;
+  --board-text: #f4f1e8;
+  --board-alert: #ffb300;
+  --plaque: #1e2a32;
+  --plaque-text: #e9eef1;
+
+  /* ── §2.2 Type ── */
+  --font-display: "Anton", Impact, sans-serif;
+  --font-text: "Archivo Variable", "Archivo", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, monospace;
+
+  --fs-hero: clamp(64px, 11vw, 150px);
+  --lh-hero: 0.95;
+  --fs-display: clamp(44px, 7vw, 96px);
+  --lh-display: 1;
+  --fs-giant: clamp(120px, 26vw, 330px);
+  --lh-giant: 0.8;
+  --fs-h2: clamp(28px, 3.4vw, 40px);
+  --lh-h2: 1.05;
+  --fs-prompt: clamp(22px, 2.6vw, 30px);
+  --lh-prompt: 1.3;
+  --fs-body-lg: clamp(16px, 1.4vw, 19px);
+  --lh-body-lg: 1.5;
+  --fs-body: 16px;
+  --lh-body: 1.5;
+  --fs-small: 14px;
+  --lh-small: 1.45;
+  --fs-label: 12px;
+  --lh-label: 1;
+  --fs-overline: clamp(12px, 1.2vw, 15px);
+  --lh-overline: 1;
+
+  /* ── §2.3 Spacing (px): 4, 8, 12, 16, 20, 24, 32, 40, 56, 72, 96, 128 ── */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 20px;
+  --s-6: 24px;
+  --s-7: 32px;
+  --s-8: 40px;
+  --s-9: 56px;
+  --s-10: 72px;
+  --s-11: 96px;
+  --s-12: 128px;
+
+  /* Radius */
+  --r-pill: 999px;
+  --r-card: 16px;
+  --r-option: 14px;
+  --r-small: 8px;
+
+  /* Shadow: only on the email card and floating results cards */
+  --shadow-card: 0 1px 2px rgba(17, 17, 17, 0.06), 0 8px 24px rgba(17, 17, 17, 0.08);
+
+  --hairline-border: 1px solid var(--hairline);
+
+  /* Layers */
+  --z-globe: 0;
+  --z-content: 1;
+  --z-sticky: 10;
+  --z-glow: 50;
+  --z-debug: 100;
+}
