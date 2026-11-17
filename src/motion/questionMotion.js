@@ -3,9 +3,8 @@
 //
 // Timing budget: question → question ≤ 0.6 s (DESIGN.md §10 rule 3).
 // Exit 0.22 s + enter 0.32 s = 0.54 s. The button feedback (sure sweep 0.22 s,
-// guessed wobble 0.35 s, don't-know fade 0.15 s) starts WITH the exit rather
-// than before it; otherwise "I guessed" alone would take 0.89 s. The screen
-// swaps when the exit ends, so the wobble is cut at 0.22 s of its 0.35 s.
+// guessed wobble 0.22 s, don't-know fade 0.15 s) starts WITH the exit rather
+// than before it, and each one finishes by the time the screen swaps.
 import { gsap } from "./gsap.js";
 import { reducedMotion } from "./prefs.js";
 import { fadeUp } from "./fadeUp.js";
@@ -53,7 +52,8 @@ export function playExit(root, { command = null, dir = 1 } = {}) {
   tl.to(root.querySelector(".q-body"), { x: -SHIFT * dir, opacity: 0, duration: EXIT_S, ease: "power2.in" }, 0);
   if (command === "sure") tl.add(sweep(root.querySelector('[data-action="sure"]')), 0);
   if (command === "guessed") {
-    tl.to(root.querySelector('[data-action="guessed"]'), { keyframes: { rotation: [0, -3, 3, -1.5, 0] }, duration: 0.35, ease: "power1.inOut" }, 0);
+    // Full wobble in the exit's 0.22 s (spec'd at 0.35 s; sped up so it isn't cut off).
+    tl.to(root.querySelector('[data-action="guessed"]'), { keyframes: { rotation: [0, -3, 3, -1.5, 0] }, duration: EXIT_S, ease: "power1.inOut" }, 0);
   }
   if (command === "unknown") tl.to(root.querySelectorAll(".option"), { opacity: 0.4, duration: 0.15 }, 0);
   const done = new Promise((resolve) => tl.call(resolve, null, EXIT_S));
@@ -77,6 +77,9 @@ export function setStroke(option, on, animate) {
   const rect = option.querySelector(".option__stroke rect");
   if (!rect) return;
   gsap.killTweensOf(rect);
+  // Measure now, not only on resize: a sentence option may have wrapped to two
+  // lines since the last measurement, and DrawSVG reads the length at tween start.
+  sizeStroke(option);
   if (!animate || reducedMotion) {
     gsap.set(rect, { drawSVG: on ? "100%" : "0%" });
   } else if (on) {

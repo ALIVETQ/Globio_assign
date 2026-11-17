@@ -441,12 +441,12 @@ Above every passage, a mono label naming the format: `reading.formatEmail`, `rea
 | **Option selected** | An SVG rounded-rect stroke (cobalt, 2px) draws around the option with DrawSVG from 0% to 100% in **0.28 s**, `power2.out`; background fades to `--wash` in 0.2 s. Deselecting the previous option reverses its stroke in 0.15 s. |
 | **Confidence buttons enable** | When the first option is selected: both main buttons fade from 35% to 100% opacity (0.2 s) and the primary does a tiny scale pulse 1 → 1.03 → 1 (0.3 s). |
 | **"I'm sure" pressed** | A white-to-cobalt fill sweeps left → right across the button (clip-path, 0.22 s), then the question exits. |
-| **"I guessed" pressed** | The button wobbles: rotate 0 → −3° → 3° → −1.5° → 0 over 0.35 s, `power1.inOut`, then the question exits. |
+| **"I guessed" pressed** | The button wobbles: rotate 0 → −3° → 3° → −1.5° → 0 over **0.22 s** (was 0.35 s), `power1.inOut`, together with the question exit. |
 | **"I don't know" pressed** | The options fade to 40% opacity (0.15 s), then the question exits. |
 | **Journey bar** | On every confirm: the cobalt line extends to the next dot and the plane moves along the path to it (MotionPath, 0.5 s, `power2.inOut`); the dot it leaves fills cobalt with a 1 → 1.4 → 1 scale pop (0.25 s). On Back, the plane moves backwards. |
 | **Back** | Mirror of enter/exit (enter from the left). |
 
-**Timing within the 0.6 s budget (§10 rule 3):** the button feedback for "I'm sure", "I guessed" and "I don't know" starts *together with* the question exit, not before it. Exit 0.22 s + enter 0.32 s = 0.54 s for every kind of confirm. The sure sweep (0.22 s) and the don't-know fade (0.15 s) finish inside the exit; the guessed wobble (0.35 s) is cut at 0.22 s when the screen swaps. Played strictly one after the other, "I guessed" would take 0.89 s.
+**Timing within the 0.6 s budget (§10 rule 3):** the button feedback for "I'm sure", "I guessed" and "I don't know" starts *together with* the question exit, not before it. Exit 0.22 s + enter 0.32 s = 0.54 s for every kind of confirm. All three finish inside the exit: the sure sweep (0.22 s), the guessed wobble (sped up from 0.35 s to 0.22 s so the full rotate sequence completes before the screen swaps) and the don't-know fade (0.15 s). Played strictly one after the other at the original timings, "I guessed" would take 0.89 s.
 
 **Passage entrances** (each finishes within 1.2 s; then everything on screen is still):
 

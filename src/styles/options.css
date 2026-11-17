@@ -50,6 +50,14 @@
   stroke-width: 2;
   stroke-dasharray: 0 99999; /* hidden until JS sets the drawn length */
 }
+.option__text {
+  min-width: 0; /* let long text wrap inside the flex row instead of widening it */
+  overflow-wrap: break-word;
+  text-wrap: pretty; /* avoid a lone word on the second line */
+}
+/* Sentence options (grammar "which sentence is correct?", §7.2): full sentences
+   may wrap to two lines on phones. The drawn stroke is re-measured on every
+   select, so it fits a 64px or a two-line option alike. */
 .options--sentence .option {
   min-height: 64px;
 }
