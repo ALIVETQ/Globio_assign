@@ -111,6 +111,8 @@ Globio_assign/                 ← repo root (GitHub: Globio_assign)
 │   │   └── results.js
 │   │
 │   ├── components/            ← reusable pieces used by screens
+│   │   ├── landingHero.js     ← landing top bar, resume banner, hero copy, meta line, globe slot
+│   │   ├── landingSections.js ← landing: why, how it works, sample result, coverage note, footer
 │   │   ├── optionList.js      ← the answer options
 │   │   ├── confidenceBar.js   ← "I'm sure" / "I guessed" / "I don't know this yet"
 │   │   ├── journeyBar.js      ← India → Germany progress bar with plane
@@ -141,7 +143,8 @@ Globio_assign/                 ← repo root (GitHub: Globio_assign)
 │   └── styles/
 │       ├── tokens.css         ← colours, fonts, spacing, radii, z-index (from DESIGN.md)
 │       ├── base.css           ← reset, typography, buttons, layout helpers
-│       └── screens.css        ← per-screen styles, grouped by screen
+│       ├── screens.css        ← per-screen styles, grouped by screen
+│       └── landing.css        ← landing screen styles (own file: too many for screens.css)
 │
 └── tests/
     ├── helpers.js             ← shared scoring context, per-section answer builder, seeded rng

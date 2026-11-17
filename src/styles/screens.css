@@ -50,9 +50,4 @@
   max-height: 60vh;
 }
 
-/* ── Landing (placeholder) ── */
-.resume {
-  display: flex;
-  flex-direction: column;
-  gap: var(--s-4);
-}
+/* Landing styles live in landing.css (too many to group here). */

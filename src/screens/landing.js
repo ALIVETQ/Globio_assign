@@ -1,34 +1,30 @@
-// Landing screen — PHASE 0 PLACEHOLDER: heading, Start button and the resume
-// banner, so the flow can be clicked through. The real layout comes in Phase 1.
-import { MESSAGES } from "../data/messages.js";
-import { esc, fromHTML, onAction } from "../dom.js";
-import { fill } from "../logic/fill.js";
+// Landing screen (DESIGN.md §5). Phase 1a: layout and content, no motion.
+// The hero and the sections below it are built by components; this file wires
+// up the buttons and owns the screen contract (render / enter / exit / destroy).
+import { fromHTML, onAction } from "../dom.js";
+import { reducedMotion } from "../motion/prefs.js";
+import { heroHTML } from "../components/landingHero.js";
+import { sectionsHTML } from "../components/landingSections.js";
 
-const T = MESSAGES.landing;
 const cleanups = new WeakMap();
 
-export function render(state, actions) {
-  const resume = actions.getResumeInfo();
-  const banner = resume
-    ? `<div class="resume card" role="status">
-         <p>${esc(fill(T.resumeText, resume))}</p>
-         <div class="row">
-           <button class="btn btn--primary" data-action="resume">${esc(T.resumeYes)}<span aria-hidden="true">→</span></button>
-           <button class="btn btn--secondary" data-action="startOver">${esc(T.resumeNo)}</button>
-         </div>
-       </div>`
-    : "";
+// "How it works" (nav link and hero button) scrolls to the section, then moves
+// keyboard focus to its heading so Tab continues from there.
+function scrollToHow(root) {
+  const section = root.querySelector("#how-it-works");
+  if (!section) return;
+  section.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "start" });
+  const heading = section.querySelector("h2");
+  heading.setAttribute("tabindex", "-1");
+  heading.focus({ preventScroll: true });
+}
 
+export function render(state, actions) {
   const el = fromHTML(`
-    <section class="screen placeholder">
-      ${banner}
-      <p class="overline">${esc(T.overline)}</p>
-      <h1 class="hero">${T.headline.map(esc).join("<br>")}</h1>
-      <p class="body-lg muted">${esc(T.lede)}</p>
-      <div class="row">
-        <button class="btn btn--primary" data-action="start">${esc(T.ctaStart)}<span aria-hidden="true">→</span></button>
-      </div>
-    </section>
+    <div class="screen landing">
+      ${heroHTML(actions.getResumeInfo())}
+      ${sectionsHTML()}
+    </div>
   `);
 
   cleanups.set(
@@ -37,6 +33,10 @@ export function render(state, actions) {
       start: () => actions.start(),
       resume: () => actions.resume(),
       startOver: () => actions.startOver(),
+      how: (_target, e) => {
+        e.preventDefault(); // the nav link is a real anchor (works without JS); JS adds smooth scroll
+        scrollToHow(el);
+      },
     }),
   );
   return el;

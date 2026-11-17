@@ -1,0 +1,315 @@
+/* Landing screen (DESIGN.md §5.1 desktop, §5.2 tablet/phone, §3.5 globe space).
+   Mobile first: phone/tablet rules are the default, desktop (≥1024px) at the end. */
+
+/* ── Top bar: 60px, padding 0 20px (phone/tablet) ── */
+.topbar {
+  position: relative;
+  z-index: var(--z-content);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+  height: 60px;
+  padding: 0 20px;
+}
+.topbar__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  min-width: 0;
+}
+.wordmark {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 15px;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.wordmark__dot {
+  width: 5px;
+  height: 5px;
+  margin: 0 4px;
+  border-radius: 50%;
+  background: var(--cobalt);
+}
+/* Mono label in a 1px hairline pill (brand tag, "EXAMPLE" tag) */
+.pill-tag {
+  display: inline-block;
+  padding: 5px 9px;
+  border: var(--hairline-border);
+  border-radius: var(--r-pill);
+  white-space: nowrap;
+}
+
+/* ── Hero: a column on phone/tablet — copy, then the globe box ── */
+.landing-hero {
+  position: relative;
+}
+.hero__copy {
+  position: relative;
+  z-index: var(--z-content);
+  padding: 40px 20px 0; /* starts 40px below the top bar */
+}
+.resume-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2) var(--s-4);
+  margin-bottom: var(--s-6);
+  padding: 10px 20px;
+  background: var(--wash);
+  border-radius: var(--r-pill);
+}
+.resume-bar__actions {
+  display: flex;
+  gap: var(--s-4);
+}
+.hero__headline {
+  margin-top: 16px;
+  font-size: clamp(64px, 21vw, 120px);
+}
+.hero__line {
+  display: block;
+  white-space: nowrap; /* one line per array item; the glitch reveal animates per line */
+}
+.hero__lede {
+  margin-top: 24px;
+  max-width: 460px;
+}
+.hero__ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 32px;
+}
+/* Buttons stack full width on phones < 400px (§5.2) */
+@media (max-width: 399px) {
+  .hero__ctas {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .hero__ctas .btn {
+    width: 100%;
+  }
+}
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  margin-top: 28px;
+  line-height: 1.6;
+}
+.meta__item {
+  white-space: nowrap;
+}
+.meta__num {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Globe box (§3.5 tablet/phone): min(92vw, 520px) tall, bottom 25% faded. */
+.globe-slot {
+  position: relative;
+  height: min(92vw, 520px);
+  overflow: hidden;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(#000 75%, transparent);
+  mask-image: linear-gradient(#000 75%, transparent);
+}
+
+/* ── Sections below the hero: 64px vertical padding (phone/tablet) ── */
+.landing-below {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+.landing-section {
+  padding: 64px 0;
+}
+.landing-section + .landing-section {
+  padding-top: 0;
+}
+.why {
+  max-width: 720px;
+  margin: 0 auto;
+  text-align: center;
+}
+.why .body-lg {
+  margin-top: var(--s-4);
+}
+.how__cards {
+  display: grid;
+  gap: 12px;
+  margin-top: var(--s-7);
+}
+.how-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  min-width: 0; /* scale(.7) doesn't shrink the preview's layout box; don't let it widen the column */
+}
+.how-card__number {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: var(--fs-h2);
+  line-height: 1;
+  color: var(--cobalt);
+  margin-bottom: var(--s-2);
+}
+.how-card__title {
+  font-weight: 600;
+  font-size: 19px;
+  line-height: 1.3;
+}
+/* Picture of the confidence buttons at 70% scale; not interactive. */
+.mini-confidence {
+  display: flex;
+  gap: 12px;
+  margin-top: var(--s-2);
+  transform: scale(0.7);
+  transform-origin: left center;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.mini-confidence .btn {
+  cursor: default;
+}
+
+/* Sample result card: stacks on phone/tablet (text, then mini result) */
+.sample {
+  display: grid;
+  gap: var(--s-6);
+}
+.sample__text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--s-3);
+}
+.mini-result {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+  padding: var(--s-5);
+  background: var(--paper);
+  border-radius: var(--r-small);
+}
+/* Verdict stamp at 50% of the results stamp (DESIGN.md §9.2) */
+.mini-stamp {
+  align-self: flex-start;
+  font-family: var(--font-display);
+  font-size: clamp(22px, 3.5vw, 42px);
+  line-height: 1;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border: 2px solid currentColor;
+  border-radius: 5px;
+  transform: rotate(-4deg);
+}
+.mini-stamp--ready { color: var(--ready); }
+.mini-stamp--almost { color: var(--almost); }
+.mini-stamp--notYet { color: var(--notyet); }
+.mini-skills {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+.mini-skill {
+  display: grid;
+  grid-template-columns: 92px 1fr 28px;
+  align-items: center;
+  gap: var(--s-3);
+}
+.mini-skill__track {
+  height: 8px;
+  border-radius: var(--r-pill);
+  background: var(--hairline);
+  overflow: hidden;
+}
+.mini-skill__fill {
+  display: block;
+  height: 100%;
+  background: var(--cobalt);
+  transform-origin: left; /* bars use scaleX so they can animate later (§10 rule 7) */
+}
+.mini-skill__fill.is-low {
+  background: var(--notyet);
+}
+.mini-skill__score {
+  color: var(--ink);
+  text-align: right;
+}
+.mini-result__practice {
+  font-weight: 600;
+}
+
+.coverage-note {
+  display: flex;
+  gap: var(--s-2);
+  max-width: 640px;
+  margin: 0 auto;
+}
+.coverage-note__icon {
+  flex: none;
+  margin-top: 2px;
+}
+.second-cta {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--s-8);
+}
+.landing-footer {
+  padding: 48px 20px;
+  text-align: center;
+  line-height: 1.6;
+}
+
+/* ── Desktop (≥1024px) ── */
+@media (min-width: 1024px) {
+  .topbar {
+    height: 72px;
+    padding: 0 48px;
+  }
+  /* Hero fills the screen; the globe sits on the right and bleeds off (§3.5). */
+  .landing-hero {
+    display: flex;
+    flex-direction: column;
+    min-height: max(100svh, 640px);
+  }
+  .hero__body {
+    flex: 1;
+    display: flex;
+    align-items: center;
+  }
+  .hero__copy {
+    max-width: calc(560px + clamp(48px, 8vw, 120px));
+    padding: 0 0 0 clamp(48px, 8vw, 120px);
+  }
+  .hero__headline {
+    font-size: var(--fs-hero);
+  }
+  /* The canvas will cover the whole hero (its haze spans the canvas); the
+     globe itself is drawn centred at 73% width, 56% height. */
+  .globe-slot {
+    position: absolute;
+    inset: 0;
+    height: auto;
+    z-index: var(--z-globe);
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  .landing-section {
+    padding: 96px 0;
+  }
+  .landing-below {
+    padding: 0 48px;
+  }
+  .how__cards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .sample {
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+  }
+}
