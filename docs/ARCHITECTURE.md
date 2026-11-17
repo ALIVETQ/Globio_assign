@@ -121,7 +121,7 @@ Globio_assign/                 ← repo root (GitHub: Globio_assign)
 │   │   ├── briefingArt.js     ← the six briefing panel illustrations (inline SVG)
 │   │   ├── seatbelt.js        ← FASTEN SEATBELT sign + pledge card (label around a hidden checkbox) + buckle
 │   │   ├── optionList.js      ← the answer options
-│   │   ├── confidenceBar.js   ← "I'm sure" / "I guessed" / "I don't know this yet"
+│   │   ├── confidenceBar.js   ← confidence panel: "I'm sure" / "I guessed" (+ points sub-lines) / "I don't know this yet"
 │   │   ├── cockpit.js         ← question-screen cockpit: ticket strip, topic chip, background word, route rail, topic card
 │   │   ├── themeToggle.js     ← sun/moon button markup
 │   │   ├── journeyBar.js      ← India → Germany progress bar with plane
@@ -186,6 +186,8 @@ Globio_assign/                 ← repo root (GitHub: Globio_assign)
 │       ├── board.css          ← split-flap train board (+ flip folds)
 │       ├── cockpit.css        ← question cockpit: ticket strip, chip, background word, ≥1200px three-column layout
 │       ├── cockpitRails.css   ← question cockpit rails: route stops/dots, topic card
+│       ├── confidence.css     ← confidence bar panel, main buttons, disabled/enabled states
+│       ├── confidenceLayout.css ← confidence ghost button, exit sweep, phone sticky panel
 │       ├── results.css        ← results page column, verdict block, score meter
 │       ├── ticket.css         ← boarding pass card: two parts, notches, perforation, narrow/wide layouts
 │       ├── ticketParts.css    ← boarding pass contents: header, route, fields, status flaps, stub

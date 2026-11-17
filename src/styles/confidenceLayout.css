@@ -1,0 +1,84 @@
+/* Confidence bar, part 2 (DESIGN.md §7.3): the "I don't know this yet" ghost
+   button, the "I'm sure" exit sweep, reduced motion, and the phone / desktop
+   layouts. Part 1 (panel, main buttons, states) is confidence.css. */
+
+/* ── "I don't know this yet": a ghost pill ── */
+.conf-unknown {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 44px;
+  padding: 0 20px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--font-text);
+  font-weight: 500;
+  font-size: 15px;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+.conf-unknown:hover {
+  border-color: var(--muted-2);
+  color: var(--ink);
+}
+.conf-unknown .conf__icon {
+  width: auto;
+  font-size: 13px;
+}
+
+/* "I'm sure" on exit (§7.6): the button turns white, a cobalt copy wipes in. */
+.conf.is-sweeping {
+  background: var(--paper);
+  color: var(--sure-bg);
+}
+.conf > .btn__sweep {
+  position: absolute;
+  inset: -1.5px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: inherit;
+  border-radius: inherit;
+  background: var(--sure-bg);
+  color: #fff;
+}
+
+/* Reduced motion: no sweep, no lift (§10). */
+[data-reduced-motion="true"] .conf,
+[data-reduced-motion="true"] .conf-unknown {
+  transition: none;
+  transform: none;
+}
+
+/* ── Phones: the panel is the sticky bottom bar ── */
+@media (max-width: 639px) {
+  .question-screen .confidence {
+    position: sticky;
+    bottom: 0;
+    z-index: var(--z-sticky);
+    padding: 0;
+    border: 0;
+    background: none;
+  }
+  .confidence__panel {
+    gap: 8px;
+    padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
+    border-bottom: 0;
+    border-radius: 20px 20px 0 0;
+  }
+  .conf {
+    gap: 8px;
+    padding: 8px 10px;
+  }
+  .conf__label { font-size: 13px; letter-spacing: 0.04em; }
+  .conf__sub { font-size: 12px; }
+  .conf-unknown { height: 40px; }
+}
+@media (min-width: 640px) {
+  .conf { flex: 0 1 280px; }
+}
+@media (min-width: 1024px) {
+  .conf__key { display: inline-grid; }
+}

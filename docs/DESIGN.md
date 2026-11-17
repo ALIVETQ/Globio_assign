@@ -411,14 +411,18 @@ Reduced motion: no slide (giant word static, centred, clipped), auto-advance aft
 - **Ads question (a/b):** the options are the ads themselves (see §7.5.2); keycaps "a" and "b". Keyboard: `1`/`A` and `2`/`B`.
 - **Sentence options** (grammar "which sentence is correct?"): same component, text may wrap to 2 lines, min-height 64px.
 
-### 7.3 Confidence bar
+### 7.3 Confidence bar (`components/confidenceBar.js`, `styles/confidence.css`)
 
-- Two buttons in a row, gap 10px, each 50% width (phone) / auto width min 200px (desktop), centred: primary `question.sure` ("I'M SURE →"), secondary `question.guessed` ("I GUESSED →").
-- Under them, centred, 12px gap: text link `question.unknown` ("I don't know this yet"), muted.
-- **Both main buttons are disabled until an option is selected.** The text link is always active.
-- Desktop: keyboard hints under each control in mono 11px muted: "S", "G", "D".
-- **Phone:** the bar is **sticky at the bottom** (`position: sticky; bottom: 0`), white background with a top hairline, padding 12px 20px `calc(12px + env(safe-area-inset-bottom))`. The column above gets enough bottom padding that the last option is never hidden.
-- Desktop: the bar sits in the flow, 32px below the options.
+- **Panel:** label, buttons and don't-know sit on a solid panel: `--surface`, 1px hairline border, radius 20px, padding 20px 24px. Nothing behind it shows through.
+- **Line above the buttons** (mono 12px, uppercase, `--muted`): `question.disabledHelp` ("Choose an answer first") until an option is picked, then `question.confidenceLabel` ("HOW SURE ARE YOU?").
+- **Two main buttons** in a row, gap 10px (50% each on phones, `flex: 0 1 280px` from 640px, 300px from 1200px), min-height 64px, radius 14px. Each: an icon on the left, a two-line label — `question.sure` / `question.guessed` (mono 15px, uppercase) over a sub-line (Archivo 13px, 75% opacity) `question.sureSub` "I know this · 1 point" / `question.guessedSub` "Lucky guess · ½ point" (points filled from `config.js`; 0.5 shows as "½"; one line, cut with "…" if tight) — and on desktop (≥1024px) a key chip at the right edge (22×22px, radius 5px, mono 11px, 1px border in the text colour at 40%): "S", "G".
+- **Disabled** (no option yet), no opacity: transparent fill, 1.5px **dashed** border in a neutral grey (light `#8a8f99`, dark `#6b7180`; ≥ 3:1 on the panel), text in a muted grey (light `--muted`, dark `#9aa0ad`; ≥ 4.5:1), icon hidden. `aria-describedby` → the "Choose an answer first" help, and a tooltip.
+- **"I'm sure", enabled:** solid cobalt fill (light `#2f63ff`; dark `#3366ff`, deeper than the suggested `#4d7cff` so white text keeps 4.7:1), white text, "✓" icon, soft glow `0 0 0 1px rgba(cobalt,.5), 0 8px 24px rgba(cobalt,.35)`. Hover: 10% brighter, y −1px.
+- **"I guessed", enabled:** fill `--surface` + 4% white, solid 2px cobalt border, text `#a9bcff` on dark (`--cobalt-hover` on light, 5.9:1), "?" icon. Hover: border `--cobalt-hover`, y −1px.
+- **"I don't know this yet"** (`question.unknown`): a ghost pill centred below, 44px tall, padding 0 20px, 1px hairline border, `--muted` text, a "○" icon, key chip "D" on the right (desktop). Hover: border `--muted-2`, text `--ink`. Always active.
+- **Focus:** the global 2px cobalt ring, offset 3px, on all three.
+- **Phone:** the panel is the **sticky bottom bar** (`position: sticky; bottom: 0`), radius 20px 20px 0 0, no bottom border, padding 10px 14px + safe area; labels 13px, sub-lines 12px. The column above gets enough bottom padding that the last option is never hidden.
+- Desktop: the bar sits in the flow, below the options.
 
 ### 7.4 Journey bar
 
@@ -477,7 +481,7 @@ Above every passage, a mono label naming the format: `reading.formatEmail`, `rea
 | **Question enters** | Whole content column: x 24px → 0 and opacity 0 → 1 over **0.32 s**, `power3.out`, with a two-frame glitch at the start (frames 1–2: x ±3px and a cobalt ghost text-shadow `−2px 0 rgba(47,99,255,.5)`). Options fade-up y 8, staggered 50 ms. |
 | **Question exits** | x 0 → −24px, opacity → 0, **0.22 s**, `power2.in`. |
 | **Option selected** | An SVG rounded-rect stroke (cobalt, 2px) draws around the option with DrawSVG from 0% to 100% in **0.28 s**, `power2.out`; background fades to `--wash` in 0.2 s. Deselecting the previous option reverses its stroke in 0.15 s. |
-| **Confidence buttons enable** | When the first option is selected: both main buttons fade from 35% to 100% opacity (0.2 s) and the primary does a tiny scale pulse 1 → 1.03 → 1 (0.3 s). |
+| **Confidence buttons enable** | When the first option is selected: the dashed borders turn solid and both fills sweep in left to right (0.25 s, CSS transition on the fill gradient's width), the line above swaps from "Choose an answer first" to "HOW SURE ARE YOU?", and "I'm sure" does its tiny scale pulse 1 → 1.03 → 1 (0.3 s). Reduced motion: instant. |
 | **"I'm sure" pressed** | A white-to-cobalt fill sweeps left → right across the button (clip-path, 0.22 s), then the question exits. |
 | **"I guessed" pressed** | The button wobbles: rotate 0 → −3° → 3° → −1.5° → 0 over **0.22 s** (was 0.35 s), `power1.inOut`, together with the question exit. |
 | **"I don't know" pressed** | The options fade to 40% opacity (0.15 s), then the question exits. |
@@ -510,7 +514,7 @@ Everything here is **static**: it changes only when the question changes, never 
 **All sizes**
 - **Ticket strip** under the journey bar, full width, mono 12px (11px on phones), uppercase, `--muted`, hairline below, padding 8px 20px (10px 40px ≥1200px). Left (`aria-hidden`): `question.ticket` — "FLIGHT GL-A1 · SEAT Q01 · GATE WORTSCHATZ". Right: the question label (`question.label`, "01 / VOCABULARY · Q1 OF 15"), moved here from the label row. Wraps to two lines on phones.
 - **Label row:** Back on the left (as before); on the right, when the topic card isn't shown (below 1200px, and on reading questions), the **topic chip**: the topic `label` as a small mono pill (11px, `--surface`, `--muted`, one line with ellipsis).
-- **Background word:** the current section's German name (`SECTIONS[].de`: WORTSCHATZ / GRAMMATIK / LESEN) in Anton `clamp(160px, 18vw, 320px)`, line-height 0.8, `--ink` at 4%, `position: fixed`, centred, anchored to the bottom of the viewport, behind everything (`z-index: −1`), `aria-hidden`, `pointer-events: none`. It changes only at section breaks.
+- **Background word:** the current section's German name (`SECTIONS[].de`: WORTSCHATZ / GRAMMATIK / LESEN) in Anton `clamp(160px, 18vw, 320px)`, line-height 0.8, `--ink` at 3%, `position: fixed`, centred, anchored to the bottom of the viewport, behind everything (`z-index: −1`), `aria-hidden`, `pointer-events: none`. It changes only at section breaks.
 
 **Desktop ≥1200px** (below that, the layout of §7.1–7.5)
 - **Three columns** (non-reading questions): left rail 240px · centre max 860px · right rail 280px, gap 48px, side padding 40px, vertically centred in the space below the header. Back sits above the centre column.

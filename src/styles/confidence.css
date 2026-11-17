@@ -1,0 +1,141 @@
+/* Confidence bar (DESIGN.md §7.3, components/confidenceBar.js): a solid panel
+   with "I'M SURE" / "I GUESSED" (disabled until an option is picked) and the
+   ghost "I don't know this yet". Phones: the panel is the sticky bottom bar.
+   Contrast (checked on both themes): disabled border ≥ 3:1 and disabled text
+   ≥ 4.5:1 against the panel; white on the "sure" cobalt ≥ 4.5:1. */
+
+.confidence__panel {
+  --sure-bg: #2f63ff;
+  --sure-rgb: 47, 99, 255;
+  --guess-text: var(--cobalt-hover); /* 5.9:1 on the light fill (plain cobalt is 4.3:1) */
+  --off-line: #8a8f99; /* 3.1:1 on #f6f7f9 */
+  --off-text: var(--muted); /* 5.8:1 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 20px 24px;
+  border: 1px solid var(--hairline);
+  border-radius: 20px;
+  background: var(--surface); /* solid: nothing behind shows through */
+}
+:root[data-theme="dark"] .confidence__panel {
+  /* #4d7cff (the suggested cobalt) gives white text only 3.7:1, so a slightly deeper one: 4.7:1 */
+  --sure-bg: #3366ff;
+  --sure-rgb: 51, 102, 255;
+  --guess-text: #a9bcff;
+  --off-line: #6b7180; /* 3.6:1 on #171a22 */
+  --off-text: #9aa0ad; /* 6.7:1 */
+}
+.confidence__label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.confidence__main {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+}
+
+/* ── The two main buttons ── */
+.conf {
+  --fill: transparent;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 64px;
+  padding: 10px 16px;
+  border: 1.5px dashed var(--off-line);
+  border-radius: 14px;
+  /* The fill is a gradient sized 0 → 100%: it sweeps in left to right when enabled. */
+  background: linear-gradient(var(--fill), var(--fill)) no-repeat left / 0% 100%;
+  color: var(--off-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-size 0.25s ease-out, border-color 0.2s, color 0.2s, box-shadow 0.2s, transform 0.15s, filter 0.15s;
+}
+.conf:disabled {
+  cursor: not-allowed;
+}
+.conf:disabled .conf__icon {
+  display: none;
+}
+.conf:disabled .conf__sub {
+  opacity: 1; /* keeps the disabled text at 4.5:1 */
+}
+.conf--sure:enabled {
+  --fill: var(--sure-bg);
+  border: 1.5px solid var(--sure-bg);
+  background-size: 100% 100%;
+  color: #fff;
+  box-shadow: 0 0 0 1px rgba(var(--sure-rgb), 0.5), 0 8px 24px rgba(var(--sure-rgb), 0.35);
+}
+.conf--sure:enabled:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+.conf--guessed:enabled {
+  --fill: color-mix(in srgb, var(--surface), #fff 4%);
+  border: 2px solid var(--cobalt);
+  background-size: 100% 100%;
+  color: var(--guess-text);
+}
+.conf--guessed:enabled:hover {
+  border-color: var(--cobalt-hover);
+  transform: translateY(-1px);
+}
+.conf__icon {
+  flex: none;
+  width: 18px;
+  font-weight: 700;
+  font-size: 17px;
+  line-height: 1;
+  text-align: center;
+}
+.conf__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.conf__label {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 15px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.conf__sub {
+  overflow: hidden;
+  font-family: var(--font-text);
+  font-size: 13px;
+  opacity: 0.75;
+  white-space: nowrap; /* one line; cut with … when space is tight (phones) */
+  text-overflow: ellipsis;
+}
+/* Key chip at the right edge: desktop only */
+.conf__key {
+  display: none;
+  flex: none;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border: 1px solid color-mix(in srgb, currentColor 40%, transparent);
+  border-radius: 5px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1;
+}
+
+/* The ghost button, exit sweep, reduced motion and phone layout: confidenceLayout.css */

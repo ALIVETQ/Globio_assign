@@ -1,36 +1,47 @@
-// Confidence bar (DESIGN.md §7.3): "I'M SURE →" and "I GUESSED →", disabled until
-// an option is chosen, and "I don't know this yet", always available.
-// Keyboard hints (S / G / D) show on desktop only (CSS).
+// Confidence bar (DESIGN.md §7.3): on a solid panel, "I'M SURE" and "I GUESSED"
+// (each with an icon, a sub-line with its points, and a key chip), disabled
+// until an option is chosen, and the ghost button "I don't know this yet".
+// Key chips show on desktop only (CSS). Styles: styles/confidence.css.
 import { MESSAGES } from "../data/messages.js";
+import { CONFIG } from "../data/config.js";
 import { esc } from "../dom.js";
+import { fill } from "../logic/fill.js";
 
 const Q = MESSAGES.question;
-const ARROW = `<span aria-hidden="true">→</span>`;
+// Points as the learner reads them: 0.5 is "½".
+const points = (n) => (n === 0.5 ? "½" : String(n));
+
+function main(kind, icon, label, sub, key) {
+  return `
+    <button type="button" class="conf conf--${kind}" data-action="${kind}" data-needs-choice>
+      <span class="conf__icon" aria-hidden="true">${icon}</span>
+      <span class="conf__text"><span class="conf__label">${esc(label)}</span><span class="conf__sub">${esc(sub)}</span></span>
+      <span class="conf__key" aria-hidden="true">${esc(key)}</span>
+    </button>`;
+}
 
 export function confidenceBarHTML() {
+  const sure = fill(Q.sureSub, { creditSure: points(CONFIG.credit.correctSure) });
+  const guessed = fill(Q.guessedSub, { creditGuessed: points(CONFIG.credit.correctGuessed) });
   return `
     <div class="confidence">
-      <p class="label confidence__label">${esc(Q.confidenceLabel)}</p>
-      <p id="confidence-help" class="sr-only">${esc(Q.disabledHelp)}</p>
-      <div class="confidence__main">
-        <div class="confidence__item">
-          <button type="button" class="btn btn--primary" data-action="sure" data-needs-choice>${esc(Q.sure)}${ARROW}</button>
-          <span class="keyhint" aria-hidden="true">${esc(Q.keyHints.sure)}</span>
+      <div class="confidence__panel">
+        <p class="confidence__label" aria-hidden="true">${esc(Q.confidenceLabel)}</p>
+        <p id="confidence-help" class="sr-only">${esc(Q.disabledHelp)}</p>
+        <div class="confidence__main">
+          ${main("sure", "✓", Q.sure, sure, Q.keyHints.sure)}
+          ${main("guessed", "?", Q.guessed, guessed, Q.keyHints.guessed)}
         </div>
-        <div class="confidence__item">
-          <button type="button" class="btn btn--secondary" data-action="guessed" data-needs-choice>${esc(Q.guessed)}${ARROW}</button>
-          <span class="keyhint" aria-hidden="true">${esc(Q.keyHints.guessed)}</span>
-        </div>
-      </div>
-      <div class="confidence__item">
-        <button type="button" class="btn btn--link confidence__unknown" data-action="unknown">${esc(Q.unknown)}</button>
-        <span class="keyhint" aria-hidden="true">${esc(Q.keyHints.unknown)}</span>
+        <button type="button" class="conf-unknown" data-action="unknown">
+          <span class="conf__icon" aria-hidden="true">○</span>${esc(Q.unknown)}<span class="conf__key" aria-hidden="true">${esc(Q.keyHints.unknown)}</span>
+        </button>
       </div>
     </div>`;
 }
 
-// Main buttons are disabled until a choice exists; the reason is given as a
-// tooltip and, for screen readers, through aria-describedby.
+// Main buttons are disabled until a choice exists; the reason is shown as the
+// line above them ("Choose an answer first" instead of "HOW SURE ARE YOU?"),
+// as a tooltip, and for screen readers through aria-describedby.
 // Returns true when the buttons have just switched on (for the enable pulse).
 export function updateConfidenceBar(root, hasChoice) {
   const buttons = root.querySelectorAll("[data-needs-choice]");
@@ -45,5 +56,7 @@ export function updateConfidenceBar(root, hasChoice) {
       btn.setAttribute("title", Q.disabledHelp);
     }
   });
+  const label = root.querySelector(".confidence__label");
+  if (label) label.textContent = hasChoice ? Q.confidenceLabel : Q.disabledHelp;
   return switchedOn;
 }

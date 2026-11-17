@@ -20,6 +20,8 @@ import "./styles/passages.css";
 import "./styles/board.css";
 import "./styles/cockpit.css";
 import "./styles/cockpitRails.css";
+import "./styles/confidence.css";
+import "./styles/confidenceLayout.css";
 import "./styles/results.css";
 import "./styles/ticket.css";
 import "./styles/ticketParts.css";

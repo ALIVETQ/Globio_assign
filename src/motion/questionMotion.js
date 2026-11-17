@@ -97,6 +97,6 @@ export function setStroke(option, on, animate) {
 // and the primary pulses 1 → 1.03 → 1 (0.3 s).
 export function pulseEnable(buttons, primary) {
   if (reducedMotion) return;
-  gsap.fromTo(buttons, { opacity: 0.35 }, { opacity: 1, duration: 0.2, clearProps: "opacity" });
+  // The dashed → solid change and the fill sweep are CSS (confidence.css); here only the pulse.
   gsap.fromTo(primary, { scale: 1 }, { scale: 1.03, duration: 0.15, yoyo: true, repeat: 1, ease: "power1.inOut", clearProps: "transform" });
 }

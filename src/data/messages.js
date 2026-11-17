@@ -130,7 +130,10 @@ export const MESSAGES = {
     // In-flight cockpit (DESIGN.md §7.7). {nn} = question number "01"–"15";
     // {sectionDe} = SECTIONS[].de of the current section.
     ticket: "FLIGHT GL-A1 · SEAT Q{nn} · GATE {sectionDe}",
-    confidenceLabel: "HOW SURE ARE YOU?", // above the confidence bar, desktop
+    confidenceLabel: "HOW SURE ARE YOU?", // above the buttons; "Choose an answer first" (disabledHelp) until an option is picked
+    // Sub-lines of the two main buttons; points from config.js (0.5 shows as "½").
+    sureSub: "I know this · {creditSure} point",
+    guessedSub: "Lucky guess · {creditGuessed} point",
     routeTitle: "YOUR ROUTE",
     routeFooter: "{total} QUESTIONS · NO TIMER",
     topicTitle: "TOPIC",
