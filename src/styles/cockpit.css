@@ -140,3 +140,12 @@
 }
 
 /* Rail contents: cockpitRails.css */
+
+/* Dark mode: on the pure black page the 4% word and 12% outline read far
+   stronger than in light mode, so both are pulled back to stay in the background. */
+:root[data-theme="dark"] .q-bgword {
+  color: color-mix(in srgb, var(--ink) 2%, transparent);
+}
+:root[data-theme="dark"] .q-num {
+  -webkit-text-stroke-color: color-mix(in srgb, var(--ink) 5%, transparent);
+}
