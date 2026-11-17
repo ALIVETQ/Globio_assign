@@ -101,6 +101,7 @@ Globio_assign/                 ← repo root (GitHub: Globio_assign)
 │   │   ├── shuffle.js         ← builds this attempt's question order and option order
 │   │   ├── presets.js         ← the 8 debug answer sets defined in LOGIC.md §12
 │   │   ├── fill.js            ← fill(template, values) placeholder helper (LOGIC.md §11)
+│   │   ├── keys.js            ← question-screen keyboard shortcuts: key + question → command
 │   │   └── validateConfig.js  ← dev-only startup checks on config.js (LOGIC.md §2)
 │   │
 │   ├── screens/               ← ONE FILE PER SCREEN (see §5 for the contract)
@@ -148,12 +149,16 @@ Globio_assign/                 ← repo root (GitHub: Globio_assign)
 │       ├── base.css           ← reset, typography, buttons, layout helpers
 │       ├── screens.css        ← per-screen styles, grouped by screen
 │       ├── landing.css        ← landing hero: top bar, hero copy, globe slot
-│       └── landingSections.css ← landing sections below the hero
+│       ├── landingSections.css ← landing sections below the hero
+│       ├── journey.css        ← journey bar (section break + question screens)
+│       ├── sectionBreak.css   ← section break screen
+│       └── question.css       ← question screen: label row, prompt, options, confidence bar
 │
 └── tests/
     ├── helpers.js             ← shared scoring context, per-section answer builder, seeded rng
     ├── scoring.test.js
     ├── shuffle.test.js
+    ├── keys.test.js           ← keyboard shortcut mapping
     └── data.test.js           ← content sanity checks, config validation, fill()
 ```
 

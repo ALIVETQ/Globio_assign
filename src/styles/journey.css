@@ -1,0 +1,62 @@
+/* Journey bar (DESIGN.md §7.4) — on the section break and question screens.
+   The SVG geometry is drawn by components/journeyBar.js; colours live here. */
+.journey {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  height: 44px;
+  padding: 0 20px;
+  border-bottom: var(--hairline-border);
+}
+.journey__end {
+  flex: none;
+  color: var(--cobalt);
+}
+.journey__short {
+  display: none;
+}
+.journey__track {
+  display: block;
+  flex: 1;
+  min-width: 0;
+  height: 44px;
+  overflow: visible;
+}
+.journey__path {
+  fill: none;
+  stroke: var(--hairline);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+.journey__path.is-done {
+  stroke: var(--cobalt);
+}
+.journey__dot.is-done {
+  fill: var(--cobalt);
+}
+.journey__dot.is-current {
+  fill: var(--paper);
+  stroke: var(--cobalt);
+  stroke-width: 2;
+}
+.journey__dot.is-next {
+  fill: var(--periwinkle);
+}
+.journey__plane {
+  fill: var(--cobalt);
+}
+
+/* Phone: "IN" / "DE" */
+@media (max-width: 639px) {
+  .journey__long {
+    display: none;
+  }
+  .journey__short {
+    display: inline;
+  }
+}
+@media (min-width: 1024px) {
+  .journey {
+    padding: 0 40px;
+  }
+}

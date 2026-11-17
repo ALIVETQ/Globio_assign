@@ -1,77 +1,90 @@
-// Question screen — PHASE 0 PLACEHOLDER: label, prompt, options and the three
-// confidence buttons, wired to the real state actions. Passages, keyboard
-// shortcuts, journey bar and styling come in Phases 2–4.
+// Question screen (DESIGN.md §7.1–7.4), shared by all three sections.
+// Phase 2a: layout, options, confidence bar, Back, static journey bar and
+// keyboard shortcuts. Motion comes in 2b; passages in Phase 4.
 import { MESSAGES } from "../data/messages.js";
 import { SECTIONS } from "../data/sections.js";
 import { esc, fromHTML, onAction } from "../dom.js";
 import { fill } from "../logic/fill.js";
+import { commandForKey } from "../logic/keys.js";
+import { journeyBarHTML, mountJourney } from "../components/journeyBar.js";
+import { optionListHTML, updateOptionList } from "../components/optionList.js";
+import { confidenceBarHTML, updateConfidenceBar } from "../components/confidenceBar.js";
 
-const T = MESSAGES.question;
-const cleanups = new WeakMap();
+const Q = MESSAGES.question;
+const live = new WeakMap();
+
+// "___" in a prompt is drawn as a 3em cobalt underline (§7.1). The underscores
+// stay in the text for screen readers, visually hidden.
+function promptHTML(prompt) {
+  return esc(prompt).replace(/_{3,}/g, '<span class="gap"><span class="sr-only">___</span></span>');
+}
+
+function labelText(state, q) {
+  const s = SECTIONS.find((x) => x.id === q.section);
+  return fill(Q.label, { sectionNumber: s.number, sectionEn: s.en, n: state.index + 1, total: state.order.length });
+}
 
 export function render(state, actions) {
   const q = state.order[state.index];
-  const s = SECTIONS.find((x) => x.id === q.section);
-  const label = fill(T.label, {
-    sectionNumber: s.number,
-    sectionEn: s.en,
-    n: state.index + 1,
-    total: state.order.length,
-  });
-
-  // Display position i shows options[optionOrder[i]] (LOGIC.md §9).
-  const options = q.optionOrder
-    .map(
-      (orig, i) =>
-        `<button class="option" role="radio" aria-checked="false" data-action="select" data-index="${i}" lang="de">${esc(q.options[orig])}</button>`,
-    )
-    .join("");
+  const back =
+    state.index > 0 // hidden on question 1 of the whole test
+      ? `<button type="button" class="btn btn--link q-back" data-action="back"><span aria-hidden="true">← </span>${esc(Q.back)}</button>`
+      : "<span></span>";
 
   const el = fromHTML(`
-    <section class="screen placeholder">
-      <div class="row row--between">
-        <p class="label">${esc(label)}</p>
-        ${state.index > 0 ? `<button class="btn btn--link" data-action="back">${esc(T.back)}</button>` : ""}
+    <section class="screen question-screen">
+      ${journeyBarHTML()}
+      <div class="q-label-row">
+        ${back}
+        <p class="label">${esc(labelText(state, q))}</p>
       </div>
-      <h1 class="prompt" lang="de">${esc(q.prompt)}</h1>
-      ${q.hint ? `<p class="muted">${esc(q.hint)}</p>` : ""}
-      <div class="options" role="radiogroup" aria-label="${esc(T.optionsAria)}">${options}</div>
-      <p id="disabled-help" class="sr-only">${esc(T.disabledHelp)}</p>
-      <div class="row">
-        <button class="btn btn--primary" data-action="sure" data-needs-choice>${esc(T.sure)}</button>
-        <button class="btn btn--secondary" data-action="guessed" data-needs-choice>${esc(T.guessed)}</button>
-        <button class="btn btn--link" data-action="unknown">${esc(T.unknown)}</button>
+      <div class="q-column">
+        <h1 class="prompt" lang="de">${promptHTML(q.prompt)}</h1>
+        ${q.hint ? `<p class="q-hint small muted">${esc(q.hint)}</p>` : ""}
+        ${optionListHTML(q)}
       </div>
+      ${confidenceBarHTML()}
     </section>
   `);
 
-  update(el, state);
-  cleanups.set(
-    el,
-    onAction(el, {
-      select: (btn) => actions.selectOption(Number(btn.dataset.index)),
-      sure: () => actions.confirm("sure"),
-      guessed: () => actions.confirm("guessed"),
-      unknown: () => actions.skip(),
-      back: () => actions.back(),
+  const run = (cmd) => {
+    if (!cmd) return false;
+    if (cmd.type === "select") actions.selectOption(cmd.index);
+    else if (cmd.type === "sure") actions.confirm("sure");
+    else if (cmd.type === "guessed") actions.confirm("guessed");
+    else if (cmd.type === "unknown") actions.skip();
+    else if (cmd.type === "back") actions.back();
+    return true;
+  };
+
+  // Shortcuts work from anywhere on the page, except with modifier keys
+  // (so browser shortcuts like Ctrl+R still work) or on a held-down key.
+  const onKey = (e) => {
+    if (e.repeat || e.altKey || e.ctrlKey || e.metaKey) return;
+    if (run(commandForKey(e.key, q))) e.preventDefault();
+  };
+  document.addEventListener("keydown", onKey);
+
+  live.set(el, {
+    offClick: onAction(el, {
+      select: (btn) => run({ type: "select", index: Number(btn.dataset.index) }),
+      sure: () => run({ type: "sure" }),
+      guessed: () => run({ type: "guessed" }),
+      unknown: () => run({ type: "unknown" }),
+      back: () => run({ type: "back" }),
     }),
-  );
+    offKey: () => document.removeEventListener("keydown", onKey),
+    journey: mountJourney(el, state.order, state.index),
+  });
+  update(el, state);
   return el;
 }
 
-// Called by main.js when only the selection changed, so the screen isn't rebuilt.
+// Same question, new selection: update in place (main.js calls this).
 export function update(el, state) {
   const q = state.order[state.index];
-  el.querySelectorAll(".option").forEach((btn) => {
-    const selected = q.optionOrder[Number(btn.dataset.index)] === state.pendingChoice;
-    btn.setAttribute("aria-checked", String(selected));
-  });
-  const noChoice = state.pendingChoice === null;
-  el.querySelectorAll("[data-needs-choice]").forEach((btn) => {
-    btn.disabled = noChoice;
-    if (noChoice) btn.setAttribute("aria-describedby", "disabled-help");
-    else btn.removeAttribute("aria-describedby");
-  });
+  updateOptionList(el, q, state.pendingChoice);
+  updateConfidenceBar(el, state.pendingChoice !== null);
 }
 
 export function enter() {
@@ -83,6 +96,10 @@ export function exit() {
 }
 
 export function destroy(el) {
-  cleanups.get(el)?.();
-  cleanups.delete(el);
+  const h = live.get(el);
+  if (!h) return;
+  h.offClick();
+  h.offKey();
+  h.journey.destroy();
+  live.delete(el);
 }

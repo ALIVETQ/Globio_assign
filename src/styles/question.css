@@ -1,0 +1,181 @@
+/* Question screen (DESIGN.md §7.1–7.3). Mobile first; desktop (≥1024px) at the end.
+   --q-pad is the column's side padding: 20px phone/tablet, 40px desktop. */
+.question-screen {
+  --q-pad: 20px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+}
+
+/* ── Label row: ← Back (left) · 01 / VOCABULARY · Q4 OF 15 (right) ── */
+.q-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+  width: 100%;
+  max-width: calc(720px + 2 * var(--q-pad));
+  min-height: 44px;
+  margin: 0 auto;
+  padding: var(--s-3) var(--q-pad) 0;
+}
+.q-label-row .label {
+  text-align: right;
+  line-height: 1.4;
+}
+
+/* ── Column: prompt, hint, options. Starts 32px below the label row. ── */
+.q-column {
+  width: 100%;
+  max-width: calc(720px + 2 * var(--q-pad));
+  margin: 32px auto 0;
+  padding: 0 var(--q-pad) var(--s-6);
+}
+/* "___" gap: a 3em-wide cobalt underline, not underscores */
+.gap {
+  display: inline-block;
+  width: 3em;
+  height: 0;
+  border-bottom: 2px solid var(--cobalt);
+  vertical-align: -0.12em;
+}
+.q-hint {
+  margin-top: 8px;
+}
+
+/* ── Options (§7.2) ── */
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 28px;
+}
+.option {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-height: 60px;
+  padding: 14px 18px;
+  border: 1.5px solid var(--hairline);
+  border-radius: var(--r-option);
+  background: var(--paper);
+  font-family: var(--font-text);
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 1.35;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.25s, background-color 0.25s;
+}
+.option:hover {
+  border-color: var(--periwinkle);
+}
+.option.is-selected {
+  background: var(--wash);
+  border-color: var(--cobalt); /* Phase 2b draws this border with DrawSVG */
+}
+.options--sentence .option {
+  min-height: 64px;
+}
+/* Keycap: desktop only */
+.keycap {
+  display: none;
+  flex: none;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--hairline);
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--muted);
+  transition: background-color 0.25s, color 0.25s, border-color 0.25s;
+}
+.option.is-selected .keycap {
+  background: var(--cobalt);
+  border-color: var(--cobalt);
+  color: var(--paper);
+}
+
+/* ── Confidence bar (§7.3). Phone: sticky at the bottom. ── */
+.confidence {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: calc(720px + 2 * var(--q-pad));
+  margin: 0 auto;
+  padding: 32px var(--q-pad) var(--s-8);
+}
+.confidence__main {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+}
+.confidence__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.confidence__main .confidence__item {
+  flex: 1 1 0; /* 50% each on phone */
+  min-width: 0;
+}
+.confidence__main .btn {
+  width: 100%;
+  padding: 0 16px;
+}
+.confidence__unknown {
+  color: var(--muted);
+}
+.keyhint {
+  display: none;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1;
+  color: var(--muted-2);
+}
+
+@media (max-width: 639px) {
+  /* The column grows so the bar rests at the bottom of the screen even when
+     the question is short; when it's long, the bar sticks over the page bottom
+     and slides back below the last option at the end of the scroll. */
+  .q-column {
+    flex: 1;
+  }
+  .confidence {
+    position: sticky;
+    bottom: 0;
+    z-index: var(--z-sticky);
+    background: var(--paper);
+    border-top: var(--hairline-border);
+    padding: 12px 20px calc(12px + env(safe-area-inset-bottom));
+  }
+}
+
+/* ── Desktop (≥1024px) ── */
+@media (min-width: 1024px) {
+  .question-screen {
+    --q-pad: 40px;
+  }
+  .keycap {
+    display: inline-grid;
+  }
+  .keyhint {
+    display: block;
+  }
+  .confidence__main .confidence__item {
+    flex: none;
+  }
+  .confidence__main .btn {
+    width: auto;
+    min-width: 200px;
+    padding: 0 28px;
+  }
+}
