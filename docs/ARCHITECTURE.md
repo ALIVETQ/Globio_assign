@@ -144,7 +144,8 @@ Globio_assign/                 ← repo root (GitHub: Globio_assign)
 │       ├── tokens.css         ← colours, fonts, spacing, radii, z-index (from DESIGN.md)
 │       ├── base.css           ← reset, typography, buttons, layout helpers
 │       ├── screens.css        ← per-screen styles, grouped by screen
-│       └── landing.css        ← landing screen styles (own file: too many for screens.css)
+│       ├── landing.css        ← landing hero: top bar, hero copy, globe slot
+│       └── landingSections.css ← landing sections below the hero
 │
 └── tests/
     ├── helpers.js             ← shared scoring context, per-section answer builder, seeded rng
