@@ -62,7 +62,7 @@ export function update(el) {
 export function enter(el) {
   stopMotion(el); // debug "Replay" calls enter() again on the same element
   const h = live.get(el);
-  globe.mount(el.querySelector(".globe-slot"), { mode: "landing" });
+  globe.mount(el.querySelector(".globe-slot"));
   h.entrance = playEntrance(el);
   h.stopReveal = revealBelowFold(el);
   return Promise.resolve();

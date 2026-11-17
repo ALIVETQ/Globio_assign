@@ -54,7 +54,7 @@ Verdict colours appear **only** on the results page and in the sample result car
 
 ### 2.6 Dark theme (added on request)
 
-A sun/moon button (`components/themeToggle.js`) switches light/dark: in the landing top bar, at the right end of the journey bar (section break + question screens), and at the top of checking/results. The page follows the device setting until the learner presses it; the choice is saved in `localStorage` (`examReady.theme`). `index.html` sets `<html data-theme>` before paint (no flash). Dark token values live in `tokens.css` under `:root[data-theme="dark"]` (ink `#eef0f5`, paper `#0e1016`, cobalt `#6b8cff` with dark text on cobalt, surface `#171a22`, hairline `#2a2e38`, raised `#181b24`, verdict colours lifted). The globe (`globeDraw.js` PALETTE.dark) and the horizon glow (`glow.js` DARK_STOPS, fading to the dark page colour) have dark variants. The train board and door plaque stay dark in both themes.
+A sun/moon button (`components/themeToggle.js`) switches light/dark: in the landing top bar, at the right end of the journey bar (section break + question screens), and at the top of checking/results. The page follows the device setting until the learner presses it; the choice is saved in `localStorage` (`examReady.theme`). `index.html` sets `<html data-theme>` before paint (no flash). Dark token values live in `tokens.css` under `:root[data-theme="dark"]` (ink `#eef0f5`, paper `#0e1016`, cobalt `#6b8cff` with dark text on cobalt, surface `#171a22`, hairline `#2a2e38`, raised `#181b24`, verdict colours lifted). The globe (`globeDraw.js` PALETTE.dark) and the horizon glow (`glow.js` DARK_STOPS, fading to the dark page colour) have dark variants. The train board, door plaque and boarding-pass status flaps stay dark in both themes.
 
 ### 2.2 Type
 
@@ -117,7 +117,7 @@ Must look right, with nothing cut off or scrolling sideways, at **360×740, 390�
 
 ## 3. The globe (`motion/globe.js`)
 
-One canvas, created once, used on the landing page and the results page.
+One canvas, created once, used on the landing page. (It used to appear on the results page too; that spot is now a boarding pass, §9.2.)
 
 ### 3.1 Dots (built once by `scripts/build-dots.mjs`)
 
@@ -161,7 +161,6 @@ One canvas, created once, used on the landing page and the results page.
 | desktop (landing) | Fills the right side of the hero. `R = min(0.42 · heroHeight, 0.30 · vw)`. Centre at `x = vw − 0.27·vw`, `y = 0.56 · heroHeight`. Bleeds off the bottom a little. |
 | tablet (landing, 640–1023px) | Below the hero copy in a box `min(92vw, 520px)` tall, `overflow: hidden`, bottom 25% faded with `mask-image: linear-gradient(#000 75%, transparent)`. `R = 0.62 · vw` (max 340px), centre at 55% width, 58% box height. |
 | phone (landing, < 640px) | Same box and bottom fade as tablet. The whole globe fits the width with a 16px margin each side: `R = boxWidth / 2 − 16` (max 340px), centre at 50% width, 58% box height. India, Germany and the arc are always fully visible. |
-| results (all sizes) | In the verdict block (see §9.2). Box 360×300 desktop / full width × 260 phone. `R` fits the box with 12px margin. No haze beyond the box. |
 
 ### 3.6 Motion
 
@@ -172,9 +171,8 @@ One canvas, created once, used on the landing page and the results page.
 | Arc (landing) | Draws from 0 to 1 over 1.4 s, `power2.inOut`, starting t = 1.1 s |
 | Plane (landing) | After the arc is drawn: a cobalt dot (radius `max(2.5, 3.2k)`) flies India → Germany along the arc in 3.2 s, `power1.inOut`, with a trail of the last 14 positions fading from alpha .6 to 0 and shrinking to 40% size. Pauses 1.2 s at Germany (Germany pin pulses once: a ring growing from 1× to 2.4× pin radius and fading out over 0.8 s), then restarts from India. |
 | Sway | Continuous from t = 0 (§3.2) |
-| Results mode | No plane loop. Arc draws from 0 to `result.overall / 100` over 1.6 s, `power2.out`, starting when the verdict block enters (see §9.11). A plane dot sits at the arc's tip. If the verdict is **ready**, the arc completes to 1, the plane lands, and the Germany pin turns `--ready` and pulses twice. |
 | Pausing | Stop the loop when the canvas is off-screen or the tab is hidden. |
-| Reduced motion | Draw one still frame: sway at 0, pins shown, arc fully drawn (landing) or drawn to its final value (results), plane at the tip, no trail. |
+| Reduced motion | Draw one still frame: sway at 0, pins shown, arc fully drawn, plane at the tip, no trail. |
 
 ---
 
@@ -510,7 +508,7 @@ Single column, max-width 960px, centred; padding 24px 20px (phone), 56px 40px (d
 
 ### 9.2 Verdict block
 
-Desktop: two columns (left 60% / right 40%). Phone: stacked (left content, then globe).
+Desktop: two columns (left: the rest / right: the boarding pass, up to 440px). Phone and tablet: stacked (left content, then the boarding pass).
 
 **Left:**
 - Mono label `results.label` ("YOUR RESULT").
@@ -523,7 +521,16 @@ Desktop: two columns (left 60% / right 40%). Phone: stacked (left content, then 
   - A vertical tick at **75%** (ready line) and one at **55%** (almost line), each 18px tall, 2px ink, with mono 10px labels under them `results.readyLine` ("READY 75") / `results.almostLine` ("ALMOST 55").
   - A small mono caption: `results.passMarkNote` (the real exam pass mark is 60).
 
-**Right:** the globe in results mode (§3.5, §3.6) with a mono caption under it: `results.journeyCaption` with the score inserted (e.g. "68% OF THE WAY TO GERMANY").
+**Right:** a **boarding pass** New Delhi → Berlin (`components/boardingPass.js`, `styles/ticket.css`, text `results.ticket`), max-width 440px, with a mono caption under it: `results.journeyCaption` with the score inserted (e.g. "68% OF THE WAY TO GERMANY"), or `results.journeyCaptionReady` for "ready".
+
+- **Card:** `--raised` background, radius 14px, soft drop shadow. Two parts: the main part and a stub, separated by a dashed perforation (1.5px, `--muted-2`, dashes 4/4) with a semicircle notch (radius 10px) cut out at each end; the notches are real cut-outs (CSS masks). When the ticket itself is ≥ 400px wide the stub (112px) sits on the right with a vertical perforation; narrower (phone), the stub sits below with a horizontal perforation.
+- **Header:** wordmark `ticket.airline` ("GLOBIO", Anton 20px, uppercase) after a small cobalt paper-plane glyph; `ticket.title` ("BOARDING PASS") as a mono label on the right.
+- **Route:** `DEL` left, `BER` right in Anton (36–48px, by ticket width), with the cities in mono 11px under them (wrapping to two lines). Between them a gentle dotted arc (`--muted-2` dots) with the journey bar's paper plane in cobalt at `result.overall`% along it — at BER for "ready" — and a solid cobalt line on the part already flown.
+- **Fields** (mono 10px label, mono 13px value; 2 columns narrow, 3 wide): PASSENGER · FLIGHT · GATE · READINESS (`{overall}%`) · CLASS, from `ticket.fields`.
+- **Status:** `ticket.statusLabel` + the status word on split-flap cells (the train board's flaps, 15px cells, letters in the verdict colour): ready "BOARDING", almost "WAITLISTED", notYet "ON HOLD".
+- **Stub:** `ticket.stubRoute` ("DEL → BER"), the status word again (mono 12px, verdict colour), a decorative barcode (bars generated from the result, so the same result always gets the same barcode), and `ticket.notReal` ("Not a real ticket", mono 10px).
+- **"Ready":** the stub rests torn off a little: `translateX(8px) rotate(3deg)`, hinged at its far bottom corner.
+- **Accessibility:** the whole ticket is `aria-hidden`; screen readers get `ticket.srText` ("Boarding pass, New Delhi to Berlin. Status: {status}. Readiness {overall} percent.").
 
 ### 9.3 Skill bars
 
@@ -590,7 +597,7 @@ Desktop: two columns (left 60% / right 40%). Phone: stacked (left content, then 
 | 800 | Reason, next action | Fade-up y 10, 100 ms apart |
 | 1000 | Score number | Count-up to `result.overall` (1.4 s) |
 | 1000 | Score bar | Width 0 → overall% (1.4 s, `power3.out`); the two ticks fade in at 1.2 s |
-| 1100 | Globe | Results-mode arc (§3.6) |
+| 1100 | **Boarding pass** | (1) Prints: slides up 40px while revealed top to bottom (clip-path), 0.6 s, "soft". (2) The perforation draws (DrawSVG on a mask over the dashed line), 0.3 s. (3) From 2.0 s the plane flies DEL → its place (`result.overall`%) along the dotted path, drawing a solid line behind it, 1.6 s, `power2.out`; at the same time (4) the status split-flaps into place (`splitFlap.js`, ≤ 0.9 s, no fade). (5) Ready only: the plane lands at BER with a small hop (y 0 → −4 → 0, 0.3 s), then the stub tears off: rotate 3°, x 8px, 0.4 s, `back.out(2)`. Reduced motion: final state. |
 
 **Below the fold** (each block triggers when 15% of it enters the viewport, once):
 
@@ -623,7 +630,7 @@ Desktop: two columns (left 60% / right 40%). Phone: stacked (left content, then 
 
 | Priority | Items |
 |---|---|
-| **Must-have** | Globe hero with arc + plane; headline glitch reveal; journey bar with moving plane; option stroke draw; confidence button feedback; score count-up; skill bars; visa stamp; results-mode arc |
+| **Must-have** | Globe hero with arc + plane; headline glitch reveal; journey bar with moving plane; option stroke draw; confidence button feedback; score count-up; skill bars; visa stamp; boarding pass (static) |
 | **Nice to have** | Horizon glow transitions; split-flap board; email notification expand; door-sign swing; confidence-dots Flip; checking readout; practice-card sweep; section-break sliding letters |
 | **Only if time** | Floating German words; clock and odometer extras; coverage shimmer |
 
@@ -645,6 +652,6 @@ If something nice-to-have is cut, its element still appears in its final, static
 
 **Checking:** three lines type in with counting percentages.
 
-**Results:** the verdict stamp thuds onto a tinted block, which shakes slightly; the score counts up and the bar fills to it, with the 75 and 55 ticks; the globe's arc draws partway toward Germany (all the way for "ready"). Scrolling down: skill bars grow (red pulse under 60%), the lucky-guess warning slides in when it applies, 15 dots sort into four groups, practice cards sweep in, the three untested exam sections shimmer gently.
+**Results:** the verdict stamp thuds onto a tinted block, which shakes slightly; the score counts up and the bar fills to it, with the 75 and 55 ticks; a boarding pass prints, its plane flies partway from DEL toward BER (all the way for "ready", where the stub tears off) and the status flips in. Scrolling down: skill bars grow (red pulse under 60%), the lucky-guess warning slides in when it applies, 15 dots sort into four groups, practice cards sweep in, the three untested exam sections shimmer gently.
 
 **Everywhere:** with reduced motion on, every screen shows its final state immediately and the globe is still. No horizontal scroll at any test size. Every control works by keyboard with a visible focus ring.

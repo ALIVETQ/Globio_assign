@@ -1,9 +1,8 @@
-// The canvas globe (DESIGN.md §3) — a singleton: one canvas, created once and
-// moved between the landing page and (Phase 5) the results page.
+// The canvas globe (DESIGN.md §3) — a singleton: one canvas, created once,
+// shown on the landing page. (The results page used to show it too; it now
+// shows a boarding pass instead, components/boardingPass.js.)
 //
-// API: mount(container, {mode}), unmount(), setArcProgress(0–1),
-//      setPulse(0–1 | null) (results: the Germany pin's arrival ring),
-//      setMode("landing" | "results"), pause(), resume().
+// API: mount(container), unmount(), pause(), resume().
 //
 // It runs its own requestAnimationFrame loop (not GSAP), so slow-mo is applied
 // by scaling its clock with prefs.timeScale. The loop stops whenever the canvas
@@ -25,7 +24,7 @@ const TRAIL = 14; // positions, one per 60 fps frame
 const PHONE_MARGIN = 16; // px each side of the phone globe
 
 let canvas = null, ctx = null, dots = null, colors = null;
-let container = null, mode = "landing", arcProgress = 0, resultsPulse = null;
+let container = null;
 let clock = 0, lastTs = null, rafId = null;
 let onScreen = true, manualPause = false;
 let resizeObs = null, intersectObs = null, unsubPrefs = null;
@@ -38,7 +37,6 @@ function readColors() {
     ink: v("--ink", "#111111"),
     paper: v("--paper", "#ffffff"),
     cobalt: v("--cobalt", "#2f63ff"),
-    ready: v("--ready", "#16a34a"),
     monoFont: v("--font-mono", "monospace"),
     dark: document.documentElement.dataset.theme === "dark",
   };
@@ -59,9 +57,7 @@ function layout() {
   canvas.width = Math.round(w * dpr);
   canvas.height = Math.round(h * dpr);
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  if (mode === "results") {
-    box = { w, h, cx: w / 2, cy: h / 2, R: Math.max(0, Math.min(w, h) / 2 - 12) };
-  } else if (window.innerWidth >= 1024) {
+  if (window.innerWidth >= 1024) {
     box = { w, h, cx: w - 0.27 * w, cy: 0.56 * h, R: Math.min(0.42 * h, 0.3 * w) };
   } else if (window.innerWidth >= 640) {
     box = { w, h, cx: 0.55 * w, cy: 0.58 * h, R: Math.min(0.62 * w, 340) };
@@ -87,19 +83,7 @@ function frameAt(t) {
     plane: null,
     trail: [],
     pulse: null,
-    arrived: false,
   };
-
-  if (mode === "results") {
-    f.arc = arcProgress;
-    // Only a "ready" verdict draws the arc all the way (§3.6): the plane has
-    // landed, so the Germany pin turns --ready. The plane dot is no longer
-    // drawn then: it would sit on the pin and hide its colour.
-    f.arrived = arcProgress >= 1;
-    f.plane = arcProgress > 0 && !f.arrived ? arcProgress : null; // a plane dot sits at the arc's tip
-    f.pulse = f.arrived ? resultsPulse : null; // driven by the results timeline
-    return f;
-  }
 
   f.arc = still ? 1 : arcEase(clamp01((t - ARC_START) / ARC_DUR));
   if (still) {
@@ -162,7 +146,7 @@ function onVisibility() {
   update();
 }
 
-export function mount(el, { mode: m = "landing" } = {}) {
+export function mount(el) {
   if (!canvas) {
     canvas = document.createElement("canvas");
     canvas.className = "globe-canvas";
@@ -172,7 +156,6 @@ export function mount(el, { mode: m = "landing" } = {}) {
   }
   if (container) unmount();
   container = el;
-  mode = m;
   clock = 0; // replay the intro on every mount
   colors = readColors();
   el.append(canvas);
@@ -208,27 +191,6 @@ export function unmount() {
   canvas?.remove();
   container = null;
   manualPause = false;
-  resultsPulse = null;
-}
-
-export function setArcProgress(p) {
-  arcProgress = clamp01(p);
-  if (rafId === null) draw();
-}
-
-// Results only: the arrival pulse ring at the Germany pin, 0 → 1 (null = none).
-// The results timeline drives it, so it follows slow-mo and reduced motion.
-export function setPulse(p) {
-  resultsPulse = p === null ? null : clamp01(p);
-  if (rafId === null) draw();
-}
-
-export function setMode(m) {
-  mode = m;
-  if (container) {
-    layout();
-    draw();
-  }
 }
 
 export function pause() {

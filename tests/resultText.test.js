@@ -40,6 +40,12 @@ describe("results text", () => {
         R.luckyWarning, ...MESSAGES.method.paragraphs,
       ];
       for (const t of templates) expect(() => fill(t, values, strict)).not.toThrow();
+      // Boarding pass: every field and the screen-reader sentence fill too.
+      const T = R.ticket;
+      for (const f of T.fields) expect(() => fill(f.value, values, strict)).not.toThrow();
+      expect(fill(T.srText, { ...values, status: T.status[result.verdict] }, strict)).toBe(
+        `Boarding pass, New Delhi to Berlin. Status: ${T.status[result.verdict]}. Readiness ${result.overall} percent.`,
+      );
       const v = verdictText(result, values, MESSAGES);
       expect(v.reason).not.toMatch(/\{\w+\}/);
       expect(v.next).not.toMatch(/\{\w+\}/);

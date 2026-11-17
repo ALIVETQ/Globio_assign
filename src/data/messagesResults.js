@@ -31,6 +31,27 @@ export const RESULTS_MESSAGES = {
     journeyCaption: "{overall}% OF THE WAY TO GERMANY",
     journeyCaptionReady: "ARRIVED · READY TO BOOK",
 
+    // Boarding pass (DESIGN.md §9.2), New Delhi → Berlin. Decorative: the whole
+    // ticket is aria-hidden and screen readers get `srText` instead.
+    ticket: {
+      airline: "GLOBIO",
+      title: "BOARDING PASS",
+      from: { code: "DEL", city: "New Delhi, India" },
+      to: { code: "BER", city: "Berlin, Germany" },
+      fields: [
+        { label: "PASSENGER", value: "A1 LEARNER" },
+        { label: "FLIGHT", value: "GL-A1" },
+        { label: "GATE", value: "GOETHE / ÖSD" },
+        { label: "READINESS", value: "{overall}%" },
+        { label: "CLASS", value: "A1" },
+      ],
+      statusLabel: "STATUS",
+      status: { ready: "BOARDING", almost: "WAITLISTED", notYet: "ON HOLD" },
+      stubRoute: "DEL → BER",
+      notReal: "Not a real ticket",
+      srText: "Boarding pass, New Delhi to Berlin. Status: {status}. Readiness {overall} percent.",
+    },
+
     // §8.2 Skills, warning, dots
     skillsTitle: "YOUR SKILLS",
     skillLine: "{readySkill}% LINE",

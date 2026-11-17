@@ -4,7 +4,7 @@
 //
 // It reads ONLY state.result, config.js and messages.js (plus display text from
 // data/). Nothing is recalculated here (ARCHITECTURE.md §4.3). Animation lives
-// in motion/resultsMotion.js (verdict block, globe) and motion/resultsReveal.js
+// in motion/resultsMotion.js (verdict block, boarding pass) and motion/resultsReveal.js
 // (blocks below the fold).
 import { MESSAGES } from "../data/messages.js";
 import { CONFIG } from "../data/config.js";
@@ -21,7 +21,7 @@ import { practiceCardsHTML } from "../components/practiceCards.js";
 import { examCoverageHTML } from "../components/examCoverage.js";
 import { answerReviewHTML, methodHTML } from "../components/answerReview.js";
 import { createToast } from "../components/toast.js";
-import * as globe from "../motion/globe.js";
+import { boardingPassHTML, mountBoardingPass } from "../components/boardingPass.js";
 import { playVerdict } from "../motion/resultsMotion.js";
 import { revealResults } from "../motion/resultsReveal.js";
 
@@ -44,8 +44,8 @@ function verdictBlock(result, values) {
         <p class="verdict__next">${esc(v.next)}</p>
         ${scoreMeterHTML(result, values)}
       </div>
-      <figure class="verdict__globe">
-        <div class="results-globe" aria-hidden="true"></div>
+      <figure class="verdict__ticket">
+        ${boardingPassHTML(result, values)}
         <figcaption class="label verdict__caption">${esc(caption)}</figcaption>
       </figure>
     </div>`;
@@ -110,19 +110,19 @@ export function render(state, actions) {
 function stopMotion(h) {
   h.verdictTl?.kill();
   h.stopReveal?.();
-  globe.setPulse(null);
+  h.ticket?.destroy();
 }
 
-// The globe needs the screen on the page to measure its box, so it is mounted here.
-// Resolves at once: the learner can scroll and act while the entrance plays.
+// The boarding pass measures its route and perforation, so it is set up once the
+// screen is on the page. Resolves at once: the learner can scroll and act while
+// the entrance plays.
 export function enter(el) {
   const h = live.get(el);
   stopMotion(h); // debug "Replay" calls enter() again on the same element
-  // Final arc first: a "ready" verdict reaches Germany (DESIGN.md §3.6). Under
-  // reduced motion that is all the globe shows; otherwise the entrance redraws it from 0.
-  globe.setArcProgress(h.result.verdict === "ready" ? 1 : h.result.overall / 100);
-  globe.mount(el.querySelector(".results-globe"), { mode: "results" });
-  h.verdictTl = playVerdict(el, h.result);
+  // Final state first (plane at its place, perforation sized). Under reduced
+  // motion that is all; otherwise the entrance replays it from the start.
+  h.ticket = mountBoardingPass(el, h.result);
+  h.verdictTl = playVerdict(el, h.result, h.ticket.raw);
   h.stopReveal = revealResults(el, h.result);
   return Promise.resolve();
 }
@@ -135,7 +135,6 @@ export function destroy(el) {
   const h = live.get(el);
   if (!h) return;
   stopMotion(h);
-  globe.unmount();
   h.offActions();
   h.offDots();
   h.toast.destroy();

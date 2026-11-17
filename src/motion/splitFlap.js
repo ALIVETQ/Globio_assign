@@ -8,6 +8,9 @@
 //
 // Each flap gets a temporary "fold" (the top half of the old character) which
 // is removed when the cell lands, so the finished board is plain static markup.
+//
+// Also used by the boarding pass's status (components/boardingPass.js), with
+// its own rows, no fade and a 0.9 s ceiling — see the options of playSplitFlap.
 import { gsap } from "./gsap.js";
 
 const FADE_S = 0.2;
@@ -57,8 +60,10 @@ function flipCell(tl, flap, n, end) {
 }
 
 // Returns the timeline (null if there is nothing to animate).
-export function playSplitFlap(board) {
-  const rows = [...board.querySelectorAll(".board__row")];
+// Options: rows (selector of the flap rows), fade (the board's fade-in, s; 0 =
+// none), total (the hard ceiling, s). The defaults are the train board's.
+export function playSplitFlap(board, { rows: rowSel = ".board__row", fade = FADE_S, total = TOTAL_S } = {}) {
+  const rows = [...board.querySelectorAll(rowSel)];
   if (!rows.length) return null;
   // Jumping to the end (reduced motion switched on mid-way) may skip callbacks,
   // so completion always restores the real characters.
@@ -70,18 +75,18 @@ export function playSplitFlap(board) {
   }
   finishBoard(board); // start every run from the real board, folds removed
   board.querySelectorAll(".flap__fold").forEach((f) => f.remove());
-  tl.fromTo(board, { opacity: 0 }, { opacity: 1, duration: FADE_S, clearProps: "opacity" }, 0);
+  if (fade > 0) tl.fromTo(board, { opacity: 0 }, { opacity: 1, duration: fade, clearProps: "opacity" }, 0);
 
   // Latest a cell may land so the last cell of the last row still makes 1.2 s.
   const longest = Math.max(...rows.map((r) => r.querySelectorAll(".flap:not(.is-blank)").length));
-  const lastRowStart = FADE_S + MAX_FLIPS * FLIP_S + (rows.length - 1) * ROW_STEP_S;
-  const colStep = longest > 1 ? Math.min(0.02, (TOTAL_S - lastRowStart) / (longest - 1)) : 0;
+  const lastRowStart = fade + MAX_FLIPS * FLIP_S + (rows.length - 1) * ROW_STEP_S;
+  const colStep = longest > 1 ? Math.min(0.02, (total - lastRowStart) / (longest - 1)) : 0;
 
   rows.forEach((row, r) => {
     const flaps = [...row.querySelectorAll(".flap:not(.is-blank)")];
     flaps.forEach((flap, c) => {
       // Left to right within a row; each row 120 ms after the one above.
-      const end = FADE_S + MAX_FLIPS * FLIP_S + r * ROW_STEP_S + c * colStep;
+      const end = fade + MAX_FLIPS * FLIP_S + r * ROW_STEP_S + c * colStep;
       const n = MIN_FLIPS + Math.floor(Math.random() * (MAX_FLIPS - MIN_FLIPS + 1));
       // Before its first flip a cell shows a random character, not the answer.
       flap.textContent = randomGlyph();

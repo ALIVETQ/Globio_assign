@@ -17,6 +17,8 @@ import "./styles/reading.css";
 import "./styles/passages.css";
 import "./styles/board.css";
 import "./styles/results.css";
+import "./styles/ticket.css";
+import "./styles/ticketParts.css";
 import "./styles/skills.css";
 import "./styles/resultsBlocks.css";
 import "./styles/resultsFold.css";

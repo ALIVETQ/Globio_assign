@@ -126,6 +126,7 @@ Globio_assign/                 ← repo root (GitHub: Globio_assign)
 │   │   ├── passageBoard.js    ← split-flap train board passage
 │   │   ├── passageAds.js      ← two-ad matching passage (the ad cards are the a/b options)
 │   │   ├── scoreMeter.js      ← overall score + ready/almost ticks
+│   │   ├── boardingPass.js    ← results boarding pass DEL → BER: markup, barcode, perforation sizing
 │   │   ├── skillBars.js
 │   │   ├── verdictStamp.js    ← stamp heading + SVG ink-texture filter
 │   │   ├── confidenceDots.js  ← four dot groups + one script-positioned tooltip
@@ -137,7 +138,7 @@ Globio_assign/                 ← repo root (GitHub: Globio_assign)
 │   ├── motion/                ← ALL ANIMATION CODE
 │   │   ├── gsap.js            ← registers GSAP plugins once; exports gsap
 │   │   ├── prefs.js           ← reduced motion, low-power detection, debug slow-mo
-│   │   ├── globe.js           ← canvas globe singleton (landing + results): lifecycle, loop, pausing
+│   │   ├── globe.js           ← canvas globe singleton (landing page): lifecycle, loop, pausing
 │   │   ├── globeDraw.js       ← globe geometry + one-frame drawing (DESIGN.md §3.1–3.4)
 │   │   ├── glitch.js          ← glitch reveal / glitch-out
 │   │   ├── glow.js            ← horizon glow screen transition
@@ -148,7 +149,8 @@ Globio_assign/                 ← repo root (GitHub: Globio_assign)
 │   │   ├── journeyMotion.js   ← journey plane along the path (MotionPath) + dot pop
 │   │   ├── passageMotion.js   ← passage entrances: email pill → Flip, ads, door sign; board via splitFlap.js
 │   │   ├── checkingMotion.js  ← checking readout: scramble, dotted leader, count-up, then on (1.6 s)
-│   │   ├── resultsMotion.js   ← results entrance: verdict block, stamp slam + shake + ring, meter, globe arc
+│   │   ├── resultsMotion.js   ← results entrance: verdict block, stamp slam + shake + ring, meter, ticket
+│   │   ├── ticketMotion.js    ← boarding pass: print, perforation draw, plane flight, status flaps, stub tear
 │   │   ├── resultsReveal.js   ← below-the-fold blocks: scroll triggers + lucky-warning slide/dice spin
 │   │   ├── revealSkills.js    ← skill bars grow, 60% line draws, red pulse under the line
 │   │   ├── revealDots.js      ← confidence dots: one row → Flip into the four groups, counts count up
@@ -172,7 +174,9 @@ Globio_assign/                 ← repo root (GitHub: Globio_assign)
 │       ├── reading.css        ← reading layout (passage left / on top), Richtig/Falsch, ad options
 │       ├── passages.css       ← email, door sign
 │       ├── board.css          ← split-flap train board (+ flip folds)
-│       ├── results.css        ← results page column, verdict block, score meter, results globe box
+│       ├── results.css        ← results page column, verdict block, score meter
+│       ├── ticket.css         ← boarding pass card: two parts, notches, perforation, narrow/wide layouts
+│       ├── ticketParts.css    ← boarding pass contents: header, route, fields, status flaps, stub
 │       ├── skills.css         ← skill bars + 60% line, lucky-guess warning
 │       ├── resultsBlocks.css  ← confidence dots + tooltip, practice cards, coverage tiles
 │       ├── resultsFold.css    ← review + method folds, actions row, toast
@@ -280,7 +284,7 @@ Transitions that span two screens (the horizon glow) are run by `motion/glow.js`
   - `reducedMotion`: true if `prefers-reduced-motion: reduce`. When true, every timeline jumps to its end state (`tl.progress(1)`), the globe draws one still frame, count-ups show final values.
   - `lowPower`: true if `navigator.hardwareConcurrency <= 4` or the screen is narrower than 600px. The globe uses half its dots.
   - `timeScale`: from `?slow=0.25` in the URL. Applied with `gsap.globalTimeline.timeScale()`.
-- **`motion/globe.js`** is a **singleton**: one canvas, created once, moved between the landing and results screens. API: `mount(container, options)`, `unmount()`, `setArcProgress(0–1)`, `setMode("landing" | "results")`, `pause()`, `resume()`. It runs its own `requestAnimationFrame` loop and stops it when the canvas is off-screen (IntersectionObserver) or the tab is hidden (`visibilitychange`).
+- **`motion/globe.js`** is a **singleton**: one canvas, created once, used on the landing screen (the results screen shows a boarding pass instead). API: `mount(container)`, `unmount()`, `pause()`, `resume()`. It runs its own `requestAnimationFrame` loop and stops it when the canvas is off-screen (IntersectionObserver) or the tab is hidden (`visibilitychange`).
 - Every screen keeps its GSAP timelines in a local array and kills them in `destroy()`. No animation may outlive its screen.
 - Full specs for every animation (durations, eases, keyframes) are in `DESIGN.md`. Do not invent timings.
 
@@ -461,7 +465,7 @@ Phases follow the screens in the order the learner meets them. **Each phase has 
 - `screens/results.js`, top to bottom, exactly as ordered in `DESIGN.md`:
   1. verdict stamp + reason sentence + next action
   2. overall score meter with the ready line
-  3. globe with the arc drawn to the learner's progress
+  3. boarding pass DEL → BER with the plane at the learner's progress (replaced the results-mode globe)
   4. skill bars with the 60% line
   5. lucky-guess warning (conditional)
   6. confidence dots (four groups)
@@ -475,7 +479,7 @@ Phases follow the screens in the order the learner meets them. **Each phase has 
 (b) Motion
 - Checking readout: lines type in, numbers count up.
 - Visa-stamp verdict, score count-up, skill bars drawing with a red pulse on bars below the line.
-- Globe arc draws to `result.overall / 100` of the way; at "ready" it reaches Germany and the pin lights up.
+- Boarding pass prints, the plane flies to `result.overall`% of the route, the status split-flaps in; at "ready" it lands at BER and the stub tears off.
 - Confidence dots sort into four groups (Flip).
 - Practice cards sweep in with the blue-to-white text effect.
 - Coverage tiles: shimmer on the three untested sections.

@@ -1,5 +1,5 @@
 /* Results page, top (DESIGN.md §9.1–9.2): page column and the verdict block
-   (stamp, reason, score meter, globe). The other blocks: skills.css,
+   (stamp, reason, score meter; the boarding pass is in ticket.css). The other blocks: skills.css,
    resultsBlocks.css, resultsFold.css. */
 
 .results {
@@ -135,19 +135,10 @@
   color: var(--muted-2);
 }
 
-/* Globe (§3.5 results): full width × 260 on phones, 360×300 on desktop */
-.verdict__globe {
-  margin: 0;
-  text-align: center;
-}
-.results-globe {
-  position: relative;
-  width: 100%;
-  height: 260px;
-  margin: 0 auto;
-}
+/* Caption under the boarding pass ("68% OF THE WAY TO GERMANY") */
 .verdict__caption {
-  margin-top: var(--s-2);
+  margin-top: var(--s-3);
+  text-align: center;
 }
 
 @media (min-width: 1024px) {
@@ -156,12 +147,8 @@
     padding: 56px 40px;
   }
   .verdict {
-    grid-template-columns: 3fr 2fr; /* left 60% / right 40% */
+    /* The boarding pass is up to 440px wide (§9.2); the text takes the rest. */
+    grid-template-columns: minmax(0, 1fr) minmax(0, 440px);
     align-items: center;
-  }
-  .results-globe {
-    width: 360px;
-    max-width: 100%;
-    height: 300px;
   }
 }

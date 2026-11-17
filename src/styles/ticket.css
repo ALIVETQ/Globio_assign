@@ -1,0 +1,112 @@
+/* Boarding pass in the verdict block (DESIGN.md §9.2, components/boardingPass.js).
+   Narrow (phone): the stub sits below the main part, perforation across.
+   Wide (the ticket itself ≥ 400px): the stub sits on the right, perforation down.
+   The notches are real cut-outs (CSS masks), so they work on any background
+   and travel with the stub when it tears off. --v is the verdict colour. */
+
+.verdict__ticket {
+  margin: 0;
+}
+.ticket {
+  --notch: 10px; /* also NOTCH in boardingPass.js */
+  --ticket-r: 14px;
+  container-type: inline-size;
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
+}
+.ticket__card {
+  display: flex;
+  flex-direction: column;
+  /* Shadow on the whole card (the parts are masked, a box-shadow would be cut) */
+  filter: drop-shadow(0 1px 1px rgba(17, 17, 17, 0.06)) drop-shadow(0 8px 16px rgba(17, 17, 17, 0.1));
+}
+/* Dark mode: the card is barely lighter than the block, so give it a faint rim
+   (a drop-shadow follows the masked outline, notches included). */
+:root[data-theme="dark"] .ticket__card {
+  filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.28)) drop-shadow(0 8px 16px rgba(0, 0, 0, 0.45));
+}
+.ticket__main,
+.ticket__stub {
+  background: var(--raised);
+}
+.ticket__main {
+  position: relative;
+  padding: 18px 18px 16px;
+  border-radius: var(--ticket-r) var(--ticket-r) 0 0;
+  /* notches at the bottom corners of the perforation */
+  --m: radial-gradient(circle var(--notch) at 0 100%, #0000 98%, #000) left / 51% 100% no-repeat,
+    radial-gradient(circle var(--notch) at 100% 100%, #0000 98%, #000) right / 51% 100% no-repeat;
+  -webkit-mask: var(--m);
+  mask: var(--m);
+}
+.ticket__stub {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 4px 16px;
+  padding: 14px 18px 14px;
+  border-radius: 0 0 var(--ticket-r) var(--ticket-r);
+  --m: radial-gradient(circle var(--notch) at 0 0, #0000 98%, #000) left / 51% 100% no-repeat,
+    radial-gradient(circle var(--notch) at 100% 0, #0000 98%, #000) right / 51% 100% no-repeat;
+  -webkit-mask: var(--m);
+  mask: var(--m);
+  transform-origin: 0 100%; /* the tear hinges on the perforation's far end */
+}
+/* "Ready": the stub has been torn off a little (the motion ends here too). */
+.ticket--ready .ticket__stub {
+  transform: translateX(8px) rotate(3deg);
+}
+
+/* ── Perforation: a dashed line, drawn through a mask (motion/ticketMotion.js) ── */
+.ticket__perf {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0; /* just inside the edge: the main part's mask would cut anything outside */
+  height: 2px;
+  overflow: visible;
+  pointer-events: none;
+}
+.ticket__perf-line {
+  stroke: var(--muted-2);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 4;
+  opacity: 0.7;
+}
+.ticket__perf-draw {
+  stroke: #fff;
+  stroke-width: 6;
+}
+
+/* ── Wide ticket: stub on the right ── */
+@container (min-width: 400px) {
+  .ticket__card { flex-direction: row; }
+  .ticket__main {
+    flex: 1;
+    min-width: 0;
+    border-radius: var(--ticket-r) 0 0 var(--ticket-r);
+    --m: radial-gradient(circle var(--notch) at 100% 0, #0000 98%, #000) top / 100% 51% no-repeat,
+      radial-gradient(circle var(--notch) at 100% 100%, #0000 98%, #000) bottom / 100% 51% no-repeat;
+  }
+  .ticket__stub {
+    flex: none;
+    width: 112px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 6px;
+    padding: 18px 14px;
+    border-radius: 0 var(--ticket-r) var(--ticket-r) 0;
+    --m: radial-gradient(circle var(--notch) at 0 0, #0000 98%, #000) top / 100% 51% no-repeat,
+      radial-gradient(circle var(--notch) at 0 100%, #0000 98%, #000) bottom / 100% 51% no-repeat;
+  }
+  .ticket__perf {
+    top: 0;
+    bottom: 0;
+    left: auto;
+    right: 0;
+    width: 2px;
+    height: auto;
+  }
+}

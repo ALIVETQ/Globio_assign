@@ -95,7 +95,7 @@ function radial(ctx, x0, y0, r0, x1, y1, r1, stops) {
   return g;
 }
 
-// f = { w, h, cx, cy, R, viewLon, alpha, pins: {from, to}, arc, plane, trail, pulse, arrived, labels, colors, dots }
+// f = { w, h, cx, cy, R, viewLon, alpha, pins: {from, to}, arc, plane, trail, pulse, labels, colors, dots }
 export function drawFrame(ctx, f) {
   const { cx, cy, R, colors } = f;
   const k = R / 400;
@@ -191,13 +191,13 @@ export function drawFrame(ctx, f) {
     ctx.beginPath();
     ctx.arc(sx, sy, pinR + 1.5, 0, Math.PI * 2);
     ctx.fill();
-    ctx.fillStyle = key === "to" && f.arrived ? colors.ready : colors.cobalt;
+    ctx.fillStyle = colors.cobalt;
     ctx.beginPath();
     ctx.arc(sx, sy, pinR, 0, Math.PI * 2);
     ctx.fill();
     if (key === "to" && f.pulse !== null) {
       ctx.globalAlpha = f.alpha * a * (1 - f.pulse);
-      ctx.strokeStyle = f.arrived ? colors.ready : colors.cobalt;
+      ctx.strokeStyle = colors.cobalt;
       ctx.lineWidth = 1.5;
       ctx.beginPath();
       ctx.arc(sx, sy, pinR * (1 + 1.4 * f.pulse), 0, Math.PI * 2);
