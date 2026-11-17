@@ -21,5 +21,11 @@ const INK_FILTER = `
 // verdict: "ready" | "almost" | "notYet". The stamp is the page's heading, so
 // screen readers hear the verdict first.
 export function verdictStampHTML(verdict, text) {
-  return `${INK_FILTER}<h1 class="stamp stamp--${esc(verdict)}"><span class="stamp__word">${esc(text)}</span></h1>`;
+  // The ring (the "impact" ripple, DESIGN.md §9.11) sits beside the h1, not in
+  // it: inside, the ink filter would texture it and clip it to the stamp's box.
+  return `${INK_FILTER}
+    <div class="stamp-wrap">
+      <h1 class="stamp stamp--${esc(verdict)}"><span class="stamp__word">${esc(text)}</span></h1>
+      <span class="stamp__ring" aria-hidden="true"></span>
+    </div>`;
 }

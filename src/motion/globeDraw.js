@@ -197,7 +197,7 @@ export function drawFrame(ctx, f) {
     ctx.fill();
     if (key === "to" && f.pulse !== null) {
       ctx.globalAlpha = f.alpha * a * (1 - f.pulse);
-      ctx.strokeStyle = colors.cobalt;
+      ctx.strokeStyle = f.arrived ? colors.ready : colors.cobalt;
       ctx.lineWidth = 1.5;
       ctx.beginPath();
       ctx.arc(sx, sy, pinR * (1 + 1.4 * f.pulse), 0, Math.PI * 2);

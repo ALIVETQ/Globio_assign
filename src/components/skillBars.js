@@ -17,7 +17,7 @@ export function skillBarsHTML(result, values) {
     // Rows are placed explicitly in the grid (row 1 holds the line label), so
     // the dashed line can span the bar column of all three rows on wide screens.
     return `
-      <div class="skill${below ? " is-below" : ""}" style="--row: ${i + 2}">
+      <div class="skill${below ? " is-below" : ""}" data-skill="${esc(s.id)}" style="--row: ${i + 2}">
         <p class="skill__name"><span>${esc(s.name)}</span> <span class="label" lang="de">${esc(s.de)}</span></p>
         <div class="skill__bar" role="img" aria-label="${esc(`${s.name} ${sk.score}%`)}">
           <div class="skill__fill" style="transform: scaleX(${sk.score / 100})"></div>

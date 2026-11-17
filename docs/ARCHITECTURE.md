@@ -147,6 +147,9 @@ Globio_assign/                 ← repo root (GitHub: Globio_assign)
 │   │   ├── questionMotion.js  ← question enter/exit, option stroke, confidence feedback
 │   │   ├── journeyMotion.js   ← journey plane along the path (MotionPath) + dot pop
 │   │   ├── passageMotion.js   ← passage entrances: email pill → Flip, ads, door sign; board via splitFlap.js
+│   │   ├── checkingMotion.js  ← checking readout: scramble, dotted leader, count-up, then on (1.6 s)
+│   │   ├── resultsMotion.js   ← results entrance: verdict block, stamp slam + shake + ring, meter, globe arc
+│   │   ├── resultsReveal.js   ← results blocks below the fold, once each as they scroll in (skill bars …)
 │   │   ├── countUp.js
 │   │   └── splitFlap.js
 │   │

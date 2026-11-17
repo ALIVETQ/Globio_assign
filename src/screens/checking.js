@@ -1,16 +1,13 @@
 // Checking screen (DESIGN.md §8, CONTENT.md §7): three readout lines with the
-// learner's real skill scores, then on to results automatically.
-// Phase 5a is static; the typed lines and count-ups come in Phase 5b.
+// learner's real skill scores, then on to results automatically. The readout
+// animation (and its timing, 1.6 s in all) is in motion/checkingMotion.js.
 import { MESSAGES } from "../data/messages.js";
 import { esc, fromHTML } from "../dom.js";
 import { themeToggleHTML } from "../components/themeToggle.js";
+import { prepareReadout, playReadout } from "../motion/checkingMotion.js";
 
 const T = MESSAGES.checking;
-// DESIGN.md §8: shown for 1.6 s. (ARCHITECTURE.md §11 says "1.5 s"; DESIGN.md is
-// the more specific file for timings, so it wins.)
-const READOUT_MS = 1600;
-const timers = new WeakMap();
-const actionsFor = new WeakMap();
+const live = new WeakMap();
 
 export function render(state, actions) {
   // The scores come from the result object only (LOGIC.md §8): nothing is recalculated here.
@@ -20,7 +17,7 @@ export function render(state, actions) {
       return `<li class="readout__line">
         <span class="readout__label">${esc(l.label)}</span>
         <span class="readout__leader" aria-hidden="true"></span>
-        <span class="readout__value">${score}%</span>
+        <span class="readout__value" data-score="${score}">${score}%</span>
       </li>`;
     })
     .join("");
@@ -33,14 +30,19 @@ export function render(state, actions) {
       </div>
     </section>
   `);
-  actionsFor.set(el, actions);
+  prepareReadout(el);
+  live.set(el, { actions, anim: null });
   return el;
 }
 
-// The timer starts after the entrance so finish() never fires mid-transition.
+// The readout starts once the screen is in (after the glow), and moves on to
+// results when it ends, so finish() never fires mid-transition. Its timing
+// (DESIGN.md §8: 1.6 s; ARCHITECTURE.md §11 says 1.5 s, but DESIGN.md is the
+// more specific file for timings) lives in motion/checkingMotion.js.
 export function enter(el) {
-  clearTimeout(timers.get(el)); // a debug "replay" must not leave two timers running
-  timers.set(el, setTimeout(() => actionsFor.get(el)?.finish(), READOUT_MS));
+  const h = live.get(el);
+  h.anim?.kill(); // a debug "replay" must not leave two readouts running
+  h.anim = playReadout(el, () => h.actions.finish());
   return Promise.resolve();
 }
 
@@ -49,7 +51,6 @@ export function exit() {
 }
 
 export function destroy(el) {
-  clearTimeout(timers.get(el));
-  timers.delete(el);
-  actionsFor.delete(el);
+  live.get(el)?.anim?.kill();
+  live.delete(el);
 }

@@ -2,6 +2,7 @@
 // moved between the landing page and (Phase 5) the results page.
 //
 // API: mount(container, {mode}), unmount(), setArcProgress(0–1),
+//      setPulse(0–1 | null) (results: the Germany pin's arrival ring),
 //      setMode("landing" | "results"), pause(), resume().
 //
 // It runs its own requestAnimationFrame loop (not GSAP), so slow-mo is applied
@@ -24,7 +25,7 @@ const TRAIL = 14; // positions, one per 60 fps frame
 const PHONE_MARGIN = 16; // px each side of the phone globe
 
 let canvas = null, ctx = null, dots = null, colors = null;
-let container = null, mode = "landing", arcProgress = 0;
+let container = null, mode = "landing", arcProgress = 0, resultsPulse = null;
 let clock = 0, lastTs = null, rafId = null;
 let onScreen = true, manualPause = false;
 let resizeObs = null, intersectObs = null, unsubPrefs = null;
@@ -96,6 +97,7 @@ function frameAt(t) {
     // drawn then: it would sit on the pin and hide its colour.
     f.arrived = arcProgress >= 1;
     f.plane = arcProgress > 0 && !f.arrived ? arcProgress : null; // a plane dot sits at the arc's tip
+    f.pulse = f.arrived ? resultsPulse : null; // driven by the results timeline
     return f;
   }
 
@@ -206,10 +208,18 @@ export function unmount() {
   canvas?.remove();
   container = null;
   manualPause = false;
+  resultsPulse = null;
 }
 
 export function setArcProgress(p) {
   arcProgress = clamp01(p);
+  if (rafId === null) draw();
+}
+
+// Results only: the arrival pulse ring at the Germany pin, 0 → 1 (null = none).
+// The results timeline drives it, so it follows slow-mo and reduced motion.
+export function setPulse(p) {
+  resultsPulse = p === null ? null : clamp01(p);
   if (rafId === null) draw();
 }
 

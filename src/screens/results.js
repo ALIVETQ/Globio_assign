@@ -3,8 +3,9 @@
 // practice cards → what this check can't see → review → method → actions.
 //
 // It reads ONLY state.result, config.js and messages.js (plus display text from
-// data/). Nothing is recalculated here (ARCHITECTURE.md §4.3). Static in Phase
-// 5a; the stamp, count-ups, bar growth and Flip come in Phase 5b.
+// data/). Nothing is recalculated here (ARCHITECTURE.md §4.3). Animation lives
+// in motion/resultsMotion.js (verdict block, globe) and motion/resultsReveal.js
+// (blocks below the fold).
 import { MESSAGES } from "../data/messages.js";
 import { CONFIG } from "../data/config.js";
 import { SECTIONS } from "../data/sections.js";
@@ -21,6 +22,8 @@ import { examCoverageHTML } from "../components/examCoverage.js";
 import { answerReviewHTML, methodHTML } from "../components/answerReview.js";
 import { createToast } from "../components/toast.js";
 import * as globe from "../motion/globe.js";
+import { playVerdict } from "../motion/resultsMotion.js";
+import { revealResults } from "../motion/resultsReveal.js";
 
 const R = MESSAGES.results;
 const A = MESSAGES.actions;
@@ -104,12 +107,23 @@ export function render(state, actions) {
   return el;
 }
 
+function stopMotion(h) {
+  h.verdictTl?.kill();
+  h.stopReveal?.();
+  globe.setPulse(null);
+}
+
 // The globe needs the screen on the page to measure its box, so it is mounted here.
+// Resolves at once: the learner can scroll and act while the entrance plays.
 export function enter(el) {
   const h = live.get(el);
-  // A "ready" verdict draws the arc all the way to Germany (DESIGN.md §3.6).
+  stopMotion(h); // debug "Replay" calls enter() again on the same element
+  // Final arc first: a "ready" verdict reaches Germany (DESIGN.md §3.6). Under
+  // reduced motion that is all the globe shows; otherwise the entrance redraws it from 0.
   globe.setArcProgress(h.result.verdict === "ready" ? 1 : h.result.overall / 100);
   globe.mount(el.querySelector(".results-globe"), { mode: "results" });
+  h.verdictTl = playVerdict(el, h.result);
+  h.stopReveal = revealResults(el, h.result);
   return Promise.resolve();
 }
 
@@ -120,6 +134,7 @@ export function exit() {
 export function destroy(el) {
   const h = live.get(el);
   if (!h) return;
+  stopMotion(h);
   globe.unmount();
   h.offActions();
   h.offDots();

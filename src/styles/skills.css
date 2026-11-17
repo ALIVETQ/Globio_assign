@@ -31,6 +31,8 @@
   height: 24px;
   border-left: 2px dashed var(--ink);
   opacity: 0.55;
+  transform: scaleY(var(--line-draw, 1)); /* drawn top → bottom on reveal */
+  transform-origin: top;
 }
 .skill__name {
   grid-area: name;
@@ -113,7 +115,8 @@
     margin: -6px 0 -6px var(--line);
     border-left: 2px dashed var(--ink);
     opacity: 0.55;
-    transform: translateX(-1px);
+    transform: translateX(-1px) scaleY(var(--line-draw, 1)); /* drawn top → bottom on reveal */
+    transform-origin: top;
     z-index: 1;
     pointer-events: none;
   }
