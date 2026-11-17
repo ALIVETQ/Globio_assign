@@ -10,6 +10,8 @@ import "./styles/landing.css";
 import "./styles/landingSections.css";
 import "./styles/journey.css";
 import "./styles/sectionBreak.css";
+// options.css before question.css: question.css's desktop block shows the keycaps.
+import "./styles/options.css";
 import "./styles/question.css";
 
 // Imported first so ?slow= and reduced motion apply before any screen animates.

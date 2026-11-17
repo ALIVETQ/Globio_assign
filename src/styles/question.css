@@ -50,78 +50,7 @@
   margin-top: 8px;
 }
 
-/* ── Options (§7.2) ── */
-.options {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 28px;
-}
-.option {
-  position: relative; /* for the stroke SVG */
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  width: 100%;
-  min-height: 60px;
-  padding: 14px 18px;
-  border: 1.5px solid var(--hairline);
-  border-radius: var(--r-option);
-  background: var(--paper);
-  font-family: var(--font-text);
-  font-weight: 500;
-  font-size: 18px;
-  line-height: 1.35;
-  color: var(--ink);
-  text-align: left;
-  cursor: pointer;
-  transition: border-color 0.25s, background-color 0.2s; /* background → wash in 0.2 s (§7.6) */
-}
-.option:hover {
-  border-color: var(--periwinkle);
-}
-.option.is-selected {
-  background: var(--wash);
-}
-/* The selected border is this 2px cobalt stroke, drawn by DrawSVG (motion/questionMotion.js).
-   It covers the option's border box; the rect is sized in px from JS. */
-.option__stroke {
-  position: absolute;
-  inset: -1.5px;
-  width: calc(100% + 3px);
-  height: calc(100% + 3px);
-  overflow: visible;
-  pointer-events: none;
-}
-.option__stroke rect {
-  fill: none;
-  stroke: var(--cobalt);
-  stroke-width: 2;
-  stroke-dasharray: 0 99999; /* hidden until JS sets the drawn length */
-}
-.options--sentence .option {
-  min-height: 64px;
-}
-/* Keycap: desktop only */
-.keycap {
-  display: none;
-  flex: none;
-  place-items: center;
-  width: 26px;
-  height: 26px;
-  border: 1px solid var(--hairline);
-  border-radius: 6px;
-  font-family: var(--font-mono);
-  font-size: 12px;
-  font-weight: 400;
-  color: var(--muted);
-  transition: background-color 0.25s, color 0.25s, border-color 0.25s;
-}
-.option.is-selected .keycap {
-  background: var(--cobalt);
-  border-color: var(--cobalt);
-  color: var(--paper);
-}
+/* Options and their drawn stroke are in options.css. */
 
 /* ── Confidence bar (§7.3). Phone: sticky at the bottom. ── */
 .confidence {

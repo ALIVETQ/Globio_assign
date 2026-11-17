@@ -155,7 +155,8 @@ Globio_assign/                 ← repo root (GitHub: Globio_assign)
 │       ├── landingSections.css ← landing sections below the hero
 │       ├── journey.css        ← journey bar (section break + question screens)
 │       ├── sectionBreak.css   ← section break screen
-│       └── question.css       ← question screen: label row, prompt, options, confidence bar
+│       ├── question.css       ← question screen: label row, prompt, confidence bar
+│       └── options.css        ← answer options + drawn selection stroke
 │
 └── tests/
     ├── helpers.js             ← shared scoring context, per-section answer builder, seeded rng
