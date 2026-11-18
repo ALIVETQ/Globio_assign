@@ -174,6 +174,7 @@ Globio_assign/                 ← repo root (GitHub: Globio_assign)
 │   └── styles/
 │       ├── tokens.css         ← colours, fonts, spacing, radii, z-index (from DESIGN.md)
 │       ├── base.css           ← reset, typography, buttons, layout helpers
+│       ├── buttons.css        ← button polish: glow, hover lift, dark-mode primary/secondary
 │       ├── screens.css        ← small screens: checking readout
 │       ├── landing.css        ← landing hero: top bar, hero copy, globe slot
 │       ├── landingSections.css ← landing sections below the hero
@@ -322,7 +323,7 @@ Debug code must not load without `?debug=1` (use a dynamic `import()`).
 ### Demo guide (`?demo=1`)
 
 A presenter tool for recording the walkthrough video, **not part of the product** (`src/debug/demoGuide.js`, loaded with a dynamic `import()`). **Currently always on**, because this build is made for the demo video; to hide it from real users, load it only when the URL has `?demo=1` again (one line in `main.js`). Its labels are presenter-facing and not in `CONTENT.md`.
-- A small round "⋯" button (36px, fixed top-right below the header) opens a 320px side panel (full width on phones) that slides in from the right (0.25 s). The backtick key toggles it, to hide it quickly while recording.
+- A small round "⋯" button (36px, fixed at the left edge, halfway down, where it covers nothing on desktop) opens a 320px side panel (full width on phones) that slides in from the right (0.25 s). The backtick key toggles it, to hide it quickly while recording.
 - **Scenarios:** "Ready to book" (`ready`), "Almost" (`almostWeakest`), "Not yet" (`notYetOverall`). "Ends at: {stamp} · {overall}%" comes from running `scoreCheck` on the preset, never hard-coded. "Restart quiz with this scenario" runs the app's own actions (start → fasten → take off → next) to begin a fresh attempt at question 1.
 - **Step card** for the screen showing now: on a question, the option to tap (the preset's original index looked up through this attempt's `optionOrder`, with display position and key), then "I'M SURE" / "I GUESSED" (or "I don't know this yet"), "(wrong on purpose)" for wrong answers, and a warning if the current question was already answered differently. On results: the expected stamp, score and weakest skill with a ✓ / ✗ against the real result. It re-renders through `subscribe()` on every state change (no polling).
 - It only reads state; panel open or closed, scoring, state rules and the normal UI behave exactly the same.

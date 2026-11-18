@@ -1,0 +1,48 @@
+/* Button polish (DESIGN.md §2.5), loaded after base.css. */
+/* ── Button polish (both themes): a soft cobalt glow on primary, a 1px lift on
+   hover, and the primary's arrow nudging forward. Dark mode uses a deeper
+   cobalt with white text (4.7:1) instead of the pale lifted cobalt with dark
+   text, and light-blue text on secondary, matching the confidence buttons. ── */
+.btn--primary,
+.btn--secondary {
+  transition: background-color 0.25s, color 0.25s, border-color 0.25s, box-shadow 0.25s, transform 0.15s;
+}
+.btn--primary {
+  box-shadow: 0 0 0 1px rgba(47, 99, 255, 0.35), 0 8px 22px rgba(47, 99, 255, 0.28);
+}
+.btn--primary > [aria-hidden="true"] {
+  display: inline-block;
+  transition: transform 0.2s;
+}
+.btn--primary:not(:disabled):hover > [aria-hidden="true"] {
+  transform: translateX(3px);
+}
+.btn--primary:not(:disabled):hover,
+.btn--secondary:not(:disabled):hover {
+  transform: translateY(-1px);
+}
+.btn--secondary:not(:disabled):hover {
+  background: color-mix(in srgb, var(--cobalt) 12%, transparent);
+  color: var(--cobalt);
+}
+.btn:disabled {
+  box-shadow: none;
+}
+:root[data-theme="dark"] .btn--primary {
+  background: #3366ff;
+  color: #fff;
+  box-shadow: 0 0 0 1px rgba(51, 102, 255, 0.5), 0 8px 24px rgba(51, 102, 255, 0.35);
+}
+:root[data-theme="dark"] .btn--primary:not(:disabled):hover {
+  background: #4a78ff;
+}
+:root[data-theme="dark"] .btn--secondary {
+  color: #a9bcff;
+}
+:root[data-theme="dark"] .btn--secondary:not(:disabled):hover {
+  color: #c7d4ff;
+}
+[data-reduced-motion="true"] .btn {
+  transform: none !important;
+  transition: none;
+}

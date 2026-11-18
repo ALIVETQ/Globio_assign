@@ -5,6 +5,7 @@ import "@fontsource-variable/archivo/wght.css";
 import "@fontsource-variable/jetbrains-mono/wght.css";
 import "./styles/tokens.css";
 import "./styles/base.css";
+import "./styles/buttons.css";
 import "./styles/screens.css";
 import "./styles/landing.css";
 import "./styles/landingSections.css";

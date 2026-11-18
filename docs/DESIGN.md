@@ -108,6 +108,7 @@ Must look right, with nothing cut off or scrolling sideways, at **360×740, 390�
 - **Text link:** Archivo 500, 15px, ink, underline 1px offset 0.28em; hover cobalt.
 - **Disabled:** 35% opacity, `cursor: not-allowed`. No hover effect.
 - All colour changes `transition: .25s`. Focus ring: 2px cobalt outline, 3px offset, on every interactive element.
+- **Polish (`styles/buttons.css`):** primary has a soft cobalt glow (`0 0 0 1px rgba(cobalt,.35), 0 8px 22px rgba(cobalt,.28)`); on hover primary and secondary lift 1px and the primary's arrow nudges 3px right; secondary hover fills with cobalt at 12% (text stays cobalt). Dark mode: primary is `#3366ff` with white text (4.7:1; hover `#4a78ff`), secondary text `#a9bcff`. Disabled: no glow. Reduced motion: no lift.
 
 **Mono label** — `--fs-label`, `--muted-2`. Used for "01 / VOCABULARY · Q2 OF 15" and similar.
 

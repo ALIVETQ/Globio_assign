@@ -30,7 +30,7 @@ const sectionOf = (id) => SECTIONS.find((s) => s.id === id);
 let S = appState;
 
 const CSS = `
-.demo-btn{position:fixed;top:96px;right:16px;z-index:90;width:36px;height:36px;border-radius:50%;
+.demo-btn{position:fixed;top:50%;left:4px;z-index:90;width:36px;height:36px;border-radius:50%;
   border:1px solid var(--hairline);background:var(--surface);color:var(--muted);font:600 16px/1 var(--font-text);cursor:pointer}
 .demo-panel{position:fixed;top:0;right:0;bottom:0;z-index:95;width:320px;max-width:100vw;overflow:auto;padding:20px;
   background:var(--surface);color:var(--ink);border-left:1px solid var(--hairline);box-shadow:-8px 0 24px rgba(0,0,0,.18);
