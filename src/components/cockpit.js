@@ -3,7 +3,6 @@
 //   - ticket strip under the journey bar (all sizes)
 //   - topic chip (when the topic card isn't shown: below 1200px, and reading)
 //   - background word: the section's German name, huge and faint (all sizes)
-//   - outline question number behind the prompt (≥1200px)
 //   - left rail "YOUR ROUTE" and right rail topic card (≥1200px, not reading)
 import { MESSAGES } from "../data/messages.js";
 import { SECTIONS } from "../data/sections.js";
@@ -30,10 +29,6 @@ export function topicChipHTML(q) {
 
 export function bgWordHTML(q) {
   return `<div class="q-bgword" aria-hidden="true">${esc(sectionOf(q).de)}</div>`;
-}
-
-export function questionNumberHTML(index) {
-  return `<span class="q-num" aria-hidden="true">${nn(index)}</span>`;
 }
 
 // Left rail. Position only — done / current / upcoming — never right or wrong.

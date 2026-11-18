@@ -70,13 +70,6 @@ export function setTimeScale(value) {
   notify();
 }
 
-// Use on every timeline a screen creates: under reduced motion it jumps
-// straight to its final state instead of playing (DESIGN.md §10 rule 5).
-export function respectMotion(tl) {
-  if (reducedMotion) tl.progress(1);
-  return tl;
-}
-
 // ── Apply at load ──
 if (hasWindow) {
   document.documentElement.dataset.reducedMotion = String(reducedMotion);
