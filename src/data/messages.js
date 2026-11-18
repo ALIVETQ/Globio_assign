@@ -72,7 +72,7 @@ export const MESSAGES = {
       {
         number: "02",
         title: "Say if you're sure or guessing",
-        body: "Be honest. Lucky guesses don't help you on exam day, so we count them for less.",
+        body: "Be honest. A right guess earns half a point, and being sure but wrong costs half a point.",
         previewSure: "I'M SURE",
         previewGuessed: "I GUESSED",
       },

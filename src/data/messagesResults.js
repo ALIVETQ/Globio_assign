@@ -60,7 +60,7 @@ export const RESULTS_MESSAGES = {
     luckyWarning: "{guessedRight} of your {correctTotal} correct answers were guesses. Your real level may be lower than this score.",
 
     dotsTitle: "HOW SURE WERE YOU?",
-    dotsSubtitle: "Each dot is one question. Right answers you guessed count for less, and wrong answers you were sure about matter most.",
+    dotsSubtitle: "Each dot is one question. Right answers you guessed earn half a point, and wrong answers you were sure about cost half a point.",
     dots: {
       sureRight: "SURE AND RIGHT",
       guessedRight: "GUESSED AND RIGHT",
