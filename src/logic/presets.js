@@ -12,7 +12,7 @@ export const PRESET_CODES = {
   perfect: "SSSSS SSSSS SSSSS",
   ready: "SSGSS SXSSS SSSWS",
   almostOverall: "SSGSU SWSGS SSSUG",
-  almostWeakest: "SSSSS SSSSS SSGXX",
+  almostWeakest: "SSSSS SSSSS SSGXW",
   notYetOverall: "SSUUU SXSWU SSUUU",
   notYetWeakest: "SSSSS SSSSS SGXXX",
   luckyGuesser: "GGGGG GGGGG GGGGG",

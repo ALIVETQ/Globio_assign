@@ -55,30 +55,30 @@ describe("results text", () => {
 
   it("fills the reason sentences with the preset's numbers", () => {
     expect(verdictText(run("ready").result, run("ready").values, MESSAGES).reason).toBe(
-      "You scored 83%, and every skill is at 60% or more.",
+      "You scored 80%, and every skill is at 60% or more.",
     );
     const w = run("almostWeakest");
     expect(verdictText(w.result, w.values, MESSAGES).reason).toBe(
-      "Your overall score is good, but Reading is at 50%. One weak area can cost you the whole exam.",
+      "Your overall score is good, but Reading is at 40%. One weak area can cost you the whole exam.",
     );
     const n = run("notYetOverall");
     expect(verdictText(n.result, n.values, MESSAGES).reason).toBe(
-      "You scored 40%. The real exam needs 60%, and this check only covers part of it.",
+      "You scored 37%. The real exam needs 60%, and this check only covers part of it.",
     );
   });
 
   it("method numbers come from config", () => {
     const { values } = run("perfect");
     expect(fill(MESSAGES.method.paragraphs[1], values)).toContain("Reading for 40%, Vocabulary for 30% and Grammar for 30%");
-    expect(fill(MESSAGES.method.paragraphs[0], values)).toContain("1 if you were sure and right, 0.5 if you guessed");
+    expect(fill(MESSAGES.method.paragraphs[0], values)).toContain("1 if you were sure and right, 0.5 if you guessed and got it right, −0.5 if you were sure but wrong");
   });
 
   it("summary text", () => {
     const { result, values } = run("ready");
     expect(summaryText(result, values, MESSAGES, "https://x.test/")).toBe(
       [
-        "My A1 German readiness check: READY TO BOOK (83%)",
-        "Vocabulary 90% · Grammar 80% · Reading 80%",
+        "My A1 German readiness check: READY TO BOOK (80%)",
+        "Vocabulary 90% · Grammar 70% · Reading 80%",
         "Practise next: Accusative articles (einen, den), Reading signs and notices, Numbers 21–99",
         "https://x.test/",
       ].join("\n"),

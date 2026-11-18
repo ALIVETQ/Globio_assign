@@ -43,7 +43,8 @@ function creditOf(outcome, credit) {
   if (outcome === "sureRight") return credit.correctSure;
   if (outcome === "guessedRight") return credit.correctGuessed;
   if (outcome === "unknown") return credit.unknown;
-  return credit.wrong; // sureWrong and guessedWrong: wrong is wrong, however confident
+  if (outcome === "sureWrong") return credit.sureWrong; // negative: a confident mistake costs points
+  return credit.guessedWrong;
 }
 
 // Dot groups merge "guessed wrong" with "didn't know": both mean "not known yet".
@@ -90,7 +91,8 @@ export function scoreCheck(answers, { questions, sections, topics, config }) {
     const rows = perQuestion.filter((p) => p.section === s.id);
     const credits = rows.reduce((sum, p) => sum + p.credit, 0);
     // Multiply before dividing: 3.5 × 100 / 5 is exact, 3.5 / 5 × 100 is not.
-    unrounded[s.id] = rows.length ? (credits * 100) / rows.length : 0;
+    // Clamped at 0: sure-wrong credits are negative, but a skill never shows below 0%.
+    unrounded[s.id] = rows.length ? Math.max(0, (credits * 100) / rows.length) : 0;
     skills[s.id] = {
       score: roundScore(unrounded[s.id]),
       correct: rows.filter((p) => p.correct).length,
@@ -98,7 +100,7 @@ export function scoreCheck(answers, { questions, sections, topics, config }) {
     };
   }
 
-  // ── Overall (LOGIC.md §4.2): weighted sum of UNROUNDED skills, rounded once ──
+  // ── Overall (LOGIC.md §4.2): weighted sum of the clamped, UNROUNDED skills, rounded once ──
   const weightOf = (id) => config.skillWeights[id] ?? 0;
   const overall = roundScore(sections.reduce((sum, s) => sum + weightOf(s.id) * unrounded[s.id], 0));
 

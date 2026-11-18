@@ -6,10 +6,9 @@ import { MESSAGES } from "../data/messages.js";
 import { CONFIG } from "../data/config.js";
 import { esc } from "../dom.js";
 import { fill } from "../logic/fill.js";
+import { formatPoints } from "../logic/points.js";
 
 const Q = MESSAGES.question;
-// Points as the learner reads them: 0.5 is "½".
-const points = (n) => (n === 0.5 ? "½" : String(n));
 
 function main(kind, icon, label, sub, key) {
   return `
@@ -21,8 +20,10 @@ function main(kind, icon, label, sub, key) {
 }
 
 export function confidenceBarHTML() {
-  const sure = fill(Q.sureSub, { creditSure: points(CONFIG.credit.correctSure) });
-  const guessed = fill(Q.guessedSub, { creditGuessed: points(CONFIG.credit.correctGuessed) });
+  // Points as the learner reads them, from config.js: "+1", "−½", "½".
+  const c = CONFIG.credit;
+  const sure = fill(Q.sureSub, { creditSure: formatPoints(c.correctSure, { sign: true }), creditSureWrong: formatPoints(c.sureWrong) });
+  const guessed = fill(Q.guessedSub, { creditGuessed: formatPoints(c.correctGuessed) });
   return `
     <div class="confidence">
       <div class="confidence__panel">

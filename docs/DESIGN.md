@@ -319,7 +319,7 @@ An airline safety-briefing card, shown once per check between the landing page's
 - **Six panels** (`components/briefingArt.js`), grid gap 16px: 3×2 desktop (≥ 1024px), 2×3 tablet (640–1023px), 1 column phone. Each panel: `--surface`, radius card, padding 20px 24px 24px; a line illustration (inline SVG 220×72, 1.5px stroke, `--cobalt` + the theme's `--ink`, `aria-hidden`), a mono number "01"–"06" (cobalt, 12px), the title (Archivo 700 18px) and one muted line (15px).
   1. Route map: dotted path with three cobalt stops labelled WORTSCHATZ · GRAMMATIK · LESEN (`SECTIONS[].de`), a paper plane at the start and a flag at the end.
   2. Demo: a mini option list (3 options) and a mini "I'M SURE" button (`question.sure`). Its markup is the final frame (option 2 outlined, button filled, cursor hidden).
-  3. A coin marked "½" with a curved arrow.
+  3. A coin marked "½" with a curved arrow ("Be honest about how sure you are": the points, filled from `config.js`).
   4. A "?" in a cobalt circle and the underlined "I don't know this yet" (`question.unknown`).
   5. An open book and a phone, crossed out by one cobalt diagonal line.
   6. A back arrow and a small cobalt circular "saved / refresh" arrow.
@@ -415,7 +415,7 @@ Reduced motion: no slide (giant word static, centred, clipped), auto-advance aft
 
 - **Panel:** label, buttons and don't-know sit on a solid panel: `--surface`, 1px hairline border, radius 20px, padding 20px 24px. Nothing behind it shows through.
 - **Line above the buttons** (mono 12px, uppercase, `--muted`): `question.disabledHelp` ("Choose an answer first") until an option is picked, then `question.confidenceLabel` ("HOW SURE ARE YOU?").
-- **Two main buttons** in a row, gap 10px (50% each on phones, `flex: 0 1 280px` from 640px, 300px from 1200px), min-height 64px, radius 14px. Each: an icon on the left, a two-line label — `question.sure` / `question.guessed` (mono 15px, uppercase) over a sub-line (Archivo 13px, 75% opacity) `question.sureSub` "I know this · 1 point" / `question.guessedSub` "Lucky guess · ½ point" (points filled from `config.js`; 0.5 shows as "½"; one line, cut with "…" if tight) — and on desktop (≥1024px) a key chip at the right edge (22×22px, radius 5px, mono 11px, 1px border in the text colour at 40%): "S", "G".
+- **Two main buttons** in a row, gap 10px (50% each on phones, `flex: 0 1 280px` from 640px, 300px from 1200px), min-height 64px, radius 14px. Each: an icon on the left, a two-line label — `question.sure` / `question.guessed` (mono 15px, uppercase) over a sub-line (Archivo 13px, 75% opacity) `question.sureSub` "I know this · +1 point, −½ if wrong" / `question.guessedSub` "Lucky guess · ½ point, nothing lost" (points filled from `config.js` via `logic/points.js`: "+1", "½", "−½"; one line, cut with "…" if tight) — and on desktop (≥1024px) a key chip at the right edge (22×22px, radius 5px, mono 11px, 1px border in the text colour at 40%): "S", "G".
 - **Disabled** (no option yet), no opacity: transparent fill, 1.5px **dashed** border in a neutral grey (light `#8a8f99`, dark `#6b7180`; ≥ 3:1 on the panel), text in a muted grey (light `--muted`, dark `#9aa0ad`; ≥ 4.5:1), icon hidden. `aria-describedby` → the "Choose an answer first" help, and a tooltip.
 - **"I'm sure", enabled:** solid cobalt fill (light `#2f63ff`; dark `#3366ff`, deeper than the suggested `#4d7cff` so white text keeps 4.7:1), white text, "✓" icon, soft glow `0 0 0 1px rgba(cobalt,.5), 0 8px 24px rgba(cobalt,.35)`. Hover: 10% brighter, y −1px.
 - **"I guessed", enabled:** fill `--surface` + 4% white, solid 2px cobalt border, text `#a9bcff` on dark (`--cobalt-hover` on light, 5.9:1), "?" icon. Hover: border `--cobalt-hover`, y −1px.
@@ -639,7 +639,7 @@ Desktop: two columns (left: the rest / right: the boarding pass, up to 440px). P
 ### 9.8 Review your answers (collapsed)
 
 - A `<details>` with summary `review.title` + mono count ("15 QUESTIONS"). Custom chevron, rotates 180° on open (0.25 s).
-- Inside: one row per question in the original order: number, prompt (truncated to 1 line on phones), learner's answer, correct answer, a confidence chip (SURE / GUESSED / DIDN'T KNOW), a ✓ or ✗ (with text for screen readers), and the explanation (muted, 14px).
+- Inside: one row per question in the original order: number, prompt (truncated to 1 line on phones), learner's answer, correct answer, a confidence chip (SURE / GUESSED / DIDN'T KNOW), a ✓ or ✗ (with text for screen readers) — for a sure-but-wrong answer followed by its cost "−½" (mono 13px, `--notyet`, from `config.js`) — and the explanation (muted, 14px).
 
 ### 9.9 How we calculate "ready" (collapsed)
 

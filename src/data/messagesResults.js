@@ -119,7 +119,7 @@ export const RESULTS_MESSAGES = {
   method: {
     title: "HOW WE CALCULATE “READY”",
     paragraphs: [
-      "Each answer earns points: {creditSure} if you were sure and right, {creditGuessed} if you guessed and got it right, and 0 if it was wrong or you didn't know.",
+      "Each answer earns points: {creditSure} if you were sure and right, {creditGuessed} if you guessed and got it right, {creditSureWrong} if you were sure but wrong, and 0 if you guessed wrong or didn’t know. A confident mistake costs points because it’s the kind of mistake you won’t go back and fix before the exam.",
       "Each skill is scored out of 100. Your overall score counts Reading for {weightReading}%, Vocabulary for {weightVocabulary}% and Grammar for {weightGrammar}%. Reading counts most because it's the only part that matches a real exam section directly.",
       "Ready to book means {readyMin}% or more overall and at least {readySkill}% in every skill. The real pass mark is {passMark}%, but we ask for more because this check only sees part of the exam.",
       "Almost means {almostMin}% or more overall and at least {almostSkill}% in every skill. Anything lower is Not yet.",

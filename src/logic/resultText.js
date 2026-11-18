@@ -23,6 +23,7 @@ export function resultValues(result, { config, sections }) {
     passMark: config.examPassMark,
     creditSure: config.credit.correctSure,
     creditGuessed: config.credit.correctGuessed,
+    creditSureWrong: String(config.credit.sureWrong).replace("-", "−"), // a real minus sign
   };
   for (const s of sections) {
     values[`score${cap(s.id)}`] = result.skills[s.id].score;

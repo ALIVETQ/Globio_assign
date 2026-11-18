@@ -15,7 +15,11 @@ export const CONFIG = {
   credit: {
     correctSure: 1,
     correctGuessed: 0.5,
-    wrong: 0, // wrong, whether sure or guessed
+    // A confident wrong answer costs half a point. Makes honesty the best
+    // strategy: pressing "I'm sure" only pays off if you're more than 50% likely
+    // to be right. Without this, "sure" had no downside.
+    sureWrong: -0.5,
+    guessedWrong: 0,
     unknown: 0, // "I don't know this yet"
   },
 

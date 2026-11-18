@@ -56,6 +56,7 @@
 .review__answers dd { margin: 4px 0 0; }
 .review__explain { margin-top: var(--s-2); font-size: var(--fs-small); color: var(--muted); }
 .review__mark { font-size: 18px; font-weight: 700; }
+.review__cost { font-family: var(--font-mono); font-size: 13px; font-weight: 500; color: var(--notyet); } /* "−½": a sure-but-wrong answer's cost */
 .is-correct .review__mark { color: var(--ready); }
 .is-wrong .review__mark { color: var(--notyet); }
 .method { display: grid; gap: var(--s-3); max-width: 68ch; }

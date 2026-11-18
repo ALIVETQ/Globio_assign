@@ -517,7 +517,8 @@ briefing: {
   panels: [
     { id: "route", title: "Your route", text: "15 questions in 3 parts. About 6 minutes, no timer." },
     { id: "answer", title: "How to answer", text: "Pick an answer, then say how sure you are." },
-    { id: "guess", title: "Guesses count half", text: "A right guess earns half a point. Luck doesn’t help on exam day." },
+    // Points filled from config.js ({creditSure} 1, {creditGuessed} ½, {creditSureWrong} −½).
+    { id: "guess", title: "Be honest about how sure you are", text: "Sure and right: {creditSure} point. Guessed and right: {creditGuessed}. Sure but wrong: {creditSureWrong}. Only press “I’m sure” if you really think you’re right." },
     { id: "unknown", title: "Don’t know? Say so", text: "An honest result is more useful than a lucky one." },
     { id: "noHelp", title: "No help on board", text: "No dictionary, no translator, no asking a friend." },
     { id: "back", title: "You can go back", text: "Change any answer with Back. Your progress is saved if you refresh." },
@@ -557,8 +558,8 @@ question: {
   ticket: "FLIGHT GL-A1 · SEAT Q{nn} · GATE {sectionDe}",
   confidenceLabel: "HOW SURE ARE YOU?", // above the buttons; "Choose an answer first" (disabledHelp) until an option is picked
   // Sub-lines of the two main buttons; points from config.js (0.5 shows as "½").
-  sureSub: "I know this · {creditSure} point",
-  guessedSub: "Lucky guess · {creditGuessed} point",
+  sureSub: "I know this · {creditSure} point, {creditSureWrong} if wrong",
+  guessedSub: "Lucky guess · {creditGuessed} point, nothing lost",
   routeTitle: "YOUR ROUTE",
   routeFooter: "{total} QUESTIONS · NO TIMER",
   topicTitle: "TOPIC",
@@ -730,7 +731,7 @@ review: {
 method: {
   title: "HOW WE CALCULATE “READY”",
   paragraphs: [
-    "Each answer earns points: {creditSure} if you were sure and right, {creditGuessed} if you guessed and got it right, and 0 if it was wrong or you didn't know.",
+    "Each answer earns points: {creditSure} if you were sure and right, {creditGuessed} if you guessed and got it right, {creditSureWrong} if you were sure but wrong, and 0 if you guessed wrong or didn’t know. A confident mistake costs points because it’s the kind of mistake you won’t go back and fix before the exam.",
     "Each skill is scored out of 100. Your overall score counts Reading for {weightReading}%, Vocabulary for {weightVocabulary}% and Grammar for {weightGrammar}%. Reading counts most because it's the only part that matches a real exam section directly.",
     "Ready to book means {readyMin}% or more overall and at least {readySkill}% in every skill. The real pass mark is {passMark}%, but we ask for more because this check only sees part of the exam.",
     "Almost means {almostMin}% or more overall and at least {almostSkill}% in every skill. Anything lower is Not yet.",
@@ -771,7 +772,7 @@ summary: [
 | `{readyMin}`, `{readySkill}` | `config.verdict.ready.minOverall`, `.minEverySkill` |
 | `{almostMin}`, `{almostSkill}` | `config.verdict.almost.minOverall`, `.minEverySkill` |
 | `{passMark}` | `config.examPassMark` |
-| `{creditSure}`, `{creditGuessed}` | `config.credit.correctSure`, `.correctGuessed` |
+| `{creditSure}`, `{creditGuessed}`, `{creditSureWrong}` | `config.credit.correctSure`, `.correctGuessed`, `.sureWrong`. Method text: as numbers with a real minus ("1", "0.5", "−0.5"); buttons, briefing and review: `logic/points.js` ("+1", "½", "−½") |
 | `{weightReading}` etc. | `config.skillWeights.<id> × 100` |
 | `{stamp}` | `results.verdict[result.verdict].stamp` |
 | `{status}` | `results.ticket.status[result.verdict]` (boarding-pass status word) |

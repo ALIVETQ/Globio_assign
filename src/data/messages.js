@@ -132,8 +132,8 @@ export const MESSAGES = {
     ticket: "FLIGHT GL-A1 · SEAT Q{nn} · GATE {sectionDe}",
     confidenceLabel: "HOW SURE ARE YOU?", // above the buttons; "Choose an answer first" (disabledHelp) until an option is picked
     // Sub-lines of the two main buttons; points from config.js (0.5 shows as "½").
-    sureSub: "I know this · {creditSure} point",
-    guessedSub: "Lucky guess · {creditGuessed} point",
+    sureSub: "I know this · {creditSure} point, {creditSureWrong} if wrong",
+    guessedSub: "Lucky guess · {creditGuessed} point, nothing lost",
     routeTitle: "YOUR ROUTE",
     routeFooter: "{total} QUESTIONS · NO TIMER",
     topicTitle: "TOPIC",

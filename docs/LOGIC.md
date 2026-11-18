@@ -30,8 +30,11 @@ export const CONFIG = {
   credit: {
     correctSure: 1,
     correctGuessed: 0.5,
-    wrong: 0,        // wrong, whether sure or guessed
-    unknown: 0,      // "I don't know this yet"
+    // Makes honesty the best strategy: pressing "I'm sure" only pays off if
+    // you're more than 50% likely to be right. Without this, "sure" had no downside.
+    sureWrong: -0.5,  // sure, but wrong: a confident mistake costs half a point
+    guessedWrong: 0,
+    unknown: 0,       // "I don't know this yet"
   },
 
   // Both the overall score AND the weakest skill must clear the bar.
@@ -95,8 +98,8 @@ answers = {
 |---|---|---|---|---|
 | right + sure | `sureRight` | `credit.correctSure` (1) | 0 | `sureRight` |
 | right + guessed | `guessedRight` | `credit.correctGuessed` (0.5) | 1 | `guessedRight` |
-| wrong + sure | `sureWrong` | 0 | 3 | `sureWrong` |
-| wrong + guessed | `guessedWrong` | 0 | 2 | `notKnown` |
+| wrong + sure | `sureWrong` | `credit.sureWrong` (−0.5) | 3 | `sureWrong` |
+| wrong + guessed | `guessedWrong` | `credit.guessedWrong` (0) | 2 | `notKnown` |
 | "I don't know this yet" | `unknown` | 0 | 2 | `notKnown` |
 
 "Right" means `choice === question.answer` (both in original indexes).
@@ -110,10 +113,10 @@ answers = {
 For each section (skill):
 
 ```
-skillScore = round( (sum of credits in that section) / (number of questions in that section) × 100 )
+skillScore = round( max(0, (sum of credits in that section) / (number of questions in that section) × 100) )
 ```
 
-With 5 questions and half-point credits, skill scores are always multiples of 10.
+Sure-but-wrong credits are negative, so a skill is **clamped at 0 before rounding**: five sure-wrong answers score 0, not −50. With 5 questions and half-point credits, skill scores are always multiples of 10.
 
 Also record per skill: `correct` (right answers, sure or guessed) and `total`.
 
@@ -123,7 +126,7 @@ Also record per skill: `correct` (right answers, sure or guessed) and `total`.
 overall = round( Σ skillWeights[skill] × skillScoreUnrounded[skill] )
 ```
 
-Use the **unrounded** skill scores for the sum, then round once. With the current config the result is always a whole number anyway.
+Use the **clamped, unrounded** skill scores for the sum, then round once. With the current config the result is always a whole number anyway.
 
 **Rounding:** `Math.round` (half rounds up). **All comparisons in §5 use the rounded numbers** — the same numbers the learner sees — so the verdict always agrees with the screen.
 
@@ -348,7 +351,7 @@ Correct answers for reference: v1 1 · v2 2 · v3 1 · v4 1 · v5 1 · g1 1 · g
 | `perfect` | S S S S S | S S S S S | S S S S S |
 | `ready` | S S G S S | S X S S S | S S S W S |
 | `almostOverall` | S S G S U | S W S G S | S S S U G |
-| `almostWeakest` | S S S S S | S S S S S | S S G X X |
+| `almostWeakest` | S S S S S | S S S S S | S S G X W |
 | `notYetOverall` | S S U U U | S X S W U | S S U U U |
 | `notYetWeakest` | S S S S S | S S S S S | S G X X X |
 | `luckyGuesser` | G G G G G | G G G G G | G G G G G |
@@ -363,21 +366,21 @@ Each preset must produce exactly these results.
 | Preset | Vocab | Gram. | Read. | Overall | Verdict | blockedBy | Weakest | Recommendations (in order) | Lucky (count/correct, warn) |
 |---|---|---|---|---|---|---|---|---|---|
 | `perfect` | 100 | 100 | 100 | 100 | ready | null | reading | none | 0/15, no |
-| `ready` | 90 | 80 | 80 | 83 | ready | null | reading | accusative (sureWrong), readingSigns (guessedWrong), numbers (guessedRight) | 1/13, no |
+| `ready` | 90 | 70 | 80 | 80 | ready | null | grammar | accusative (sureWrong), readingSigns (guessedWrong), numbers (guessedRight) | 1/13, no |
 | `almostOverall` | 70 | 70 | 70 | 70 | almost | overall | reading | readingSigns (unknown), time (unknown), accusative (guessedWrong) | 3/12, no |
-| `almostWeakest` | 100 | 100 | 50 | 80 | almost | weakestSkill | reading | readingSigns (sureWrong), readingAds (guessedRight) | 1/13, no |
-| `notYetOverall` | 40 | 40 | 40 | 40 | notYet | overall | reading | readingSigns (unknown), accusative (sureWrong), readingAds (unknown) | 0/6, no |
-| `notYetWeakest` | 100 | 100 | 30 | 72 | notYet | weakestSkill | reading | readingSigns (sureWrong), readingAds (sureWrong), readingMessages (guessedRight) | 1/12, no |
+| `almostWeakest` | 100 | 100 | 40 | 76 | almost | weakestSkill | reading | readingSigns (sureWrong), readingAds (guessedRight) | 1/13, no |
+| `notYetOverall` | 40 | 30 | 40 | 37 | notYet | overall | grammar | readingSigns (unknown), accusative (sureWrong), modals (guessedWrong) | 0/6, no |
+| `notYetWeakest` | 100 | 100 | 0 | 60 | notYet | weakestSkill | reading | readingSigns (sureWrong), readingAds (sureWrong), readingMessages (guessedRight) | 1/12, no |
 | `luckyGuesser` | 50 | 50 | 50 | 50 | notYet | overall | reading | readingMessages (guessedRight), readingSigns (guessedRight), time (guessedRight) | 15/15, **yes** |
 | `allUnknown` | 0 | 0 | 0 | 0 | notYet | overall | reading | readingMessages (unknown), readingSigns (unknown), time (unknown) | 0/0, no |
 
 How the trickier rows are worked out:
 - **`ready`:** pains are accusative 3, readingSigns 2 (r4 wrong + r5 sure right), numbers 1 → sorted by pain.
 - **`almostOverall`:** readingSigns = r4 unknown (2) + r5 guessed right (1) = 3. Then time (v5 unknown, 2) and accusative (g2 guessed wrong, 2) tie on pain 2, on skill score (70 = 70) and on weight (0.3 = 0.3), so first appearance decides: v5 comes before g2. modals (g4, 1), numbers (v3, 1) and readingSigns are below. readingSigns' reason is `unknown` because unknown ranks above guessedRight.
-- **`notYetOverall`:** readingSigns 4 (r4 + r5 unknown), accusative 3 (sureWrong). Then six topics tie on pain 2 with every skill at 40; reading has the highest weight, so readingAds wins.
+- **`notYetOverall`:** readingSigns 4 (r4 + r5 unknown), accusative 3 (sureWrong). Then six topics tie on pain 2; grammar (30, lowered by g2's −½) is now the weakest skill, so its first pain-2 topic, modals (g4, guessed wrong), wins.
 - **`luckyGuesser`:** topics with two questions (time, readingMessages, readingSigns) have pain 2, the rest 1. All skills are 50, so weight decides: the two reading topics first (readingMessages appears before readingSigns), then time.
 - **`allUnknown`:** the same three two-question topics have pain 4; same tie-breaks.
-- **Weakest skill** is "reading" in every row: either it is strictly lowest, or it ties and wins on weight (§4.3).
+- **Weakest skill** is "reading" in most rows (strictly lowest, or tied and winning on weight, §4.3); in `ready` and `notYetOverall` g2's sure-wrong −½ makes grammar the lowest.
 
 ### Boundary tests (build these answer sets inside the test file)
 
@@ -394,6 +397,7 @@ How the trickier rows are worked out:
 - **Lucky-guess minimum count:** 1 right answer, guessed → share 1.0 but count 1 → **no** warning.
 - **Missing answers:** scoring `{}` gives the same result as `allUnknown`.
 - **Unknown ids:** an extra `{ zz: {...} }` entry changes nothing.
+- **Sure-but-wrong:** a skill with 5 sure-wrong answers scores 0, not negative (and the overall uses that 0); one sure-wrong next to four sure-right gives 70.
 - **Config change:** with `credit.correctGuessed = 0.25`, `luckyGuesser` gives skills 25 / 25 / 25 and overall 25.
 - **Purity:** calling `scoreCheck` twice with the same input returns deep-equal results and does not modify `answers`.
 

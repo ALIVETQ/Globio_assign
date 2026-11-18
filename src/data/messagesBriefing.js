@@ -11,7 +11,8 @@ export const BRIEFING_MESSAGES = {
     panels: [
       { id: "route", title: "Your route", text: "15 questions in 3 parts. About 6 minutes, no timer." },
       { id: "answer", title: "How to answer", text: "Pick an answer, then say how sure you are." },
-      { id: "guess", title: "Guesses count half", text: "A right guess earns half a point. Luck doesn’t help on exam day." },
+      // Points filled from config.js ({creditSure} 1, {creditGuessed} ½, {creditSureWrong} −½).
+      { id: "guess", title: "Be honest about how sure you are", text: "Sure and right: {creditSure} point. Guessed and right: {creditGuessed}. Sure but wrong: {creditSureWrong}. Only press “I’m sure” if you really think you’re right." },
       { id: "unknown", title: "Don’t know? Say so", text: "An honest result is more useful than a lucky one." },
       { id: "noHelp", title: "No help on board", text: "No dictionary, no translator, no asking a friend." },
       { id: "back", title: "You can go back", text: "Change any answer with Back. Your progress is saved if you refresh." },

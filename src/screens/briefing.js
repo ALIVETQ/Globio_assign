@@ -9,9 +9,18 @@ import { BRIEFING_ART } from "../components/briefingArt.js";
 import { seatbeltHTML, setSeatbelt } from "../components/seatbelt.js";
 import { playBriefing, playTakeOff } from "../motion/briefingMotion.js";
 import { playSeatbelt } from "../motion/seatbeltMotion.js";
+import { CONFIG } from "../data/config.js";
+import { fill } from "../logic/fill.js";
+import { formatPoints } from "../logic/points.js";
 
 const B = MESSAGES.briefing;
 const live = new WeakMap();
+// Panel 3 states the scoring; its numbers come from config.js.
+const POINTS = {
+  creditSure: formatPoints(CONFIG.credit.correctSure),
+  creditGuessed: formatPoints(CONFIG.credit.correctGuessed),
+  creditSureWrong: formatPoints(CONFIG.credit.sureWrong),
+};
 
 function panelsHTML() {
   return B.panels
@@ -21,7 +30,7 @@ function panelsHTML() {
         <div class="panel__art">${BRIEFING_ART[p.id]()}</div>
         <span class="panel__num">${String(i + 1).padStart(2, "0")}</span>
         <h2 class="panel__title">${esc(p.title)}</h2>
-        <p class="panel__text">${esc(p.text)}</p>
+        <p class="panel__text">${esc(fill(p.text, POINTS))}</p>
       </li>`,
     )
     .join("");

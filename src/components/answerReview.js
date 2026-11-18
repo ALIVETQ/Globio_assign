@@ -8,6 +8,7 @@ import { MESSAGES } from "../data/messages.js";
 import { QUESTIONS } from "../data/questions.js";
 import { esc } from "../dom.js";
 import { fill } from "../logic/fill.js";
+import { formatPoints } from "../logic/points.js";
 
 const RV = MESSAGES.review;
 const M = MESSAGES.method;
@@ -33,6 +34,7 @@ function row(p) {
       <div class="review__status">
         <span class="chip chip--conf">${esc(RV.chip[p.confidence])}</span>
         <span class="review__mark" aria-hidden="true">${mark}</span>
+        ${p.credit < 0 ? `<span class="review__cost">${esc(formatPoints(p.credit))}</span>` : ""}
         <span class="sr-only">${esc(p.correct ? RV.srCorrect : RV.srWrong)}</span>
       </div>
     </li>`;

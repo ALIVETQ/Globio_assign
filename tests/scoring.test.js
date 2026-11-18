@@ -8,15 +8,15 @@ import { CTX, score, answersBySection } from "./helpers.js";
 // LOGIC.md §13 table: [vocab, grammar, reading, overall, verdict, blockedBy, weakest, recs, lucky]
 const TABLE = {
   perfect: [100, 100, 100, 100, "ready", null, "reading", [], [0, 15, false]],
-  ready: [90, 80, 80, 83, "ready", null, "reading",
+  ready: [90, 70, 80, 80, "ready", null, "grammar",
     [["accusative", "sureWrong"], ["readingSigns", "guessedWrong"], ["numbers", "guessedRight"]], [1, 13, false]],
   almostOverall: [70, 70, 70, 70, "almost", "overall", "reading",
     [["readingSigns", "unknown"], ["time", "unknown"], ["accusative", "guessedWrong"]], [3, 12, false]],
-  almostWeakest: [100, 100, 50, 80, "almost", "weakestSkill", "reading",
+  almostWeakest: [100, 100, 40, 76, "almost", "weakestSkill", "reading",
     [["readingSigns", "sureWrong"], ["readingAds", "guessedRight"]], [1, 13, false]],
-  notYetOverall: [40, 40, 40, 40, "notYet", "overall", "reading",
-    [["readingSigns", "unknown"], ["accusative", "sureWrong"], ["readingAds", "unknown"]], [0, 6, false]],
-  notYetWeakest: [100, 100, 30, 72, "notYet", "weakestSkill", "reading",
+  notYetOverall: [40, 30, 40, 37, "notYet", "overall", "grammar",
+    [["readingSigns", "unknown"], ["accusative", "sureWrong"], ["modals", "guessedWrong"]], [0, 6, false]],
+  notYetWeakest: [100, 100, 0, 60, "notYet", "weakestSkill", "reading",
     [["readingSigns", "sureWrong"], ["readingAds", "sureWrong"], ["readingMessages", "guessedRight"]], [1, 12, false]],
   luckyGuesser: [50, 50, 50, 50, "notYet", "overall", "reading",
     [["readingMessages", "guessedRight"], ["readingSigns", "guessedRight"], ["time", "guessedRight"]], [15, 15, true]],
@@ -53,6 +53,14 @@ describe("presets (LOGIC.md §13)", () => {
       label: CTX.topics.accusative.label,
       tip: CTX.topics.accusative.tip,
     });
+  });
+
+  it("sure-but-wrong costs half a point; a skill never goes below 0", () => {
+    const all = score(answersBySection({ vocabulary: "XXXXX", grammar: "SSSSS", reading: "SSSSS" }));
+    expect(all.skills.vocabulary.score).toBe(0); // −2.5 points clamps to 0, not −50
+    expect(all.overall).toBe(70); // overall uses the clamped 0: 0.3·0 + 0.3·100 + 0.4·100
+    const one = score(answersBySection({ vocabulary: "XSSSS", grammar: "SSSSS", reading: "SSSSS" }));
+    expect(one.skills.vocabulary.score).toBe(70); // (4 − 0.5) / 5
   });
 
   it("perfect shows no recommendations", () => {
