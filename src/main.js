@@ -172,3 +172,7 @@ sync();
 if (new URLSearchParams(location.search).has("debug")) {
   import("./debug/debugPanel.js").then((m) => m.mountDebugPanel({ replay }));
 }
+// The demo guide (a presenter tool for the walkthrough video) only with ?demo=1.
+if (new URLSearchParams(location.search).has("demo")) {
+  import("./debug/demoGuide.js").then((m) => m.mountDemoGuide({ S })); // the app's own state module, so both see the same state
+}
