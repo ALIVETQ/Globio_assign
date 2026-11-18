@@ -172,8 +172,12 @@ One canvas, created once, used on the landing page. (It used to appear on the re
 | Take-off (first flight) | At t = 1.1 s the plane takes off from India and flies to Germany (3.2 s, `power1.inOut`); the arc is drawn **behind the plane** as it flies (the route never draws itself). After the first flight the whole arc stays drawn. |
 | Plane (landing) | Each flight: grows from 55% to full size over the first 10% of the route (take-off) and shrinks back over the last 10% (landing), then is gone while it rests 1.2 s at Germany (the Germany pin pulses once: a ring growing from 1× to 2.4× pin radius and fading out over 0.8 s). Then the next flight takes off from India along the drawn route. |
 | Sway | Continuous from t = 0 (§3.2) |
+| Other journeys | Five extra routes, no pins or labels: Mumbai (19.08N, 72.88E) → Frankfurt (50.11N, 8.68E), Bengaluru (12.97N, 77.59E) → Munich (48.14N, 11.58E), Chennai (13.08N, 80.27E) → Stuttgart (48.78N, 9.18E), Hyderabad (17.39N, 78.49E) → Hamburg (53.55N, 9.99E), Kolkata (22.57N, 88.36E) → Berlin. From t = 2.4 s, every 1.6 s one starts at random (never the same route twice at once, at most 2 at a time; a start is skipped when 2 are flying): its arc draws in over 0.8 s (cobalt at 25%, 0.8px), a 1.5px cobalt dot travels along it in 2.4 s, then the arc fades out over 0.6 s. Drawn under the main route (`motion/globeLife.js`). |
+| Take-off rings | On each departure of the main flight, 3 rings expand from the India pin: radius 0 → 28px·k, alpha .5 → 0, 1.2 s each, 250 ms apart. |
+| Arrival | When the plane lands: a radial cobalt glow at Germany (0.4 s), and the Germany label flips to `globe.labelArrived` ("ANKUNFT") with a split-flap style scramble (letters lock left to right, 0.5 s), holds 0.8 s, then flips back to "GERMANY" (0.5 s). The pin's pulse ring plays as before. |
+| Drag to spin | Mouse/pen drag changes the view (longitude, and latitude clamped to ±35°); on release it spins on with inertia (velocity × 0.92 per frame); after 1.5 s without input it eases back to the default view over 1.2 s (`power2.inOut`). Cursor `grab` / `grabbing`. Touch is ignored, so phones scroll normally (`motion/globeDrag.js`). |
 | Pausing | Stop the loop when the canvas is off-screen or the tab is hidden. |
-| Reduced motion | Draw one still frame: sway at 0, pins shown, arc fully drawn, the plane on it at 62% of the way (mid-flight), no contrail. |
+| Reduced motion | Draw one still frame: sway at 0, pins shown, arc fully drawn, the plane on it at 62% of the way (mid-flight), no contrail, no other journeys, no rings or flash, no drag. |
 
 ---
 

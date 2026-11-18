@@ -20,6 +20,7 @@ export const MESSAGES = {
   globe: {
     labelFrom: "INDIA",
     labelTo: "GERMANY",
+    labelArrived: "ANKUNFT", // flips in (split-flap) for 0.8 s when the plane lands (DESIGN.md §3.6)
   },
 
   // Sun/moon button (CONTENT.md §4). Says what pressing it will do.

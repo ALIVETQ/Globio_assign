@@ -243,6 +243,7 @@ h1:focus {
 
 /* ── Globe canvas (motion/globe.js): fills whatever slot it is mounted in ── */
 .globe-canvas {
+  pointer-events: auto; /* drag to spin (the slot itself ignores the pointer) */
   position: absolute;
   inset: 0;
   display: block;

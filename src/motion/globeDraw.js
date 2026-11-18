@@ -3,6 +3,7 @@
 // calls drawFrame(). Every number below is from DESIGN.md §3.
 import landDots from "../data/landdots.json";
 import { drawPlane } from "./globePlane.js";
+import { drawTraffic, drawEvents } from "./globeLife.js";
 
 const DEG = Math.PI / 180;
 export const VIEW_LAT = 30; // °N: India and Germany both on the visible face
@@ -48,9 +49,9 @@ export const ARC = (() => {
 })();
 
 // Rotate around the vertical axis by −viewLon, then the horizontal axis by viewLat.
-export function rotator(viewLonDeg) {
+export function rotator(viewLonDeg, viewLatDeg = VIEW_LAT) {
   const cl = Math.cos(viewLonDeg * DEG), sl = Math.sin(viewLonDeg * DEG);
-  const cp = Math.cos(VIEW_LAT * DEG), sp = Math.sin(VIEW_LAT * DEG);
+  const cp = Math.cos(viewLatDeg * DEG), sp = Math.sin(viewLatDeg * DEG);
   return (x, y, z) => {
     const x1 = x * cl - z * sl;
     const z1 = z * cl + x * sl;
@@ -96,12 +97,13 @@ function radial(ctx, x0, y0, r0, x1, y1, r1, stops) {
   return g;
 }
 
-// f = { w, h, cx, cy, R, viewLon, alpha, pins: {from, to}, arc, plane, planeSize, trail, pulse, labels, colors, dots }
+// f = { w, h, cx, cy, R, viewLon, viewLat, alpha, pins: {from, to}, arc, plane, planeSize, trail, pulse,
+//       traffic, rings, flash, labels, colors, dots }
 export function drawFrame(ctx, f) {
   const { cx, cy, R, colors } = f;
   const k = R / 400;
   const pal = colors.dark ? PALETTE.dark : PALETTE.light;
-  const rot = rotator(f.viewLon);
+  const rot = rotator(f.viewLon, f.viewLat);
   const px = (p) => [cx + R * p[0], cy - R * p[1]];
 
   ctx.clearRect(0, 0, f.w, f.h);
@@ -155,6 +157,9 @@ export function drawFrame(ctx, f) {
   ctx.arc(cx, cy, R - 0.8, -2.4, -0.3);
   ctx.stroke();
 
+  // 5b. Other journeys (globeLife.js), under the main route
+  if (f.traffic?.length) drawTraffic(ctx, f, { rot, px, hidden });
+
   // 6. Arc, drawn up to f.arc of its length; runs break where it passes behind
   if (f.arc > 0) {
     const n = f.arc * (ARC_POINTS - 1);
@@ -178,6 +183,9 @@ export function drawFrame(ctx, f) {
 
   // 7. Pins with labels (and the Germany arrival pulse)
   const pinR = Math.max(3.5, 5 * k);
+  // Departure rings at India and the arrival flash at Germany, under the pins
+  const onFace = (v) => { const p = rot(...v); return p[2] > 0.02 ? px(p) : null; };
+  if (f.rings?.length || f.flash != null) drawEvents(ctx, f, { from: onFace(FROM), to: onFace(TO), k });
   ctx.font = `500 ${Math.max(10, 12.5 * k)}px ${colors.monoFont}`;
   ctx.textAlign = "center";
   ctx.textBaseline = "bottom";

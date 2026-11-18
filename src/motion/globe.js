@@ -10,7 +10,9 @@
 // frame is drawn instead).
 import { gsap } from "./gsap.js";
 import { reducedMotion, lowPower, timeScale, onPrefsChange } from "./prefs.js";
-import { buildDots, drawFrame, VIEW_LON } from "./globeDraw.js";
+import { buildDots, drawFrame, VIEW_LON, VIEW_LAT } from "./globeDraw.js";
+import { createTraffic, arrivalLabel } from "./globeLife.js";
+import { createDrag } from "./globeDrag.js";
 import { MESSAGES } from "../data/messages.js";
 
 const clamp01 = (v) => Math.min(1, Math.max(0, v));
@@ -30,6 +32,10 @@ let clock = 0, lastTs = null, rafId = null;
 let onScreen = true, manualPause = false;
 let resizeObs = null, intersectObs = null, unsubPrefs = null;
 let box = { w: 0, h: 0, cx: 0, cy: 0, R: 0 };
+const traffic = createTraffic(); // the other India → Germany journeys (globeLife.js)
+let drag = null; // drag to spin (globeDrag.js)
+let view = { lon: 0, lat: 0 }; // the drag's current offset
+const RING_GAP = 0.25, RING = 1.2, FLASH = 0.4;
 
 function readColors() {
   const css = getComputedStyle(document.documentElement);
@@ -78,13 +84,17 @@ function frameAt(t) {
     colors,
     labels: { from: MESSAGES.globe.labelFrom, to: MESSAGES.globe.labelTo },
     alpha: still ? 1 : 1 - (1 - clamp01(t / 1.1)) ** 3,
-    viewLon: still ? VIEW_LON : VIEW_LON + 10 * Math.sin((2 * Math.PI * t) / 40),
+    viewLon: still ? VIEW_LON : VIEW_LON + 10 * Math.sin((2 * Math.PI * t) / 40) + view.lon,
+    viewLat: still ? VIEW_LAT : VIEW_LAT + view.lat,
     pins: still ? { from: 1, to: 1 } : { from: clamp01((t - 0.8) / 0.6), to: clamp01((t - 0.96) / 0.6) },
     arc: 0,
     plane: null,
     planeSize: 1, // 0.55 on the ground → 1 at cruising height
     trail: [],
     pulse: null,
+    traffic: [],
+    rings: [],
+    flash: null,
   };
 
   if (still) {
@@ -92,10 +102,20 @@ function frameAt(t) {
     f.plane = STILL_AT;
     return f;
   }
+  f.traffic = traffic.at(t);
   if (t < TAKE_OFF) return f;
   const cycle = FLY + REST;
   const flight = Math.floor((t - TAKE_OFF) / cycle); // 0 = the first flight
   const c = (t - TAKE_OFF) % cycle;
+  // Take-off: 3 rings from India, 250 ms apart, 1.2 s each.
+  for (let i = 0; i < 3; i++) {
+    const p = (c - i * RING_GAP) / RING;
+    if (p >= 0 && p < 1) f.rings.push(p);
+  }
+  // Landing: a flash at Germany (0.4 s), and the label flips to ANKUNFT and back.
+  const sinceLanding = c >= FLY ? c - FLY : flight > 0 ? c + REST : null;
+  if (sinceLanding !== null && sinceLanding < FLASH) f.flash = sinceLanding / FLASH;
+  f.labels.to = arrivalLabel(sinceLanding, MESSAGES.globe.labelTo, MESSAGES.globe.labelArrived);
   if (c < FLY) {
     const u = c / FLY;
     f.plane = planeEase(u);
@@ -127,6 +147,7 @@ function tick(ts) {
   const dt = lastTs === null ? 0 : Math.min((ts - lastTs) / 1000, 0.1);
   lastTs = ts;
   clock += dt * timeScale;
+  if (drag) view = drag.step(performance.now());
   draw();
   rafId = requestAnimationFrame(tick);
 }
@@ -164,6 +185,8 @@ export function mount(el) {
   if (container) unmount();
   container = el;
   clock = 0; // replay the intro on every mount
+  traffic.reset();
+  view = { lon: 0, lat: 0 };
   colors = readColors();
   el.append(canvas);
   layout();
@@ -181,6 +204,8 @@ export function mount(el) {
   document.addEventListener("visibilitychange", onVisibility);
   window.addEventListener("examready:theme", onTheme);
   unsubPrefs = onPrefsChange(update);
+  // Mouse / pen only; not under reduced motion (the globe is a still frame then).
+  if (!reducedMotion) drag = createDrag(canvas, { radius: () => box.R, baseLat: VIEW_LAT });
   // Canvas text needs the mono font; redraw once it has loaded (matters for still frames).
   document.fonts?.ready.then(() => container === el && draw());
   update();
@@ -195,6 +220,8 @@ export function unmount() {
   document.removeEventListener("visibilitychange", onVisibility);
   window.removeEventListener("examready:theme", onTheme);
   resizeObs = intersectObs = unsubPrefs = null;
+  drag?.destroy();
+  drag = null;
   canvas?.remove();
   container = null;
   manualPause = false;

@@ -408,6 +408,7 @@ page: {
 globe: {
   labelFrom: "INDIA",
   labelTo: "GERMANY",
+  labelArrived: "ANKUNFT", // flips in (split-flap) for 0.8 s when the plane lands (DESIGN.md §3.6)
 },
 
 // Sun/moon theme button (aria-label + tooltip): what pressing it will do.

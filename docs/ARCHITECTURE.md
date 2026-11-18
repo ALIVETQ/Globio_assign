@@ -146,6 +146,8 @@ Globio_assign/                 ← repo root (GitHub: Globio_assign)
 │   │   ├── globe.js           ← canvas globe singleton (landing page): lifecycle, loop, pausing
 │   │   ├── globeDraw.js       ← globe geometry + one-frame drawing (DESIGN.md §3.1–3.4)
 │   │   ├── globePlane.js      ← the globe's airliner + contrail (DESIGN.md §3.4 item 8)
+│   │   ├── globeLife.js       ← globe: other journeys, take-off rings, arrival flash + ANKUNFT label
+│   │   ├── globeDrag.js       ← globe: drag to spin (mouse/pen), inertia, ease back
 │   │   ├── glitch.js          ← glitch reveal / glitch-out
 │   │   ├── glow.js            ← horizon glow screen transition
 │   │   ├── fadeUp.js          ← fade-up helper (DESIGN.md §4.3)
