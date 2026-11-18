@@ -10,6 +10,7 @@ import { esc } from "../dom.js";
 import { fill } from "../logic/fill.js";
 import { rawPathOf, placePlane, setDone, flyPlane } from "../motion/journeyMotion.js";
 import { themeToggleHTML } from "./themeToggle.js";
+import { PLANE_SHAPE } from "../motion/globePlane.js";
 
 const T = MESSAGES.journey;
 const H = 44;
@@ -18,8 +19,10 @@ const BASE_Y = 30; // dots sit here at the ends …
 const RISE = 10; // … and 10px higher in the middle
 const SECTION_GAP = 1.6; // spacing between sections, in normal spacings
 const PLANE_LIFT = 12; // the plane sits just above its dot
-// A 14px paper plane pointing right (+x), centred on 0,0, lifted above the path.
-const PLANE = `<g transform="translate(0 -${PLANE_LIFT})"><path d="M-7 -6 L7 0 L-7 6 L-4 0 Z"/></g>`;
+// The globe's airliner (top view, 24 units) at 18px, pointing right (+x), lifted
+// above the path. The inner group is what climbs during a flight (journeyMotion.js).
+const PLANE_D = `M${PLANE_SHAPE.map(([x, y]) => `${x} ${y}`).join(" L")} Z`;
+const PLANE = `<g class="journey__lift" transform="translate(0 -${PLANE_LIFT})"><path transform="scale(0.75)" d="${PLANE_D}"/></g>`;
 
 // Where the bar was last shown, so the next bar can fly the plane from there.
 let last = null; // { attempt, index }

@@ -4,7 +4,7 @@
 
 // An airliner seen from above, nose pointing +x, 24 units long (scaled to size).
 const HALF = [[12, 0], [9, -1.6], [2, -1.9], [-4, -10.5], [-7, -10.5], [-3.5, -1.9], [-8, -1.7], [-11, -5.5], [-13, -5.5], [-11.5, 0]];
-const PLANE_SHAPE = [...HALF, ...HALF.slice(1, -1).reverse().map(([x, y]) => [x, -y])];
+export const PLANE_SHAPE = [...HALF, ...HALF.slice(1, -1).reverse().map(([x, y]) => [x, -y])];
 
 // helpers from drawFrame: rot/px/hidden (projection), arcPoint (route), k (size), halo (colour).
 export function drawPlane(ctx, f, { rot, px, hidden, arcPoint, k, halo }) {

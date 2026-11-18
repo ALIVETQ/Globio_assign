@@ -433,7 +433,7 @@ Reduced motion: no slide (giant word static, centred, clipped), auto-advance aft
   - Current: white fill, 2px cobalt ring, radius 6.
   - Upcoming: filled `--periwinkle`, radius 3.5.
   - The path itself: 1.5px; the part up to the current dot is cobalt, the rest `--hairline`.
-- **Plane:** a small cobalt paper-plane glyph (inline SVG, 14px), sitting on the current dot, pointing along the path.
+- **Plane:** the globe's cobalt airliner (top view, inline SVG, 18px long), sitting 12px above the current dot, pointing along the path.
 - Phone: labels shortened to `journey.fromShort` / `journey.toShort` ("IN" / "DE").
 
 ### 7.5 Layout — reading questions (passages)
@@ -485,7 +485,7 @@ Above every passage, a mono label naming the format: `reading.formatEmail`, `rea
 | **"I'm sure" pressed** | A white-to-cobalt fill sweeps left → right across the button (clip-path, 0.22 s), then the question exits. |
 | **"I guessed" pressed** | The button wobbles: rotate 0 → −3° → 3° → −1.5° → 0 over **0.22 s** (was 0.35 s), `power1.inOut`, together with the question exit. |
 | **"I don't know" pressed** | The options fade to 40% opacity (0.15 s), then the question exits. |
-| **Journey bar** | On every confirm: the cobalt line extends to the next dot and the plane moves along the path to it (MotionPath, 0.5 s, `power2.inOut`); the dot it leaves fills cobalt with a 1 → 1.4 → 1 scale pop (0.25 s). On Back, the plane moves backwards. |
+| **Journey bar** | On every confirm: the cobalt line extends to the next dot and the airliner flies along the path to it (MotionPath, 0.5 s, `power2.inOut`), climbing up to 7px higher and 20% larger mid-flight (a sine curve: take-off → cruise → landing) and settling back onto the next dot; the dot it leaves fills cobalt with a 1 → 1.4 → 1 scale pop (0.25 s). On Back, the plane moves backwards. |
 | **Back** | Mirror of enter/exit (enter from the left). |
 
 **Timing within the 0.6 s budget (§10 rule 3):** the button feedback for "I'm sure", "I guessed" and "I don't know" starts *together with* the question exit, not before it. Exit 0.22 s + enter 0.32 s = 0.54 s for every kind of confirm. All three finish inside the exit: the sure sweep (0.22 s), the guessed wobble (sped up from 0.35 s to 0.22 s so the full rotate sequence completes before the screen swaps) and the don't-know fade (0.15 s). Played strictly one after the other at the original timings, "I guessed" would take 0.89 s.
